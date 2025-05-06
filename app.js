@@ -1,11 +1,12 @@
+const express = require('express');
+const path = require('path');
 var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+//각 실행경로 설정
+const mainRouter = require('./routes/main');
+const usersRouter = require('./routes/users');
 
 var app = express();
 
@@ -19,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/', mainRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
@@ -38,4 +39,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+//module.exports = app;
+const SubpoRt = 3001;
+app.listen(SubpoRt, () => {
+  console.log(`서버가 ${SubpoRt} 실행됩니다.`);
+});

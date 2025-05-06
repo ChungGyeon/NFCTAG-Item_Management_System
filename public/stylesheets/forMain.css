@@ -1,0 +1,74 @@
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+.main-grid-container {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  grid-template-rows: 100px 1fr 100px;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas:
+        "header header header"
+        "main   main  main"
+        "main   main  main";
+}
+header {
+  grid-area: header;
+  background-color: #f0f0f0;
+  text-align: center;
+  padding: 20px;
+  display: flex;
+  flex-direction: column; /* 요소를 세로로 정렬 */
+  align-items: center; /* 가운데 정렬 */
+}
+main {
+  grid-area: main;
+  background-color: #e0e0e0;
+  padding: 20px;
+  overflow: auto;
+  display: flex; /* 플렉스 레이아웃 활성화 */
+  flex-direction: column; /* 세로 정렬 */
+  justify-content: flex-end; /* 아래로 배치 */
+}
+
+/*앞 배너*/
+.indroduction-img-container {
+  position: relative;
+  width: 300px; /* 원하는 너비 */
+  height: auto;
+  align-items: center;
+}
+.welcome-img {
+  position: relative;
+  grid-area: header; /* 그리드에서 헤더 영역에 배치 */
+  width: 700px;
+  height: 250px;
+  z-index: 10;
+}
+.bottom-text {
+  position: absolute;
+  bottom: 100px;
+  height: 33.33%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  color: black;
+  font-weight: bold;
+  font-size: 1.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*물품 display되는 구간*/
+.itemDetails {
+}
+
+.itemDetail-card {
+  width: 250px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
