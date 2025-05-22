@@ -2,7 +2,7 @@ body, html {
   margin: 0;
   padding: 0;
 }
-
+/*
 .main-grid-container {
   display: grid;
   width: 100vw;
@@ -13,7 +13,13 @@ body, html {
         "header header header"
         "main   main  main"
         "main   main  main";
+}*/
+.main-grid-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+
 header {
   grid-area: header;
   background-color: #f0f0f0;
@@ -66,9 +72,33 @@ main {
 }
 
 .itemDetail-card {
-  width: 250px;
+  width: 200px;
   background: white;
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+
+
+header {
+  padding: 20px;
+  background-color: #f5f5f5;
+  text-align: center;
+}
+
+main {
+  flex: 1;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.itemDetail-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
 }
