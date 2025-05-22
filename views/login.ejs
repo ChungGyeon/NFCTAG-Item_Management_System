@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <link rel="stylesheet" href="/stylesheets/login.css">
+</head>
+<body>
+  <div class="login-container">
+    <h2>🔐 로그인</h2>
+    <form action="/users/login" method="POST">
+      <label for="studentnum">학번</label>
+      <input type="text" id="studentnum" name="studentnum" required>
+
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">로그인</button>
+    </form>
+  </div>
+</body>
+</html>
