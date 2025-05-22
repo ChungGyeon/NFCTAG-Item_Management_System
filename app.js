@@ -21,12 +21,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', mainRouter);
-app.use('/users', usersRouter);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+//app.use('/users', usersRouter);
+app.use('/users', require('./routes/users'));
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -39,6 +35,11 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+/*
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});*/
 
 //module.exports = app;
 const SubpoRt = 3001;

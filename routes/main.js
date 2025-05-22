@@ -7,13 +7,3 @@ router.get('/', function(req, res, next) {
 });
 
 module.exports = router;
-
-router.get('/', (req, res) => {
-  res.redirect('/login');
-});
-
-router.get('/login', (req, res) => {
-  res.render('login');
-});
-
-module.exports = router;
