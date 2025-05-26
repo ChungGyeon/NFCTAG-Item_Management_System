@@ -4,6 +4,7 @@ const createError = require('http-errors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하는 그거
 
 //각 실행경로 설정
 const mainRouter = require('./routes/main');
