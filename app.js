@@ -21,6 +21,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+/* 세션설정 */
+app.use(session({ // 세션 설정
+    secret: 'tagorder-secret-key',
+    resave: false,
+    saveUninitialized: false
+}));
+
 app.use('/', mainRouter);
 //app.use('/users', usersRouter);
 app.use('/users', require('./routes/users'));
