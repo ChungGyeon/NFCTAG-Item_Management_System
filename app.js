@@ -1,8 +1,9 @@
 const express = require('express');
 const path = require('path');
-var createError = require('http-errors');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
 //각 실행경로 설정
 const mainRouter = require('./routes/main');
