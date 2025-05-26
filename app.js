@@ -1,8 +1,10 @@
 const express = require('express');
 const path = require('path');
-var createError = require('http-errors');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하는 그거
 
 //각 실행경로 설정
 const mainRouter = require('./routes/main');
@@ -20,13 +22,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', mainRouter);
-app.use('/users', usersRouter);
+/* 세션설정 */
+app.use(session({ // 세션 설정
+    secret: 'SESSION_SECRET',
+    resave: false,
+    saveUninitialized: false
+}));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+app.use('/', mainRouter);
+//app.use('/users', usersRouter);
+app.use('/users', require('./routes/users'));
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -39,6 +44,11 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+/*
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});*/
 
 //module.exports = app;
 const SubpoRt = 3001;
