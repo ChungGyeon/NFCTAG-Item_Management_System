@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /* 세션설정 */
 app.use(session({ // 세션 설정
-    secret: 'tagorder-secret-key',
+    secret: 'SESSION_SECRET',
     resave: false,
     saveUninitialized: false
 }));
