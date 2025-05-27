@@ -24,3 +24,6 @@ router.get('/LoadMysql', (req, res) => {
     });
 });
 module.exports = router;
+
+
+//히히 오줌발싸
