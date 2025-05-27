@@ -10,6 +10,7 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 //각 실행경로 설정
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
+const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
 var app = express();
 
@@ -29,7 +30,7 @@ app.use(session({ // 세션 설정
     resave: false,
     saveUninitialized: false
 }));
-
+/*
 //mysql DB 연결변수 설정
 const db = mysql.createConnection({
     host: process.env.IMS_DB_HOST,
@@ -39,6 +40,35 @@ const db = mysql.createConnection({
     port: process.env.IMS_DB_PORTNUM,
     multipleStatements: true // 여러 쿼리 실행을 허용
 });
+
+//db 연결
+db.connect((err) => {
+    if (err) {
+        console.error('데이터베이스 연결 실패: ' + err.stack);
+        const readline = require('readline'); //readline 활성화
+        const tsuzukeru = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
+
+        tsuzukeru.question('계속 진행하겠습니까? (Y/N)', (answer) => {
+            if(answer=='Y' || answer=='y'){
+                console.log('계속 진행합니다');
+                testPageConnect=true;
+                tsuzukeru.close();
+            }
+            else{
+                console.log('잘못 입력했어도 종료합니다.')
+                tsuzukeru.close();
+                process.exit(1);
+            }
+        });
+    }
+    else{
+        console.log('데이터베이스와 연결 성공!');
+    }
+});
+*/
 
 app.use('/', mainRouter);
 //app.use('/users', usersRouter);
@@ -55,6 +85,19 @@ app.use('/users', require('./routes/users'));
 //         res.render('main',{ items: results });
 //     });
 // });
+
+
+app.get('/LoadMysql', (req, res) => {
+    const sql = 'SELECT itemName, img FROM Items';
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('DB 오류:', err);
+        }
+
+        res.render('main',{ items: results });
+    });
+});
 
 
 // error handler
@@ -79,3 +122,4 @@ const SubpoRt = 3001;
 app.listen(SubpoRt, () => {
   console.log(`서버가 ${SubpoRt} 실행됩니다.`);
 });
+
