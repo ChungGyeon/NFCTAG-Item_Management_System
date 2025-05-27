@@ -40,38 +40,22 @@ const db = mysql.createConnection({
     multipleStatements: true // 여러 쿼리 실행을 허용
 });
 
-//db 연결
-db.connect((err) => {
-    if (err) {
-        console.error('데이터베이스 연결 실패: ' + err.stack);
-        const readline = require('readline'); //readline 활성화
-        const tsuzukeru = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        });
-
-        tsuzukeru.question('계속 진행하겠습니까? (Y/N)', (answer) => {
-            if(answer=='Y' || answer=='y'){
-                console.log('계속 진행합니다');
-                testPageConnect=true;
-                tsuzukeru.close();
-            }
-            else{
-                console.log('잘못 입력했어도 종료합니다.')
-                tsuzukeru.close();
-                process.exit(1);
-            }
-        });
-    }
-    else{
-        console.log('데이터베이스와 연결 성공!');
-    }
-});
-
-
 app.use('/', mainRouter);
 //app.use('/users', usersRouter);
 app.use('/users', require('./routes/users'));
+
+// app.get('/LoadMysql', (req, res) => {
+//     const sql = 'SELECT itemName, img FROM Items';
+//
+//     db.query(sql, (err, results) => {
+//         if (err) {
+//             console.error('DB 오류:', err);
+//         }
+//
+//         res.render('main',{ items: results });
+//     });
+// });
+
 
 // error handler
 app.use(function(err, req, res, next) {
