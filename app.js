@@ -10,6 +10,7 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 //각 실행경로 설정
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
+const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
 var app = express();
 
@@ -29,7 +30,7 @@ app.use(session({ // 세션 설정
     resave: false,
     saveUninitialized: false
 }));
-
+/*
 //mysql DB 연결변수 설정
 const db = mysql.createConnection({
     host: process.env.IMS_DB_HOST,
@@ -67,7 +68,7 @@ db.connect((err) => {
         console.log('데이터베이스와 연결 성공!');
     }
 });
-
+*/
 
 app.use('/', mainRouter);
 //app.use('/users', usersRouter);
@@ -95,3 +96,4 @@ const SubpoRt = 3001;
 app.listen(SubpoRt, () => {
   console.log(`서버가 ${SubpoRt} 실행됩니다.`);
 });
+
