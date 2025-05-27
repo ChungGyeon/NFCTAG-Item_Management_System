@@ -1,48 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/forMain.css' />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/stylesheets/forMain.css" />
   </head>
   <body>
     <div class="main-grid-container">
       <header>
-        <h1><%= title %></h1>
-        <img class="welcome-img" src="/images/put_out_the_picture.jpg">
+
+        <img class="welcome-img" src="/images/put_out_the_picture.jpg" />
         <div class="indroduction-img-container">
           <p class="bottom-text">잠시 빌리려 왔습니다</p>
         </div>
       </header>
 
       <main>
-        <div class="itemDetail-card">
-          <h3>테스트 물품1</h3>
-          <ul>
-            <li>
-              <p>이미지가 여기에</p>
-            </li>
-          </ul>
-        </div>
-        <div class="itemDetail-card">
-          <h3>테스트 물품1</h3>
-          <ul>
-            <li>
-              <p>이미지가 여기에</p>
-            </li>
-          </ul>
-        </div>
-        <div class="itemDetail-card">
-          <h3>테스트 물품1</h3>
-          <ul>
-            <li>
-              <p>이미지가 여기에</p>
-            </li>
-          </ul>
-        </div>
-
-
+        <% items.forEach(item => { %>
+          <div class="itemDetail-card">
+            <h3><%= item.itemName %></h3>
+            <ul>
+              <li>
+                <img src="<%= item.img %>" alt="<%= item.itemName %>" />
+              </li>
+            </ul>
+          </div>
+        <% }) %>
       </main>
     </div>
   </body>

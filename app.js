@@ -68,10 +68,27 @@ db.connect((err) => {
     }
 });
 
+app.use((req, res, next) => {
+    req.db = db;
+    next();
+});
 
 app.use('/', mainRouter);
 //app.use('/users', usersRouter);
 app.use('/users', require('./routes/users'));
+
+app.get('/LoadMysql', (req, res) => {
+    const sql = 'SELECT itemName, img FROM Items';
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('DB 오류:', err);
+        }
+
+        res.render('main',{ items: results });
+    });
+});
+
 
 // error handler
 app.use(function(err, req, res, next) {
