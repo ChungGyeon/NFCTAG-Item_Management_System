@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const mysql = require('mysql'); //mysql 모듈 불러오기
+let testPageConnect = false; //테스트 페이지 연결 여부 변수
 require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하는 그거
 
 //mysql DB 연결변수 설정
@@ -41,4 +42,6 @@ db.connect((err) => {
     }
 });
 
-module.exports = db;
+module.exports = {db,
+    testPageConnect: () => testPageConnect
+};
