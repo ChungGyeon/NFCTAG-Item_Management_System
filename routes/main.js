@@ -4,24 +4,31 @@ const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    if(testPageConnect){
-         res.render('test_main');
-    }
-    if(!req.session.user){
+    /* if(testPageConnect){
+          res.render('test_main');
+     }*/
+    if (!req.session.user) {
         return res.redirect('/users/login');
-     }
-  //res.render('main', { title: 'ITS 물품대여소' });
-  res.redirect('/LoadMysql');
-});
-
-router.get('/LoadMysql', (req, res) => {
+    }
     const sql = 'SELECT itemName, img FROM Items';
-
     db.query(sql, (err, results) => {
         if (err) {
             console.error('DB 오류:', err);
         }
+        console.log(results);
+        res.render('main', {items: results, title: 'ITS 물품대여소'});
+        //res.render('main', { title: 'ITS 물품대여소' });
+        //res.redirect('/LoadMysql');
+    });
+});
 
+router.get('/LoadMysql', (req, res) => {
+    const sql = 'SELECT itemName, img FROM Items';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('DB 오류:', err);
+        }
+        console.log(results);
         res.render('main',{ items: results });
     });
 });
