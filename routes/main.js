@@ -17,8 +17,11 @@ router.get('/', function(req, res, next) {
         //res.render('main', { title: 'ITS 물품대여소' });
         //res.redirect('/LoadMysql');
     });
+
 });
 
+
+//삭제예정
 router.get('/LoadMysql', (req, res) => {
     const sql = 'SELECT itemName, img FROM Items';
 
@@ -30,6 +33,8 @@ router.get('/LoadMysql', (req, res) => {
         res.render('main',{ items: results });
     });
 });
+
+
 module.exports = router;
 
 

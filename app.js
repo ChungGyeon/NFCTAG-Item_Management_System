@@ -10,6 +10,7 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 //각 실행경로 설정
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
+const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
 var app = express();
@@ -38,6 +39,7 @@ app.use(session({ // 세션 설정
 
 app.use('/', mainRouter);
 app.use('/users', usersRouter);
+app.use('/util', genCookie);
 //app.use('/users', require('./routes/users'));
 
 // app.get('/LoadMysql', (req, res) => {
