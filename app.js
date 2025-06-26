@@ -37,8 +37,8 @@ app.use(session({ // 세션 설정
 
 
 app.use('/', mainRouter);
-//app.use('/users', usersRouter);
-app.use('/users', require('./routes/users'));
+app.use('/users', usersRouter);
+//app.use('/users', require('./routes/users'));
 
 // app.get('/LoadMysql', (req, res) => {
 //     const sql = 'SELECT itemName, img FROM Items';
