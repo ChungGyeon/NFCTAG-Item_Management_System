@@ -10,14 +10,14 @@ router.get('/generateCookie', (req, res) => {
     //쿠키 하나에 여러개 넣기 위한 그시기
     let infoObj = {};
     const keys = ['object1', 'object2', 'object3'];
-    const values = ['value1', 'value2', 'value3'];
+    const values = ['싸인팬', '실험복', '공학용계산기'];
 
     for (let i = 0; i < keys.length; i++) {
         infoObj[keys[i]] = values[i];
     }
         // 쿠키 설정
     res.cookie('info', JSON.stringify(infoObj),
-        { maxAge: 900000}
+        { maxAge: 1 * 60 * 1000}
     );
 
     res.json({ success: true, message: '쿠키가 생성되었습니다.' });
