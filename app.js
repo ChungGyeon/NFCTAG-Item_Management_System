@@ -29,13 +29,34 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ // 세션 설정
     secret: 'SESSION_SECRET',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 // ✅ 24시간 동안 로그인 유지
+    }
 }));
+
 
 app.use('/', mainRouter);
 app.use('/users', usersRouter);
 app.use('/util', genCookie);
 //app.use('/users', require('./routes/users'));
+
+// app.get('/LoadMysql', (req, res) => {
+//     const sql = 'SELECT itemName, img FROM Items';
+//
+//     db.query(sql, (err, results) => {
+//         if (err) {
+//             console.error('DB 오류:', err);
+//         }
+//
+//         res.render('main',{ items: results });
+//     });
+// });
+
+
+
+
 
 // error handler
 app.use(function(err, req, res, next) {

@@ -42,6 +42,7 @@ db.connect((err) => {
     }
 });
 
-module.exports = {db,
+module.exports = {
+    db,
     testPageConnect: () => testPageConnect
 };
