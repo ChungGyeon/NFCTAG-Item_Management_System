@@ -66,12 +66,11 @@ router.post('/reservation/cancel', (req, res) => {
 //삭제예정
 router.get('/LoadMysql', (req, res) => {
     const sql = 'SELECT itemName, img FROM Items';
-
     db.query(sql, (err, results) => {
         if (err) {
             console.error('DB 오류:', err);
         }
-
+        console.log(results);
         res.render('main',{ items: results });
     });
 });
