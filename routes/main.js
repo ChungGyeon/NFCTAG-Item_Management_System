@@ -4,9 +4,6 @@ const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    /* if(testPageConnect){
-          res.render('test_main');
-     }*/
     if (!req.session.user) {
         return res.redirect('/users/login');
     }

@@ -32,8 +32,8 @@ app.use(session({ // 세션 설정
 }));
 
 app.use('/', mainRouter);
-//app.use('/users', usersRouter);
-app.use('/users', require('./routes/users'));
+app.use('/users', usersRouter);
+//app.use('/users', require('./routes/users'));
 
 // error handler
 app.use(function(err, req, res, next) {
