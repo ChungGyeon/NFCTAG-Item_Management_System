@@ -28,7 +28,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ // 세션 설정
     secret: 'SESSION_SECRET',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 // ✅ 24시간 동안 로그인 유지
+    }
 }));
 
 

@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const db = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+// const db = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
 /* GET home page. */
