@@ -21,17 +21,11 @@ router.get('/', function(req, res, next) {
 });
 
 
-//삭제예정
-router.get('/LoadMysql', (req, res) => {
-    const sql = 'SELECT itemName, img FROM Items';
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('DB 오류:', err);
-        }
-        console.log(results);
-        res.render('main',{ items: results });
-    });
+//임시 관리자 페이지 경로
+router.get('/admin', (req, res) => {
+    res.render('admin', { title: '관리자 페이지' });
 });
+
 
 
 module.exports = router;
