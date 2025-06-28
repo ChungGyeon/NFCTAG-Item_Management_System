@@ -51,27 +51,27 @@ router.post('/reservation/cancel', (req, res) => {
 
     let reservedList = currentReserved
         .split(',')
-        .filter(item => item && item !== itemName); // 해당 항목만 제거
+        .filter(item => item);
 
-    res.cookie('reservedItems', reservedList.join(','), {
+    if (!reservedList.includes(itemName)) {
+        return res.send({
+            success: false,
+            message: `${itemName}은(는) 예약된 항목이 아닙니다.`
+        });
+    }
+
+    // 실제 취소 처리
+    const updatedList = reservedList.filter(item => item !== itemName);
+    res.cookie('reservedItems', updatedList.join(','), {
         maxAge: 3600000,
         httpOnly: false,
         path: '/'
     });
 
-    console.log(`${itemName} 예약 취소됨. 현재 목록:`, reservedList);
-    res.send({ success: true, message: `${itemName} 예약이 취소되었습니다.` });
-});
-
-//삭제예정
-router.get('/LoadMysql', (req, res) => {
-    const sql = 'SELECT itemName, img FROM Items';
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('DB 오류:', err);
-        }
-        console.log(results);
-        res.render('main',{ items: results });
+    console.log(`${itemName} 예약 취소됨. 현재 목록:`, updatedList);
+    res.send({
+        success: true,
+        message: `${itemName} 예약이 취소되었습니다.`
     });
 });
 

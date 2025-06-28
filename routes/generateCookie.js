@@ -18,7 +18,6 @@ router.get('/generateCookie', (req, res) => {
         // 쿠키 설정
     res.cookie('info', JSON.stringify(infoObj),
         { maxAge: 900000}
-        { maxAge: 1 * 60 * 1000}
     );
 
     res.json({ success: true, message: '쿠키가 생성되었습니다.' });
