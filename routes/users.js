@@ -67,19 +67,19 @@ router.post('/signUpquery', async (req,res)=> {
     if (result.length > 0) {
       return res.status(409).json({message: '이미 존재하는 계정입니다.'});
     }
-  });
-
-  // 중복확인 후 계정 추가
-  const insertSql = 'INSERT INTO Users (name, studentNum, grade, password) VALUES (?, ?, ?, ?)';
-  db.query(insertSql, [name, studentnum, grade, password], (err, result) => {
-      // 중복 없을 때 계정 추가
+    else {
+      // 중복이 없으면 계정 추가
+      const insertSql = 'INSERT INTO Users (name, studentNum, grade, password) VALUES (?, ?, ?, ?)';
+      db.query(insertSql, [name, studentnum, grade, password], (err, result) => {
         if (err) {
           console.error('DB 오류:', err);
           return res.status(500).json({message: '서버 오류가 발생했습니다.'});
         }
-        res.json({message: '계정이 성공적으로 추가되었습니다.'});
+        return res.status(201).json({message: '계정이 성공적으로 추가되었습니다.'});
       });
-    });
+    }
+  });
+});
 
 
 

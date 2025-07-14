@@ -28,10 +28,17 @@ function signUpquery(){
     fetch('/users/signUpquery', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
-        },
+            'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     })
+        .then(async (response) => {
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message);
+            alert('계정 추가 성공: ' + result.message);
+        })
+        .catch(error => {
+            alert('계정 추가 실패: ' + error.message);
+        /*
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -45,5 +52,7 @@ function signUpquery(){
         .catch(error => {
             console.error('에러:', error);
             alert('계정 추가 실패');
+        });
+         */
         });
 }
