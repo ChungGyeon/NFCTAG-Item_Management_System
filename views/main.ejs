@@ -25,9 +25,55 @@
                 <img src="<%= item.img %>" alt="<%= item.itemName %>" />
               </li>
             </ul>
+            <button onclick="reserveFromServer('<%= item.itemName %>')">예약하기</button>
+            <button onclick="cancelReservation('<%= item.itemName %>')">예약 취소하기</button>
           </div>
         <% }) %>
       </main>
     </div>
+
+    <script>
+      function reserveFromServer(itemName) {
+        if (confirm(`${itemName} 예약 하시겠습니까?`)) {
+          fetch('/reservation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ itemName })
+          })
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message);
+            location.reload(); // 새로고침해서 쿠키 갱신 반영
+          })
+          .catch(err => {
+            alert("예약 중 오류가 발생했습니다.");
+            console.error(err);
+          });
+        }
+      }
+
+      function cancelReservation(itemName) {
+        if (confirm(`${itemName} 예약을 취소하시겠습니까?`)) {
+          fetch('/reservation/cancel', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ itemName })
+          })
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message);
+            location.reload(); // 새로고침해서 쿠키 갱신 반영
+          })
+          .catch(err => {
+            alert("예약 취소 중 오류가 발생했습니다.");
+            console.error(err);
+          });
+        }
+      }
+    </script>
   </body>
 </html>

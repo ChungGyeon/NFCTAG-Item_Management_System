@@ -1,0 +1,320 @@
+* {
+    box-sizing: border-box;
+}
+body, html {
+    margin: 0;
+    padding: 0;
+}
+.test-container {
+    display: grid;
+    width: 100vw;
+    height: 100vh;
+    grid-template-rows: 100px 1fr 100px;
+    grid-template-columns: 250px 1fr 1fr;
+    grid-template-areas:
+        "aside   main  main"
+        "aside   main  main"
+        "aside   main  main";
+}
+main {
+    grid-area: main;
+    background-color: #e0e0e0;
+    padding: 20px;
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+aside {
+    grid-area: aside;
+    background-color: #d0d0d0;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+}
+
+
+
+/*이 아래는 세부 요소들 css*/
+/* 이 버튼을 아래의 버튼으로 대체함
+.settle-button {
+   display: block;
+   margin-top: 15px;
+   padding: 12px 20px;
+   background-color: #4CAF50;
+   color: white;
+   text-align: center;
+   text-decoration: none;
+   border-radius: 8px;
+   font-size: 16px;
+   font-weight: bold;
+   border: none;
+   cursor: pointer;
+}
+.settle-button:hover {
+   background-color: #388E3C;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}*/
+
+aside adjustment-button {
+    display: block;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 48px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+aside adjustment-button:hover {
+    background-color: #388E3C;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+
+/*주문 취소버튼 잘못 주문한 고객의 주문 취소 기능*/
+aside adjustment-button-cancelVer {
+    display: block;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 48px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+aside adjustment-button-cancelVer:hover {
+    background-color: #388E3C;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/*이전 정산기록들 확인하는 버튼*/
+aside adjustment-button-caluelate-logVer {
+    display: block;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 48px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+aside adjustment-button-caluelate-logVer:hover {
+    background-color: #388E3C;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.table-card {
+    width: 250px;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.table-card h3 {
+    margin-top: 0;
+}
+.table-card ul {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+.table-card label {
+    display: block;
+    margin-top: 10px;
+}
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 500px;
+    max-width: 90%;
+    text-align: left;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal-content button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #777;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.modal-content button:hover {
+    background-color: #555;
+}
+
+
+/*계정추가용 모달 온*/
+.AddAcountModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 120%;
+    overflow: auto;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+
+}
+.AddAcountModal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    animation: slide-down 0.5s ease-out;
+}
+.AddAcountModal-content p {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.AddAcountModal-buttons {
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.AddAcountModal-content button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0 10px;
+}
+/*회원가입 창 css*/
+.signUp-container {
+    background-color: white;
+    padding: 50px 60px;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    width: 450px;
+    max-width: 90%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.signUp-container h2 {
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #333;
+}
+
+.signUp-container label {
+    display: block;
+    text-align: left;
+    margin: 15px 0 5px;
+    font-size: 15px;
+    color: #444;
+    font-weight: 600;
+}
+
+
+.signUp-container input {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.signUp-container input:focus {
+    border-color: #0f637e;
+    outline: none;
+}
+/* 모달 창 애니메이션 */
+@keyframes slide-up {
+    from {
+        bottom: -50%;
+    }
+    to {
+        bottom: 0;
+    }
+}
+
+.modal-content {
+    padding: 20px;
+}
+
+
+.close {
+    align-self: flex-end;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@keyframes slide-down {
+    from {
+        top: -100%;
+    }
+    to {
+        top: 0;
+    }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+/* 로고 + 상호명 수평 정렬 */
+.header-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* 로고 이미지 크기 */
+.header-logo {
+    height: 40px;
+    object-fit: contain;
+}

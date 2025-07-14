@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ITS-IMS 관리자페이지</title>
+  <link href="/stylesheets/forAdmin.css" rel="stylesheet">
+  <script src="/javascripts/formainPage.js"></script>
+</head>
+<body>
+<div class="test-container">
+  <main id="main-content">
+      <div class="table-card">
+        <h3>테이블</h3>
+        <ul>
+          <li>
+            <h2>메뉴: </h2>
+            <p>옵션:></p>
+            <p>옵션:
+            </p>
+            <p>총 결제금액:원</p>
+          </li>
+        </ul>
+        <label><input type="checkbox" class="table-check"> 정산 대상 선택</label>
+      </div>
+  </main>
+  <aside>
+    <!--아래 세 개 버튼의 온클릭은 따로 함수 제작 필요 25.4.29-->
+    <button class="aside adjust-button" onclick="calculateForMenu()">추가</button>
+    <button class="aside adjust-button-cancelVer" onclick="OpenDeleteConfirmModal(this)">삭제</button>
+    <button class="aside adjust-button-cancelVer" onclick="OpenAddAcountModal()">계정추가</button>
+  </aside>
+
+  <section><!--계정 추가 모달-->
+    <div id="AddAcountModal" class="AddAcountModal">
+      <div class="AddAcountModal-content">
+        <span class="close" onclick="CloseModal()">&times;</span>
+        <p>계정추가</p><br>
+        <div class="signUp-container">
+        <form method="POST">
+
+          <label for="grade">학년</label>
+          <input type="number" id="grade" name="grade" required>
+
+          <label for="name">이름</label>
+          <input type="text" id="name" name="name" required>
+
+          <label for="studentnum">학번</label>
+          <input type="number" id="studentnum" name="studentnum" required>
+
+          <label for="password">비밀번호</label>
+          <input type="password" id="password" name="password" required>
+
+          <button type="submit" onclick="loginquery()">추가</button>
+        </div>
+        <div class="AddAcountModal-buttons">
+          <button onclick="removeCheckedMenu()">예</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
+
