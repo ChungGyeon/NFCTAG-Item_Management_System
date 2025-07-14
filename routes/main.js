@@ -76,6 +76,10 @@ router.get('/LoadMysql', (req, res) => {
 });
 
 
+router.get('/admin',(req,res)=> {
+    res.render('admin', { title: '관리자 페이지' });
+});
+
 module.exports = router;
 
 
