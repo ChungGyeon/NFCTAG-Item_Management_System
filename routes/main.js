@@ -75,9 +75,20 @@ router.get('/LoadMysql', (req, res) => {
     });
 });
 
-
+//관리자 페이지
 router.get('/admin',(req,res)=> {
-    res.render('admin', { title: '관리자 페이지' });
+    /* 관리자 권한 췤
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).send('관리자 권한이 필요합니다.');
+    }*/
+    const sql = 'SELECT itemName, status, img FROM Items';
+    db.query(sql, (err, results)=> {
+        if(err) {
+            console.error('DB 오류:', err);
+            return res.status(500).send('데이터베이스 오류');
+        }
+        res.render('admin', { title: '관리자 페이지', items: results });
+    });
 });
 
 module.exports = router;

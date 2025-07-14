@@ -10,17 +10,27 @@
 <body>
 <div class="test-container"> <!-- 물건 컨테이너 -->
   <main id="main-content">
+    <div class="table-card">
+      <h3>무슨무슨 아이템</h3>
+      <ul>
+        <li>
+          <h2>보루펜 </h2>
+        </li>
+      </ul>
+      <label><input type="checkbox" class="table-check"> 선택</label>
+    </div>
+
+    <% items.forEach(item => { %>
       <div class="table-card">
-        <h3>무슨무슨 아이템</h3>
+        <h3><%= item.itemName %></h3>
         <ul>
           <li>
-            <h2>보루펜 </h2>
-
-            </p>
+            <h2><%= item.status %></h2>
           </li>
         </ul>
         <label><input type="checkbox" class="table-check"> 선택</label>
       </div>
+    <% }) %>
   </main>
   <aside>
     <!--아래 세 개 버튼의 온클릭은 따로 함수 제작 필요 25.4.29-->
