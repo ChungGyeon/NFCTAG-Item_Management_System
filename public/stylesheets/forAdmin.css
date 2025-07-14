@@ -29,7 +29,7 @@ aside {
     grid-area: aside;
     background-color: #d0d0d0;
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
 }
 
 
@@ -55,8 +55,10 @@ aside {
    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }*/
 
-aside adjustment-button {
+aside adjust-button {
     display: block;
+    width: 120px;      /* 버튼 너비 */
+    height: 48px;      /* 버튼 높이 */
     background-color: #4CAF50;
     color: white;
     text-align: center;
@@ -67,14 +69,14 @@ aside adjustment-button {
     cursor: pointer;
 }
 
-aside adjustment-button:hover {
+aside adjust-button:hover {
     background-color: #388E3C;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 
 /*주문 취소버튼 잘못 주문한 고객의 주문 취소 기능*/
-aside adjustment-button-cancelVer {
+aside adjust-button-cancelVer {
     display: block;
     background-color: #4CAF50;
     color: white;
@@ -86,13 +88,13 @@ aside adjustment-button-cancelVer {
     cursor: pointer;
 }
 
-aside adjustment-button-cancelVer:hover {
+aside adjust-button-cancelVer:hover {
     background-color: #388E3C;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /*이전 정산기록들 확인하는 버튼*/
-aside adjustment-button-caluelate-logVer {
+aside adjust-button-caluelate-logVer {
     display: block;
     background-color: #4CAF50;
     color: white;
@@ -104,7 +106,7 @@ aside adjustment-button-caluelate-logVer {
     cursor: pointer;
 }
 
-aside adjustment-button-caluelate-logVer:hover {
+aside adjust-button-caluelate-logVer:hover {
     background-color: #388E3C;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }

@@ -34,9 +34,10 @@
   </main>
   <aside>
     <!--아래 세 개 버튼의 온클릭은 따로 함수 제작 필요 25.4.29-->
-    <button class="aside adjust-button" onclick="calculateForMenu()">추가</button>
-    <button class="aside adjust-button-cancelVer" onclick="OpenDeleteConfirmModal(this)">삭제</button>
-    <button class="aside adjust-button-cancelVer" onclick="OpenAddAcountModal()">계정추가</button>
+    <button class="aside adjust-button" onclick="calculateForMenu()">물건 추가</button>
+    <button class="aside adjust-button" onclick="OpenDeleteConfirmModal(this)">물건 삭제</button>
+    <button class="aside adjust-button">계정 확인</button>
+    <button class="aside adjust-button" onclick="OpenAddAcountModal()">계정추가</button>
   </aside>
 
   <section><!--계정 추가 모달-->
@@ -58,13 +59,12 @@
 
           <label for="password">비밀번호</label>
           <input type="password" id="password" name="password" required>
-
-          <button type="submit">추가</button>
+          <div class="AddAcountModal-buttons">
+            <button type="submit">추가</button>
+          </div>
         </form>
-        <div class="AddAcountModal-buttons">
-          <button onclick="removeCheckedMenu()">예</button>
-        </div>
       </div>
+    </div>
     </div>
   </section>
 </div>
