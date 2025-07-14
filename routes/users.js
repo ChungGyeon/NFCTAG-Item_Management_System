@@ -11,7 +11,7 @@ router.get('/login', (req, res) => {
 });
 
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res) => { //login
   const { studentnum, password } = req.body;
 
   const sql = 'SELECT studentNum, password FROM Users WHERE studentNum = ? AND password = ?';
