@@ -3,7 +3,7 @@ var router = express.Router();
 const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res, next) {//router
     if (!req.session.user) {
         return res.redirect('/users/login');
     }
