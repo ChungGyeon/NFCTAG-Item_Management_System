@@ -2,21 +2,53 @@ var express = require('express');
 var router = express.Router();
 const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
+let currentSeed = generateRandomSeed();
+let lastSeed = null; // (선택) 이전 시드도 잠깐 허용하려면 사용
+
+function generateRandomSeed() {
+    return Math.random().toString(36).substr(2, 10);
+}
+
+// 5분마다 시드 갱신
+setInterval(() => {
+    lastSeed = currentSeed;
+    currentSeed = generateRandomSeed();
+    console.log('새 시드:', currentSeed);
+}, 5 * 60 * 1000);
+
+app.get('/get-current-seed', (req, res) => {
+    res.json({ seed: currentSeed });
+});
+
+app.use('/:seed', (req, res, next) => {
+    req.currentSeed = currentSeed;
+    req.lastSeed = lastSeed;
+    next();
+}, mainRouter);
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {//router123
-    if (!req.session.user) {
-        return res.redirect('/users/login');
-    }
-    const sql = 'SELECT itemName, img FROM Items';
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('DB 오류:', err);
+    const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
+    const { currentSeed, lastSeed } = req;
+
+    if (urlSeed === currentSeed || urlSeed === lastSeed) {
+        if (!req.session.user) {
+            return res.redirect('/users/login');
         }
-        console.log(results);
-        res.render('main', {items: results, title: 'ITS 물품대여소'});
-        //res.render('main', { title: 'ITS 물품대여소' });
-        //res.redirect('/LoadMysql');
-    });
+        const sql = 'SELECT itemName, img FROM Items';
+        db.query(sql, (err, results) => {
+            if (err) {
+                console.error('DB 오류:', err);
+            }
+            console.log(results);
+            res.render('main', {items: results, title: 'ITS 물품대여소'});
+            //res.render('main', { title: 'ITS 물품대여소' });
+            //res.redirect('/LoadMysql');
+        });
+    } else {
+        res.status(404).send('존재하지 않는 페이지입니다.');
+    }
 
 });
 
