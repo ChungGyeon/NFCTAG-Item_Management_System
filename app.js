@@ -13,6 +13,9 @@ const usersRouter = require('./routes/users');
 const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
+
+const verifyRouter = require('./routes/verify'); // 🔺 추가
+
 // === [여기부터 추가] ===
 let currentSeed = generateRandomSeed();
 let lastSeed = null; // (선택) 이전 시드도 잠깐 허용하려면 사용
@@ -28,6 +31,7 @@ setInterval(() => {
     console.log('새 시드:', currentSeed);
 }, 5 * 60 * 1000);
 // === [여기까지 추가] ===
+
 
 var app = express();
 
@@ -48,13 +52,13 @@ app.get('/get-current-seed', (req, res) => {
 // === [여기까지 추가] ===
 
 /* 세션설정 */
-app.use(session({ // 세션 설정
+app.use(session({
     secret: 'SESSION_SECRET',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 // ✅ 24시간 동안 로그인 유지
+        httpOnly: true
+        // maxAge 생략 → 브라우저 종료 시 세션도 종료됨
     }
 }));
 
@@ -95,10 +99,13 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+
+app.use('/rent', verifyRouter);
+
 /*
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  next(createError(404));ve
 });*/
 
 //module.exports = app;
