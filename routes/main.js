@@ -78,9 +78,7 @@ router.get('/', function(req, res, next) {//router123
         //res.render('main', { title: 'ITS 물품대여소' });
         //res.redirect('/LoadMysql');
     });
-
-        res.render('main', { items: results, title: 'ITS 물품대여소' });
-    });
+});
 
 /* ✅ 예약하기 */
 router.post('/reservation', (req, res) => {
