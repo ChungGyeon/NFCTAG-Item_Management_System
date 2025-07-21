@@ -14,18 +14,19 @@ setInterval(() => {
     lastSeed = currentSeed;
     currentSeed = generateRandomSeed();
     console.log('새 시드:', currentSeed);
-}, 5 * 60 * 1000);
+}, 20*1000);
 
-app.get('/get-current-seed', (req, res) => {
+/* 테스트 후 삭제 예정
+router.get('/get-current-seed', (req, res) => {
     res.json({ seed: currentSeed });
 });
 
-app.use('/:seed', (req, res, next) => {
+router.use('/:seed', (req, res, next) => {
     req.currentSeed = currentSeed;
     req.lastSeed = lastSeed;
     next();
 }, mainRouter);
-
+*/
 
 /* GET home page. */
 router.get('/', function(req, res, next) {//router123
