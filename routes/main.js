@@ -1,41 +1,53 @@
-var express = require('express');
-var router = express.Router();
-const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+const express = require('express');
+const router = express.Router();
+const { db } = require('./IMS_db'); // DB 연결
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
     if (!req.session.user) {
         return res.redirect('/users/login');
     }
+
     const sql = 'SELECT itemName, img FROM Items';
     db.query(sql, (err, results) => {
         if (err) {
             console.error('DB 오류:', err);
+            return res.status(500).send('DB 오류 발생');
         }
-        console.log(results);
-        res.render('main', {items: results, title: 'ITS 물품대여소'});
-        //res.render('main', { title: 'ITS 물품대여소' });
-        //res.redirect('/LoadMysql');
-    });
 
+        res.render('main', { items: results, title: 'ITS 물품대여소' });
+    });
 });
 
-
+/* ✅ 예약하기 */
 router.post('/reservation', (req, res) => {
-    const itemName = req.body.itemName;  // JSON.parse 제거
-    let currentReserved = req.cookies.reservedItems || '';
+    const itemName = req.body.itemName;
+    const studentnum = req.session.user?.studentnum;
 
-    let reservedList = currentReserved
-        .split(',')
-        .filter(item => item);
+    if (!studentnum) {
+        return res.status(401).send('로그인 세션 없음');
+    }
+
+    let currentReserved = req.cookies.reservedItems || '';
+    let reservedList = [];
+
+    if (currentReserved.includes(':')) {
+        const [cookieStudentNum, items] = currentReserved.split(':');
+        if (cookieStudentNum === String(studentnum)) {
+            reservedList = items.split(',').filter(Boolean);
+        } else {
+            reservedList = [];
+        }
+    }
 
     if (reservedList.includes(itemName)) {
         return res.send({ success: false, message: `${itemName}은(는) 이미 예약됨` });
     }
 
     reservedList.push(itemName);
+    const newCookieValue = `${studentnum}:${reservedList.join(',')}`;
 
-    res.cookie('reservedItems', reservedList.join(','), {
+    res.cookie('reservedItems', newCookieValue, {
         maxAge: 3600000,
         httpOnly: false,
         path: '/'
@@ -45,13 +57,24 @@ router.post('/reservation', (req, res) => {
     res.send({ success: true, message: `${itemName} 예약되었습니다.` });
 });
 
+/* ✅ 예약 취소하기 */
 router.post('/reservation/cancel', (req, res) => {
     const itemName = req.body.itemName;
-    let currentReserved = req.cookies.reservedItems || '';
+    const studentnum = req.session.user?.studentnum;
 
-    let reservedList = currentReserved
-        .split(',')
-        .filter(item => item);
+    if (!studentnum) {
+        return res.status(401).send('로그인 세션 없음');
+    }
+
+    let currentReserved = req.cookies.reservedItems || '';
+    let reservedList = [];
+
+    if (currentReserved.includes(':')) {
+        const [cookieStudentNum, items] = currentReserved.split(':');
+        if (cookieStudentNum === String(studentnum)) {
+            reservedList = items.split(',').filter(Boolean);
+        }
+    }
 
     if (!reservedList.includes(itemName)) {
         return res.send({
@@ -60,12 +83,14 @@ router.post('/reservation/cancel', (req, res) => {
         });
     }
 
-    // 실제 취소 처리
+    // ✅ 실제 취소 처리
     const updatedList = reservedList.filter(item => item !== itemName);
-    res.cookie('reservedItems', updatedList.join(','), {
-        maxAge: 3600000,
+    const newCookieValue = `${studentnum}:${updatedList.join(',')}`;
+
+    res.cookie('reservedItems', newCookieValue, {
         httpOnly: false,
         path: '/'
+        // maxAge 생략 → 브라우저 종료 시 자동 삭제
     });
 
     console.log(`${itemName} 예약 취소됨. 현재 목록:`, updatedList);
@@ -75,8 +100,4 @@ router.post('/reservation/cancel', (req, res) => {
     });
 });
 
-
 module.exports = router;
-
-
-//히히 오줌발싸

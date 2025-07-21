@@ -1,77 +1,128 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/stylesheets/forMain.css" />
-  </head>
-  <body>
-    <div class="main-grid-container">
-      <header>
-        <img class="welcome-img" src="/images/put_out_the_picture.jpg" />
-        <div class="indroduction-img-container">
-          <p class="bottom-text">잠시 빌리려 왔습니다</p>
-        </div>
-      </header>
-
-      <main>
-        <% items.forEach(item => { %>
-          <div class="itemDetail-card">
-            <h3><%= item.itemName %></h3>
-            <ul>
-              <li>
-                <img src="<%= item.img %>" alt="<%= item.itemName %>" />
-              </li>
-            </ul>
-            <button onclick="reserveFromServer('<%= item.itemName %>')">예약하기</button>
-            <button onclick="cancelReservation('<%= item.itemName %>')">예약 취소하기</button>
-          </div>
-        <% }) %>
-      </main>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/stylesheets/forMain.css" />
+  <title>ITS 물품대여소</title>
+</head>
+<body>
+<div class="main-grid-container">
+  <header>
+    <img class="welcome-img" src="/images/put_out_the_picture.jpg" />
+    <div class="indroduction-img-container">
+      <p class="bottom-text">잠시 빌리려 왔습니다</p>
     </div>
+  </header>
 
-    <script>
-      function reserveFromServer(itemName) {
-        if (confirm(`${itemName} 예약 하시겠습니까?`)) {
-          fetch('/reservation', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ itemName })
-          })
-          .then(res => res.json())
-          .then(data => {
-            alert(data.message);
-            location.reload(); // 새로고침해서 쿠키 갱신 반영
-          })
-          .catch(err => {
-            alert("예약 중 오류가 발생했습니다.");
-            console.error(err);
-          });
-        }
-      }
+  <main>
+    <% items.forEach(item => { %>
+      <div class="itemDetail-card">
+        <h3><%= item.itemName %></h3>
+        <ul>
+          <li>
+            <img src="<%= item.img %>" alt="<%= item.itemName %>" />
+          </li>
+        </ul>
+        <button onclick="reserveFromServer('<%= item.itemName %>')">예약하기</button>
+        <button onclick="cancelReservation('<%= item.itemName %>')">예약 취소하기</button>
+        <button onclick="cancelRental('<%= item.itemName %>')">대여 취소하기 (DB)</button>
+      </div>
+    <% }) %>
 
-      function cancelReservation(itemName) {
-        if (confirm(`${itemName} 예약을 취소하시겠습니까?`)) {
-          fetch('/reservation/cancel', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ itemName })
-          })
-          .then(res => res.json())
-          .then(data => {
-            alert(data.message);
-            location.reload(); // 새로고침해서 쿠키 갱신 반영
-          })
-          .catch(err => {
-            alert("예약 취소 중 오류가 발생했습니다.");
-            console.error(err);
-          });
-        }
-      }
-    </script>
-  </body>
+    <!-- ✅ 대여 확정 버튼 추가 -->
+    <div style="text-align: center; margin-top: 30px;">
+      <button onclick="confirmRental()" style="padding: 12px 24px; font-size: 16px;">대여 확정</button>
+    </div>
+  </main>
+</div>
+
+<script>
+  function reserveFromServer(itemName) {
+    if (confirm(`${itemName} 예약 하시겠습니까?`)) {
+      fetch('/reservation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ itemName })
+      })
+              .then(res => res.json())
+              .then(data => {
+                alert(data.message);
+                location.reload();
+              })
+              .catch(err => {
+                alert("예약 중 오류가 발생했습니다.");
+                console.error(err);
+              });
+    }
+  }
+
+  function cancelReservation(itemName) {
+    if (confirm(`${itemName} 예약을 취소하시겠습니까?`)) {
+      fetch('/reservation/cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ itemName })
+      })
+              .then(res => res.json())
+              .then(data => {
+                alert(data.message);
+                location.reload();
+              })
+              .catch(err => {
+                alert("예약 취소 중 오류가 발생했습니다.");
+                console.error(err);
+              });
+    }
+  }
+
+  function cancelRental(itemName) {
+    if (confirm(`${itemName} 대여를 취소하시겠습니까?`)) {
+      fetch('/rent/cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ itemName })
+      })
+              .then(res => res.json())
+              .then(data => {
+                alert(data.message);
+                location.reload();
+              })
+              .catch(err => {
+                alert("대여 취소 중 오류가 발생했습니다.");
+                console.error(err);
+              });
+    }
+  }
+
+  function confirmRental() {
+    if (confirm("예약한 물품을 대여 확정하시겠습니까?")) {
+      fetch('/rent/verify-step2', {
+        method: 'POST',
+        credentials: 'include'
+      })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  alert("✅ 대여 완료: " + data.message);
+                  location.reload();
+                } else {
+                  alert("❌ 실패: " + data.message);
+                }
+              })
+              .catch(err => {
+                alert("⚠️ 서버 오류 발생");
+                console.error('대여 요청 에러:', err);
+              });
+    }
+  }
+</script>
+</body>
 </html>
