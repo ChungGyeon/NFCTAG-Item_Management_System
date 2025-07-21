@@ -13,7 +13,25 @@ const usersRouter = require('./routes/users');
 const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
+
 const verifyRouter = require('./routes/verify'); // 🔺 추가
+
+// === [여기부터 추가] ===
+let currentSeed = generateRandomSeed();
+let lastSeed = null; // (선택) 이전 시드도 잠깐 허용하려면 사용
+
+function generateRandomSeed() {
+    return Math.random().toString(36).substr(2, 10);
+}
+
+// 5분마다 시드 갱신
+setInterval(() => {
+    lastSeed = currentSeed;
+    currentSeed = generateRandomSeed();
+    console.log('새 시드:', currentSeed);
+}, 5 * 60 * 1000);
+// === [여기까지 추가] ===
+
 
 var app = express();
 
@@ -27,6 +45,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// === [여기 추가] ===
+app.get('/get-current-seed', (req, res) => {
+    res.json({ seed: currentSeed });
+});
+// === [여기까지 추가] ===
+
 /* 세션설정 */
 app.use(session({
     secret: 'SESSION_SECRET',
@@ -39,7 +63,11 @@ app.use(session({
 }));
 
 
-app.use('/', mainRouter);
+app.use('/:seed', (req, res, next) => {
+    req.currentSeed = currentSeed;
+    req.lastSeed = lastSeed;
+    next();
+}, mainRouter);
 app.use('/users', usersRouter);
 app.use('/util', genCookie);
 //app.use('/users', require('./routes/users'));
