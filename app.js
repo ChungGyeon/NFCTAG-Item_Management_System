@@ -60,12 +60,13 @@ app.use(session({
     }
 }));
 
-
+/* 랜덤시드 사용하는 거 활성화 해야해 쓸꺼면
 app.use('/:seed', (req, res, next) => {
     req.currentSeed = currentSeed;
     req.lastSeed = lastSeed;
     next();
-}, mainRouter);
+}, mainRouter);*/
+app.use('/', mainRouter);
 app.use('/users', usersRouter);
 app.use('/util', genCookie);
 //app.use('/users', require('./routes/users'));
