@@ -46,6 +46,7 @@ router.get('/', function(req, res, next) {//router123
     const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
     const { currentSeed, lastSeed } = req;
 
+    /*  비활성화
     if (urlSeed === currentSeed || urlSeed === lastSeed) {
         if (!req.session.user) {
             return res.redirect('/users/login');
@@ -63,11 +64,23 @@ router.get('/', function(req, res, next) {//router123
     } else {
         res.status(404).send('존재하지 않는 페이지입니다.');
     }
-
+*/
+    if (!req.session.user) {
+        return res.redirect('/users/login');
+    }
+    const sql = 'SELECT itemName, img FROM Items';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('DB 오류:', err);
+        }
+        console.log(results);
+        res.render('main', {items: results, title: 'ITS 물품대여소'});
+        //res.render('main', { title: 'ITS 물품대여소' });
+        //res.redirect('/LoadMysql');
+    });
 
         res.render('main', { items: results, title: 'ITS 물품대여소' });
     });
-});
 
 /* ✅ 예약하기 */
 router.post('/reservation', (req, res) => {

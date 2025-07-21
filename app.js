@@ -12,9 +12,7 @@ const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
 const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
-
-
-const verifyRouter = require('./routes/verify'); // 🔺 추가
+const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
 
 // === [여기부터 추가] ===
 let currentSeed = generateRandomSeed();
@@ -29,7 +27,7 @@ setInterval(() => {
     lastSeed = currentSeed;
     currentSeed = generateRandomSeed();
     console.log('새 시드:', currentSeed);
-}, 5 * 60 * 1000);
+}, 10 * 1000);
 // === [여기까지 추가] ===
 
 
