@@ -36,22 +36,44 @@ router.get('/generateCookie', (req, res) => {
 //쿠키 목록 조회 라우트
 router.get('/detectCookie',(req,res) => {
     // 쿠키 읽기
-    const cookieValue = JSON.parse(req.cookies.reservedItems || '{}');
+    const cookieValue = req.cookies.reservedItems;
     if (cookieValue) {
         console.log("reservedItems cookie:", cookieValue);
-        var result = {}
-        for (const key in cookieValue) {
-            if( cookieValue.hasOwnProperty(key) ) {
-                result[key] = cookieValue[key];
-            }
-        }
-        res.json({success: true, message: '쿠키가 존재합니다.', data: result});
+        const numberPart = cookieValue.split(':')[0];
+        console.log("이거 쿠키 번호: ", numberPart);
+        res.json({success: true, message: '쿠키에서 숫자 부분을 추출했습니다.', number: numberPart});
     }
     else {
         res.status(404).json({ success: false, message: '쿠키가 존재하지 않습니다.' });
     }
 
 })
+
+
+
+
+
+/*
+쿠키에 담긴 물품을 토대로 대여 시작하게 하는 라우트 젤 중요한 곳
+
+우선 쿠키에 있는 아이디가 현재 로그인한 아이디와 동일한지 비교
+그 다음 서버에 저장된 사용자가 빌리려한 아이템의 리스트와 쿠키의 리스트가 맞는지 비교
+그 후 예약 쿠키를 없애고, 대여를 시작하도록 처리
+* */
+router.get('/startRentingItem',(req,res) => {
+    
+})
+
+
+
+
+
+
+
+
+
+
+
 module.exports = router;
 
 /*
