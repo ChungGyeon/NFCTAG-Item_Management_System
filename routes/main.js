@@ -69,14 +69,28 @@ router.get('/', function(req, res, next) {//router123
         return res.redirect('/users/login');
     }
     const sql = 'SELECT itemName, img FROM Items';
-    db.query(sql, (err, results) => {
+    db.query(sql, (err, items) => {
         if (err) {
             console.error('DB 오류:', err);
+            return res.status(500).send('DB 오류 발생');
         }
-        console.log(results);
-        res.render('main', {items: results, title: 'ITS 물품대여소'});
-        //res.render('main', { title: 'ITS 물품대여소' });
-        //res.redirect('/LoadMysql');
+
+        // 현재 사용자의 예약 목록을 쿠키에서 가져옴
+        const studentnum = req.session.user?.studentnum;
+        const reservedCookie = req.cookies.reservedItems || '';
+        let userReservedItems = [];
+
+        if (studentnum && reservedCookie.startsWith(studentnum + ':')) {
+            userReservedItems = reservedCookie.split(':')[1].split(',').filter(Boolean);
+        }
+
+        // 각 아이템에 예약 상태(isReserved) 추가
+        const itemsWithStatus = items.map(item => ({
+            ...item,
+            isReserved: userReservedItems.includes(item.itemName)
+        }));
+
+        res.render('main', { items: itemsWithStatus, title: 'ITS 물품대여소' });
     });
 });
 

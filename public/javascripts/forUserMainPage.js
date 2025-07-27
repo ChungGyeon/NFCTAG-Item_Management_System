@@ -1,3 +1,20 @@
+//예약상태에 따라 버튼 보이는게 다르게 하는 함수
+//isReserved는 bool 타입으로 아래 reserveFromServer함수에서 설정함
+function updateButtonVisibility(itemName, isReserved) {
+    const card = document.querySelector(`[data-item-name="${itemName}"]`);
+    if (card) {
+        const reserveBtn = card.querySelector('.reserve-btn');
+        const cancelBtn = card.querySelector('.cancel-reservation-btn');
+
+        if (isReserved) {
+            reserveBtn.style.display = 'none';
+            cancelBtn.style.display = 'inline-block';
+        } else {
+            reserveBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'none';
+        }
+    }
+}
 
 function reserveFromServer(itemName) {
     if (confirm(`${itemName} 예약 하시겠습니까?`)) {
@@ -8,15 +25,17 @@ function reserveFromServer(itemName) {
             },
             body: JSON.stringify({ itemName })
         })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                location.reload();
-            })
-            .catch(err => {
-                alert("예약 중 오류가 발생했습니다.");
-                console.error(err);
-            });
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                updateButtonVisibility(itemName, true);
+            }
+        })
+        .catch(err => {
+            alert("예약 중 오류가 발생했습니다.");
+            console.error(err);
+        });
     }
 }
 
@@ -29,15 +48,17 @@ function cancelReservation(itemName) {
             },
             body: JSON.stringify({ itemName })
         })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                location.reload();
-            })
-            .catch(err => {
-                alert("예약 취소 중 오류가 발생했습니다.");
-                console.error(err);
-            });
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                updateButtonVisibility(itemName, false);
+            }
+        })
+        .catch(err => {
+            alert("예약 취소 중 오류가 발생했습니다.");
+            console.error(err);
+        });
     }
 }
 
