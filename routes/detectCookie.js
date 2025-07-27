@@ -58,10 +58,11 @@ router.get('/detectCookie',(req,res) => {
 
 우선 쿠키에 있는 아이디가 현재 로그인한 아이디와 동일한지 비교
 그 다음 서버에 저장된 사용자가 빌리려한 아이템의 리스트와 쿠키의 리스트가 맞는지 비교
-그 후 예약 쿠키를 없애고, 대여를 시작하도록 처리
+그 후 예약 쿠키를 없애고, 대여를 시작하도록 처리하는 기능이 verify.js 에 있는 기능
+이걸 아래 페이지에서 post요청을 보내서 받고 처리하는 형태로 할 예정
 * */
 router.get('/startRentingItem',(req,res) => {
-    
+    res.render('ckCookie',{title:"쿠키 거시기용"});
 })
 
 

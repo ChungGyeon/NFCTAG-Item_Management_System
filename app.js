@@ -11,6 +11,7 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
 const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
+const detCookie = require('./routes/detectCookie'); //쿠키 감지 처리 관련 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
 
@@ -69,6 +70,7 @@ app.use('/:seed', (req, res, next) => {
 app.use('/', mainRouter);
 app.use('/users', usersRouter);
 app.use('/util', genCookie);
+app.use('/detect', detCookie);
 //app.use('/users', require('./routes/users'));
 
 // app.get('/LoadMysql', (req, res) => {
