@@ -16,37 +16,12 @@ setInterval(() => {
     console.log('새 시드:', currentSeed);
 }, 20*1000);
 
-/* 테스트 후 삭제 예정
-router.get('/get-current-seed', (req, res) => {
-    res.json({ seed: currentSeed });
-});
-
-router.use('/:seed', (req, res, next) => {
-    req.currentSeed = currentSeed;
-    req.lastSeed = lastSeed;
-    next();
-}, mainRouter);
-*/
-
-/* GET home page. */
-/* 아래 router123 
-router.get('/', function(req, res, next) {
-    if (!req.session.user) {
-        return res.redirect('/users/login');
-    }
-
-    const sql = 'SELECT itemName, img FROM Items';
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('DB 오류:', err);
-            return res.status(500).send('DB 오류 발생');
-        }
-*/
 router.get('/', function(req, res, next) {//router123
     const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
     const { currentSeed, lastSeed } = req;
 
     /*  비활성화
+    근데 아직 이 코드의 표준화 사용법을 적지 않아서 냄겨둠
     if (urlSeed === currentSeed || urlSeed === lastSeed) {
         if (!req.session.user) {
             return res.redirect('/users/login');
