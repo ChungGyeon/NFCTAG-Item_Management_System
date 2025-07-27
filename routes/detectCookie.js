@@ -10,30 +10,8 @@ var router = express.Router();
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const mysql = require('mysql'); //mysql 모듈 불러오기
-//const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기, testPageConnect 변수는 가져오지않음
 
-// 쿠키 생성 라우트 테스트용임
-router.get('/generateCookie', (req, res) => {
-    //쿠키 하나에 여러개 넣기 위한 그시기
-    let infoObj = {};
-    const keys = ['object1', 'object2', 'object3'];
-    const values = ['싸인팬', '실험복', '공학용계산기'];
-
-    for (let i = 0; i < keys.length; i++) {
-        infoObj[keys[i]] = values[i];
-    }
-    // 쿠키 설정
-    res.cookie('reservedItems', JSON.stringify(infoObj),
-        { maxAge: 900000}
-    );
-
-    res.json({ success: true, message: '쿠키가 생성되었습니다.' });
-});
-
-
-
-
-//쿠키 목록 조회 라우트
+//쿠키 목록 조회 라우트 테스트 용
 router.get('/detectCookie',(req,res) => {
     // 쿠키 읽기
     const cookieValue = req.cookies.reservedItems;
@@ -51,8 +29,6 @@ router.get('/detectCookie',(req,res) => {
 
 
 
-
-
 /*
 쿠키에 담긴 물품을 토대로 대여 시작하게 하는 라우트 젤 중요한 곳
 
@@ -61,18 +37,21 @@ router.get('/detectCookie',(req,res) => {
 그 후 예약 쿠키를 없애고, 대여를 시작하도록 처리하는 기능이 verify.js 에 있는 기능
 이걸 아래 페이지에서 post요청을 보내서 받고 처리하는 형태로 할 예정
 * */
-router.get('/startRentingItem',(req,res) => {
-    res.render('ckCookie',{title:"쿠키 거시기용"});
+router.get('/startRentingItem/:seed',(req,res) => {
+    //구버전const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
+    const urlSeed = req.params.seed;
+    const { currentSeed, lastSeed } = req;
+    if(!currentSeed || !lastSeed) return res.status(404).send('랜덤시드에 오류 발생');
+
+    if (urlSeed === currentSeed || urlSeed === lastSeed) {
+     if (!req.session.user) {
+         return res.status(404).send('로그인부터 하고 오십쇼');
+     }
+     res.render('ckCookie',{title:"쿠키 거시기용"});
+    } else {
+     res.status(404).send('시드가 다르군. 너 죽고싶니?');
+    }
 })
-
-
-
-
-
-
-
-
-
 
 
 module.exports = router;
@@ -87,9 +66,9 @@ res.cookie('test-cookie','1234');
 
 // 쿠키 생성 + 옵션
 res.cookie('test-cookie','1234',{
-    maxAge: 60*60*24,
-    httpOnly: true,
-    secure: true
+maxAge: 60*60*24,
+httpOnly: true,
+secure: true
 });
 
 //쿠키 삭제
@@ -97,12 +76,12 @@ res.clearCookie(('test-cookie');
 
 // 쿠키 설정
 app.get('/set-cookie', (req, res) => {
-  res.cookie('username', 'imjaehyeog', { maxAge: 900000, httpOnly: true });
-  res.send('쿠키 설정됨');
+res.cookie('username', 'imjaehyeog', { maxAge: 900000, httpOnly: true });
+res.send('쿠키 설정됨');
 });
 
 // 쿠키 읽기
 app.get('/get-cookie', (req, res) => {
-  res.send(req.cookies);  // { username: 'imjaehyeog' }
+res.send(req.cookies);  // { username: 'imjaehyeog' }
 });
 */

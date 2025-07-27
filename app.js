@@ -70,7 +70,16 @@ app.use('/:seed', (req, res, next) => {
 app.use('/', mainRouter);
 app.use('/users', usersRouter);
 app.use('/util', genCookie);
-app.use('/detect', detCookie);
+
+//랜덤시드 적용
+//app.use('/detect', detCookie);
+app.use('/:seed', (req, res, next) => {
+    req.currentSeed = currentSeed;
+    req.lastSeed = lastSeed;
+    next();
+}, detCookie);
+
+
 //app.use('/users', require('./routes/users'));
 
 // app.get('/LoadMysql', (req, res) => {
