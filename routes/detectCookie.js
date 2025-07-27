@@ -23,17 +23,20 @@ router.get('/generateCookie', (req, res) => {
         infoObj[keys[i]] = values[i];
     }
     // 쿠키 설정
-    res.cookie('info', JSON.stringify(infoObj),
+    res.cookie('reservedItems', JSON.stringify(infoObj),
         { maxAge: 900000}
     );
 
     res.json({ success: true, message: '쿠키가 생성되었습니다.' });
 });
 
+
+
+
 //쿠키 목록 조회 라우트
-router.get('/detectCookie',(req,res) =>{
+router.get('/detectCookie',(req,res) => {
     // 쿠키 읽기
-    const cookieValue = JSON.parse(req.cookies.info || '{}');
+    const cookieValue = JSON.parse(req.cookies.reservedItems || '{}');
     if (cookieValue) {
         var result = {}
         for (const key in cookieValue) {
