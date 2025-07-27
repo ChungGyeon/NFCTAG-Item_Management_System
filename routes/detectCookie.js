@@ -38,6 +38,7 @@ router.get('/detectCookie',(req,res) => {
     // 쿠키 읽기
     const cookieValue = JSON.parse(req.cookies.reservedItems || '{}');
     if (cookieValue) {
+        console.log("reservedItems cookie:", cookieValue);
         var result = {}
         for (const key in cookieValue) {
             if( cookieValue.hasOwnProperty(key) ) {
