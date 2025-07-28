@@ -80,6 +80,22 @@ header {
   display: block;
 }
 
+.main-grid-container.with-rented {
+  grid-template-rows: auto 1fr 1fr;
+}
+
+.main-grid-container.without-rented {
+  grid-template-rows: auto 1fr;
+}
+
+.main-grid-container.without-rented .main-item1 {
+  display: none;
+}
+
+.main-grid-container.without-rented .main-item2 {
+  grid-row: 2;
+}
+
 .itemDetail-card {
   width: 200px;
   background: white;

@@ -8,7 +8,7 @@
   <title>ITS 물품대여소</title>
 </head>
 <body>
-<div class="main-grid-container">
+<div class="main-grid-container <%= items.some(item => item.status === 1) ? 'with-rented' : 'without-rented' %>">
   <header>
     <img class="welcome-img" src="/images/put_out_the_picture.jpg" />
     <div class="indroduction-img-container">
@@ -33,11 +33,10 @@
       </div>
     </div>
   <% }) %>
-
+  <br><br><hr><br>
 </div>
 
 <div class="main-item2">
-  <hr><br><br>
   <h1>빌릴 수 있는 거에요</h1>
   <% items.filter(item => item.status === 0).forEach(item => { %>
     <div class="itemDetail-card not-rented" data-item-name="<%= item.itemName %>">
