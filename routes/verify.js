@@ -54,8 +54,7 @@ router.post('/verify-step2', (req, res) => {
             // rentToHour 기본값 1시간으로 설정
             const insertValues = newItemsToRent.map(item => [item, userName, 1, new Date()]);
             const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date) VALUES ?';
-
-            console.log('[📝 INSERT할 데이터]', insertValues);
+            const rentStatusSqlInsert = 'UPDATE Items SET status = 1 WHERE itemName = ?';
 
             db.query(sqlInsert, [insertValues], (err, insertResult) => {
                 if (err) {
@@ -63,14 +62,28 @@ router.post('/verify-step2', (req, res) => {
                     return res.status(500).send('대여 정보 저장 실패');
                 }
 
-                res.clearCookie('reservedItems');
-
-                return res.send({
-                    success: true,
-                    message: '대여 완료 ✅',
-                    rented: newItemsToRent,
-                    skipped: dbItemList.filter(item => cookieItemList.includes(item))
-                });
+                // 모든 아이템의 status 업데이트
+                Promise.all(newItemsToRent.map(item =>
+                    new Promise((resolve, reject) => {
+                        db.query(rentStatusSqlInsert, [item], (err, results) => {
+                            if (err) reject(err);
+                            else resolve(results);
+                        });
+                    })
+                ))
+                    .then(() => {
+                        res.clearCookie('reservedItems');
+                        return res.send({
+                            success: true,
+                            message: '대여 완료 ✅',
+                            rented: newItemsToRent,
+                            skipped: dbItemList.filter(item => cookieItemList.includes(item))
+                        });
+                    })
+                    .catch(err => {
+                        console.error('렌트 상태 조정 실패: ', err);
+                        return res.status(500).send('렌트 상태 조정 실패');
+                    });
             });
         });
     });
@@ -94,6 +107,8 @@ router.post('/cancel', (req, res) => {
         const userName = results[0].name;
 
         // ✅ 먼저 해당 대여 기록이 존재하는지 확인
+        //최적화가 필요해보이는 군
+
         const sqlCheck = 'SELECT * FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
         db.query(sqlCheck, [itemName, userName], (err, checkResult) => {
             if (err) {
@@ -112,7 +127,15 @@ router.post('/cancel', (req, res) => {
                     return res.status(500).json({ success: false, message: '대여 취소 실패' });
                 }
 
-                return res.json({ success: true, message: `${itemName} 대여 취소 완료` });
+                //대여가능임을 명시하도록 INSERT
+                const sqlUpdateStatus = 'UPDATE Items SET status = 0 WHERE itemName = ?';
+                db.query(sqlUpdateStatus, [itemName], (err, results) => {
+                    if (err) {
+                        console.error('[❌ status 업데이트 실패]', err);
+                        return res.status(500).json({ success: false, message: 'status 업데이트 실패' });
+                    }
+                    return res.json({ success: true, message: `${itemName} 대여 취소 완료` });
+                });
             });
         });
     });
