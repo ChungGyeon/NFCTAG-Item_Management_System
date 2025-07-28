@@ -1,3 +1,10 @@
+/*
+* 원래 쿠키를 생성하는 라우트
+* 하지만 쿠키 생성은 main.js에서 실질적으로 이루어짐
+* 나중에 여기로 옳기거나 이 파일은 삭제 예정이다
+*
+* */
+
 const express = require('express');
 var router = express.Router();
 const session = require('express-session');

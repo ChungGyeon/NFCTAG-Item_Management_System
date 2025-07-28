@@ -1,9 +1,15 @@
 /*
-nfc 모듈로 들어온 녀석을 처리하는 과정을 여기다 구현할거야
-이건 내가 한다고 하지
+reservedList 쿠키를 감지하는 라우트
+
+/detectCookie는 쿠키 감지 테스트용
+/startRentingItem/:seed 는 랜덤 시드를 적용하여 nfc모듈에서 생성하는 주소로만 접근가능하게 만든 파일
+이 라우트 전체가 랜덤시드 영향을 받고 있어 실질적인 쿠키 처리는 verify.js에서 처리함
+
+이곳에선 쿠키가 있으면 쿠키를 처리하는 페이지로 넘겨주고
+로그인이 안되어있거나 잘못된 시드로 접근시 각각의 원인을 안내함
+
+잘못된 시드를 입력하면 이스터에그를 해놨지 ㅋㅋ
 */
-
-
 
 const express = require('express');
 var router = express.Router();

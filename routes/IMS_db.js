@@ -1,3 +1,7 @@
+/*
+* 오로지 db를 연결하기 위한 라우트
+* */
+
 var express = require('express');
 var router = express.Router();
 const mysql = require('mysql'); //mysql 모듈 불러오기
