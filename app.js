@@ -11,9 +11,34 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
 const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
+const detCookie = require('./routes/detectCookie'); //쿠키 감지 처리 관련 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
 
-var app = express();
+// === [여기부터 추가] ===
+let currentSeed = generateRandomSeed();
+let lastSeed = null; // (선택) 이전 시드도 잠깐 허용하려면 사용
+
+function generateRandomSeed() {
+    return Math.random().toString(36).substr(2, 10);
+}
+
+// 5분마다 시드 갱신
+setInterval(() => {
+    lastSeed = currentSeed;
+    currentSeed = generateRandomSeed();
+    console.log('새 시드:', currentSeed);
+}, 10 * 1000);
+// === [여기까지 추가] ===
+
+
+const app = express();
+
+//베이스타이틀 지정
+app.use((req, res, next) => {
+    res.locals.baseTitle = 'ITS-IMS';
+    next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,35 +50,41 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//랜덤시드 생성시키는 그시기
+app.get('/get-current-seed', (req, res) => {
+    res.json({ seed: currentSeed });
+});
+
+
 /* 세션설정 */
-app.use(session({ // 세션 설정
+app.use(session({
     secret: 'SESSION_SECRET',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 // ✅ 24시간 동안 로그인 유지
+        httpOnly: true
+        // maxAge 생략 → 브라우저 종료 시 세션도 종료됨
     }
 }));
 
-
+/* 랜덤시드 사용하는 거 활성화 해야해 쓸꺼면
+아직 사용 표준화 안시켜서 냄겨둠
+app.use('/:seed', (req, res, next) => {
+    req.currentSeed = currentSeed;
+    req.lastSeed = lastSeed;
+    next();
+}, mainRouter);*/
 app.use('/', mainRouter);
 app.use('/users', usersRouter);
 app.use('/util', genCookie);
-//app.use('/users', require('./routes/users'));
 
-// app.get('/LoadMysql', (req, res) => {
-//     const sql = 'SELECT itemName, img FROM Items';
-//
-//     db.query(sql, (err, results) => {
-//         if (err) {
-//             console.error('DB 오류:', err);
-//         }
-//
-//         res.render('main',{ items: results });
-//     });
-// });
-
+//랜덤시드 적용
+//app.use('/detect', detCookie);
+app.use('/:seed', (req, res, next) => {
+    req.currentSeed = currentSeed;
+    req.lastSeed = lastSeed;
+    next();
+}, detCookie);
 
 
 
@@ -69,10 +100,13 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+
+app.use('/rent', verifyRouter);
+
 /*
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  next(createError(404));ve
 });*/
 
 //module.exports = app;

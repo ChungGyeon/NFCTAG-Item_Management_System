@@ -1,3 +1,10 @@
+/*
+* 원래 쿠키를 생성하는 라우트
+* 하지만 쿠키 생성은 main.js에서 실질적으로 이루어짐
+* 나중에 여기로 옳기거나 이 파일은 삭제 예정이다
+*
+* */
+
 const express = require('express');
 var router = express.Router();
 const session = require('express-session');
@@ -17,7 +24,7 @@ router.get('/generateCookie', (req, res) => {
     }
         // 쿠키 설정
     res.cookie('info', JSON.stringify(infoObj),
-        { maxAge: 1 * 60 * 1000}
+        { maxAge: 900000}
     );
 
     res.json({ success: true, message: '쿠키가 생성되었습니다.' });

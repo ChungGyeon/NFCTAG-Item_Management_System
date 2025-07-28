@@ -1,79 +1,71 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <link rel="stylesheet" href="/stylesheets/forMain.css" />
-  </head>
-  <body>
-    <div class="main-grid-container">
-      <header>
-
-        <img class="welcome-img" src="/images/put_out_the_picture.jpg" />
-        <div class="indroduction-img-container">
-          <p class="bottom-text">잠시 빌리려 왔습니다</p>
-        </div>
-      </header>
-
-      <main>
-        <% items.forEach(item => { %>
-          <div class="itemDetail-card">
-            <h3><%= item.itemName %></h3>
-            <ul>
-              <li>
-                <img src="<%= item.img %>" alt="<%= item.itemName %>" />
-              </li>
-            </ul>
-            <button onclick="reserveFromServer('<%= item.itemName %>')">예약하기</button>
-            <button onclick="cancelReservation('<%= item.itemName %>')">예약 취소하기</button>
-          </div>
-        <% }) %>
-      </main>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/stylesheets/forMain.css" />
+  <script src="/javascripts/forUserMainPage.js"></script>
+  <title><%= baseTitle %>  <%= title%></title>
+</head>
+<body>
+<div class="main-grid-container <%= items.some(item => item.status === 1) ? 'with-rented' : 'without-rented' %>">
+  <header>
+    <img class="welcome-img" src="/images/put_out_the_picture.jpg" />
+    <div class="indroduction-img-container">
+      <p class="bottom-text">잠시 빌리려 왔습니다</p>
     </div>
+    <a href="/users/logout" class="logout-btn">로그아웃</a>
+  </header>
 
-    <script>
-      function reserveFromServer(itemName) {
-        if (confirm(`${itemName} 예약 하시겠습니까?`)) {
-          fetch('/reservation', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ itemName })
-          })
-          .then(res => res.json())
-          .then(data => {
-            alert(data.message);
-            location.reload(); // 새로고침해서 쿠키 갱신 반영
-          })
-          .catch(err => {
-            alert("예약 중 오류가 발생했습니다.");
-            console.error(err);
-          });
-        }
-      }
+<div class="main-item1">
+  <h1>지금 빌린거에요</h1>
+  <% items.filter(item => item.status === 1).forEach(item => { %>
+    <div class="itemDetail-card rented" data-item-name="<%= item.itemName %>">
+      <input type="hidden" name="status" value="<%= item.status %>">
+      <h3><%= item.itemName %></h3>
+      <p style="color: red; font-weight: bold;">대여중</p>
+      <ul>
+        <li>
+          <img src="<%= item.img %>" alt="<%= item.itemName %>" />
+        </li>
+      </ul>
+      <div class="item-buttons">
+        <button onclick="cancelRental('<%= item.itemName %>')">대여 취소하기 (DB)</button>
+      </div>
+    </div>
+  <% }) %>
+  <br><br><hr><br>
+</div>
 
-      function cancelReservation(itemName) {
-        if (confirm(`${itemName} 예약을 취소하시겠습니까?`)) {
-          fetch('/reservation/cancel', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ itemName })
-          })
-          .then(res => res.json())
-          .then(data => {
-            alert(data.message);
-            location.reload(); // 새로고침해서 쿠키 갱신 반영
-          })
-          .catch(err => {
-            alert("예약 취소 중 오류가 발생했습니다.");
-            console.error(err);
-          });
-        }
-      }
-    </script>
-  </body>
+<div class="main-item2">
+  <h1>빌릴 수 있는 거에요</h1>
+  <% items.filter(item => item.status === 0).forEach(item => { %>
+    <div class="itemDetail-card not-rented" data-item-name="<%= item.itemName %>">
+      <input type="hidden" name="status" value="<%= item.status %>">
+      <h3><%= item.itemName %></h3>
+      <ul>
+        <li>
+          <img src="<%= item.img %>" alt="<%= item.itemName %>" />
+        </li>
+      </ul>
+      <div class="item-buttons">
+        <% if (item.isReserved) { %>
+          <button class="cancel-reservation-btn" onclick="cancelReservation('<%= item.itemName %>')">예약 취소하기</button>
+          <button class="reserve-btn" onclick="reserveFromServer('<%= item.itemName %>')" style="display: none;">예약하기</button>
+        <% } else { %>
+          <button class="cancel-reservation-btn" onclick="cancelReservation('<%= item.itemName %>')" style="display: none;">예약 취소하기</button>
+          <button class="reserve-btn" onclick="reserveFromServer('<%= item.itemName %>')">예약하기</button>
+        <% } %>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+    <!-- ✅ 대여 확정 버튼 추가 테스트용임 추후 삭제 예정-->
+    <div style="text-align: center; margin-top: 30px;">
+      <button onclick="location.href='/detect/startRentingItem'" style="padding: 12px 24px; font-size: 16px;">대여 확정</button>
+    </div>
+  </main>
+</div>
+</body>
 </html>
