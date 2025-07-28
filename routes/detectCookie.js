@@ -47,9 +47,9 @@ router.get('/startRentingItem/:seed',(req,res) => {
      if (!req.session.user) {
          return res.status(404).send('로그인부터 하고 오십쇼');
      }
-     res.render('ckCookie',{title:"쿠키 거시기용"});
+     res.render('ckCookie',{title:"ITS-IMS : 쿠키 읽는 중"});
     } else {
-     res.status(404).send('시드가 다르군. 너 죽고싶니?');
+     res.status(400).render('wrongAccess',{title:"ITS-IMS : 이전시드 감지"});
     }
 })
 

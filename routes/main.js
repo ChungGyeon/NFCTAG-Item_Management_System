@@ -65,7 +65,7 @@ router.get('/', function(req, res, next) {//router123
             isReserved: userReservedItems.includes(item.itemName)
         }));
 
-        res.render('main', { items: itemsWithStatus, title: 'ITS 물품대여소' });
+        res.render('main', { items: itemsWithStatus, title: 'ITS-IMS  물품대여소' });
     });
 });
 
