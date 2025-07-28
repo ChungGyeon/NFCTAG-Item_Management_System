@@ -81,6 +81,20 @@ router.post('/signUpquery', async (req,res)=> {
   });
 });
 
+router.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('세션 삭제 실패:', err);
+      return res.status(500).send('로그아웃 중 오류 발생');
+    }
+
+    res.clearCookie('connect.sid');       // 세션 쿠키 삭제
+    res.clearCookie('reservedItems');     // 예약 쿠키 삭제
+
+    res.redirect('/users/login');         // 로그인 페이지로 이동
+  });
+});
+
 
 
 module.exports = router;

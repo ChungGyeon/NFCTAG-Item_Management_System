@@ -102,3 +102,17 @@ main {
   background-color: white;
   border-radius: 8px;
 }
+
+.logout-btn {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #ff5c5c;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+.logout-btn:hover {
+  background-color: #e60000;
+}
