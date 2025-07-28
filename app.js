@@ -32,7 +32,13 @@ setInterval(() => {
 // === [여기까지 추가] ===
 
 
-var app = express();
+const app = express();
+
+//베이스타이틀 지정
+app.use((req, res, next) => {
+    res.locals.baseTitle = 'ITS-IMS';
+    next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

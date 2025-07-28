@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
 })
 
 router.get('/login', (req, res) => {
-  res.render('login');
+  res.render('login', {title: '로그인'});
 });
 
 

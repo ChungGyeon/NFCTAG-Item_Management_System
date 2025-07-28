@@ -49,7 +49,7 @@ router.get('/startRentingItem/:seed',(req,res) => {
      }
      res.render('ckCookie',{title:"ITS-IMS : 쿠키 읽는 중"});
     } else {
-     res.status(400).render('wrongAccess',{title:"ITS-IMS : 이전시드 감지"});
+     res.status(400).render('wrongAccess',{title:"이전시드 감지"});
     }
 })
 
