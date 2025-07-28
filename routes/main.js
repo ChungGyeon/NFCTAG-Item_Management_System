@@ -43,7 +43,7 @@ router.get('/', function(req, res, next) {//router123
     if (!req.session.user) {
         return res.redirect('/users/login');
     }
-    const sql = 'SELECT itemName, img FROM Items';
+    const sql = 'SELECT itemName, img, status FROM Items';
     db.query(sql, (err, items) => {
         if (err) {
             console.error('DB 오류:', err);

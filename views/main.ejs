@@ -18,8 +18,12 @@
 
   <main>
     <% items.forEach(item => { %>
-      <div class="itemDetail-card" data-item-name="<%= item.itemName %>">
+      <div class="itemDetail-card <%= item.status === 1 ? 'on-loan' : '' %>" data-item-name="<%= item.itemName %>">
+        <input type="hidden" name="status" value="<%= item.status %>">
         <h3><%= item.itemName %></h3>
+        <% if (item.status === 1) { %>
+          <p style="color: red; font-weight: bold;">대여중</p>
+        <% } %>
         <ul>
           <li>
             <img src="<%= item.img %>" alt="<%= item.itemName %>" />
@@ -35,6 +39,7 @@
           <% } %>
         </div>
         <button onclick="cancelRental('<%= item.itemName %>')">대여 취소하기 (DB)</button>
+
       </div>
     <% }) %>
 

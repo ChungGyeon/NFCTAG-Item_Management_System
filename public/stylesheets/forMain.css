@@ -102,3 +102,7 @@ main {
   background-color: white;
   border-radius: 8px;
 }
+
+.itemDetail-card.on-loan {
+  opacity: 0.5;
+}
