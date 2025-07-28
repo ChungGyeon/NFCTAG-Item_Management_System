@@ -1,23 +1,18 @@
 body, html {
   margin: 0;
   padding: 0;
+  font-family: sans-serif;
 }
-/*
+
 .main-grid-container {
   display: grid;
-  width: 100vw;
-  height: 100vh;
-  grid-template-rows: 100px 1fr 100px;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas:
-        "header header header"
-        "main   main  main"
-        "main   main  main";
-}*/
-.main-grid-container {
-  display: flex;
-  flex-direction: column;
+  width: 100%;
   min-height: 100vh;
+  grid-template-rows: auto 1fr 1fr;
+  grid-template-areas:
+    "header"
+    "main-item1"
+    "main-item2";
 }
 
 header {
@@ -25,39 +20,28 @@ header {
   background-color: #f0f0f0;
   text-align: center;
   padding: 20px;
-  display: flex;
-  flex-direction: column; /* 요소를 세로로 정렬 */
-  align-items: center; /* 가운데 정렬 */
-}
-main {
-  grid-area: main;
-  background-color: #f0f0f0;
-  padding: 20px;
-  overflow: auto;
-  display: flex; /* 플렉스 레이아웃 활성화 */
-  flex-direction: column; /* 세로 정렬 */
-  justify-content: flex-end; /* 아래로 배치 */
+  position: relative; /* Needed for absolute positioning of child */
 }
 
-/*앞 배너*/
-.indroduction-img-container {
-  position: relative;
-  width: 300px; /* 원하는 너비 */
-  height: auto;
-  align-items: center;
-}
 .welcome-img {
-  position: relative;
-  grid-area: header; /* 그리드에서 헤더 영역에 배치 */
   width: 700px;
   height: 250px;
-  z-index: 10;
+  display: block; /* To remove extra space below image */
+  margin: 0 auto; /* Center the image */
 }
+
+.indroduction-img-container {
+  position: relative;
+  width: 700px; /* Match image width */
+  margin: 0 auto; /* Center the container */
+}
+
 .bottom-text {
   position: absolute;
-  bottom: 100px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 33.33%;
-  width: 100%;
   background: rgba(0, 0, 0, 0.1);
   color: black;
   font-weight: bold;
@@ -67,8 +51,33 @@ main {
   align-items: center;
 }
 
-/*물품 display되는 구간*/
-.itemDetails {
+/* 첫 번째 영역: 대여중인 아이템 */
+.main-item1 {
+  grid-area: main-item1;
+  padding: 20px;
+}
+
+.main-item1 .itemDetail-card.rented {
+  display: block;
+  opacity: 0.5;
+}
+
+.main-item1 .itemDetail-card.not-rented {
+  display: none;
+}
+
+/* 두 번째 영역: 대여 가능한 아이템 */
+.main-item2 {
+  grid-area: main-item2;
+  padding: 20px;
+}
+
+.main-item2 .itemDetail-card.rented {
+  display: none;
+}
+
+.main-item2 .itemDetail-card.not-rented {
+  display: block;
 }
 
 .itemDetail-card {
@@ -77,32 +86,15 @@ main {
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-
-
-
-header {
-  padding: 20px;
-  background-color: #f5f5f5;
-  text-align: center;
-}
-
-main {
-  flex: 1;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.itemDetail-card {
   border: 1px solid #ccc;
-  padding: 15px;
-  background-color: white;
-  border-radius: 8px;
 }
 
-.itemDetail-card.on-loan {
-  opacity: 0.5;
+.itemDetail-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.item-buttons {
+    margin-top: 10px;
 }
