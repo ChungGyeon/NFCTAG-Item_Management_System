@@ -11,6 +11,7 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
 const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
+const detCookie = require('./routes/detectCookie'); //쿠키 감지 처리 관련 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
 
@@ -31,7 +32,13 @@ setInterval(() => {
 // === [여기까지 추가] ===
 
 
-var app = express();
+const app = express();
+
+//베이스타이틀 지정
+app.use((req, res, next) => {
+    res.locals.baseTitle = 'ITS-IMS';
+    next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -43,11 +50,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// === [여기 추가] ===
+//랜덤시드 생성시키는 그시기
 app.get('/get-current-seed', (req, res) => {
     res.json({ seed: currentSeed });
 });
-// === [여기까지 추가] ===
+
 
 /* 세션설정 */
 app.use(session({
@@ -61,6 +68,7 @@ app.use(session({
 }));
 
 /* 랜덤시드 사용하는 거 활성화 해야해 쓸꺼면
+아직 사용 표준화 안시켜서 냄겨둠
 app.use('/:seed', (req, res, next) => {
     req.currentSeed = currentSeed;
     req.lastSeed = lastSeed;
@@ -69,20 +77,14 @@ app.use('/:seed', (req, res, next) => {
 app.use('/', mainRouter);
 app.use('/users', usersRouter);
 app.use('/util', genCookie);
-//app.use('/users', require('./routes/users'));
 
-// app.get('/LoadMysql', (req, res) => {
-//     const sql = 'SELECT itemName, img FROM Items';
-//
-//     db.query(sql, (err, results) => {
-//         if (err) {
-//             console.error('DB 오류:', err);
-//         }
-//
-//         res.render('main',{ items: results });
-//     });
-// });
-
+//랜덤시드 적용
+//app.use('/detect', detCookie);
+app.use('/:seed', (req, res, next) => {
+    req.currentSeed = currentSeed;
+    req.lastSeed = lastSeed;
+    next();
+}, detCookie);
 
 
 

@@ -1,3 +1,6 @@
+/*
+* 가장 중요*/
+
 const express = require('express');
 const router = express.Router();
 const { db } = require('./IMS_db'); // DB 연결
@@ -16,37 +19,12 @@ setInterval(() => {
     console.log('새 시드:', currentSeed);
 }, 20*1000);
 
-/* 테스트 후 삭제 예정
-router.get('/get-current-seed', (req, res) => {
-    res.json({ seed: currentSeed });
-});
-
-router.use('/:seed', (req, res, next) => {
-    req.currentSeed = currentSeed;
-    req.lastSeed = lastSeed;
-    next();
-}, mainRouter);
-*/
-
-/* GET home page. */
-/* 아래 router123 
-router.get('/', function(req, res, next) {
-    if (!req.session.user) {
-        return res.redirect('/users/login');
-    }
-
-    const sql = 'SELECT itemName, img FROM Items';
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('DB 오류:', err);
-            return res.status(500).send('DB 오류 발생');
-        }
-*/
 router.get('/', function(req, res, next) {//router123
     const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
     const { currentSeed, lastSeed } = req;
 
     /*  비활성화
+    근데 아직 이 코드의 표준화 사용법을 적지 않아서 냄겨둠
     if (urlSeed === currentSeed || urlSeed === lastSeed) {
         if (!req.session.user) {
             return res.redirect('/users/login');
@@ -68,15 +46,29 @@ router.get('/', function(req, res, next) {//router123
     if (!req.session.user) {
         return res.redirect('/users/login');
     }
-    const sql = 'SELECT itemName, img FROM Items';
-    db.query(sql, (err, results) => {
+    const sql = 'SELECT itemName, img, status FROM Items';
+    db.query(sql, (err, items) => {
         if (err) {
             console.error('DB 오류:', err);
+            return res.status(500).send('DB 오류 발생');
         }
-        console.log(results);
-        res.render('main', {items: results, title: 'ITS 물품대여소'});
-        //res.render('main', { title: 'ITS 물품대여소' });
-        //res.redirect('/LoadMysql');
+
+        // 현재 사용자의 예약 목록을 쿠키에서 가져옴
+        const studentnum = req.session.user?.studentnum;
+        const reservedCookie = req.cookies.reservedItems || '';
+        let userReservedItems = [];
+
+        if (studentnum && reservedCookie.startsWith(studentnum + ':')) {
+            userReservedItems = reservedCookie.split(':')[1].split(',').filter(Boolean);
+        }
+
+        // 각 아이템에 예약 상태(isReserved) 추가
+        const itemsWithStatus = items.map(item => ({
+            ...item,
+            isReserved: userReservedItems.includes(item.itemName)
+        }));
+
+        res.render('main', { items: itemsWithStatus, title: '물품대여소' });
     });
 });
 
