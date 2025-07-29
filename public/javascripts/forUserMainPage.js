@@ -85,3 +85,39 @@ function cancelRental(itemName) {
             });
     }
 }
+
+//남은 대여시간 계산 함수
+function initCountdowns() {
+    const countdowns = document.querySelectorAll('.countdown');
+
+    countdowns.forEach(countdown => {
+        const rentHours = parseInt(countdown.dataset.rentHours, 10);
+        const rentStartStr = countdown.dataset.rentStart;
+
+        if (isNaN(rentHours) || !rentStartStr) {
+            return;
+        }
+
+        const rentStart = new Date(rentStartStr);
+        const endTime = new Date(rentStart.getTime() + (rentHours * 60 * 60 * 1000));
+
+        function updateCountdown() {
+            const now = new Date();
+            const timeLeft = endTime - now;
+
+            if (timeLeft <= 0) {
+                countdown.textContent = "대여 시간 종료";
+                return;
+            }
+
+            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            countdown.textContent = `(남은시간: ${hours}시간 ${minutes}분)`;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 60000); // 1분마다 업데이트
+    });
+}
+document.addEventListener('DOMContentLoaded', initCountdowns);
+
