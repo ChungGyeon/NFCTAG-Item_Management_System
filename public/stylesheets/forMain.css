@@ -4,127 +4,107 @@ body, html {
   font-family: sans-serif;
 }
 
+/* 기존 CSS 코드 */
 .main-grid-container {
-  display: grid;
-  width: 100%;
-  min-height: 100vh;
-  grid-template-rows: auto 1fr 1fr;
-  grid-template-areas:
-    "header"
-    "main-item1"
-    "main-item2";
+    display: grid;
+    grid-template-areas:
+        'header header'
+        'main-item1 main-item2';
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
 }
 
 header {
-  grid-area: header;
-  background-color: #f0f0f0;
-  text-align: center;
-  padding: 20px;
-  position: relative; /* Needed for absolute positioning of child */
+    grid-area: header;
+    text-align: center;
+    position: relative;
 }
 
 .welcome-img {
-  width: 700px;
-  height: 250px;
-  display: block; /* To remove extra space below image */
-  margin: 0 auto; /* Center the image */
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
 }
 
 .indroduction-img-container {
-  position: relative;
-  width: 700px; /* Match image width */
-  margin: 0 auto; /* Center the container */
+    position: relative;
 }
 
 .bottom-text {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 33.33%;
-  background: rgba(0, 0, 0, 0.1);
-  color: black;
-  font-weight: bold;
-  font-size: 1.5em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* 첫 번째 영역: 대여중인 아이템 */
-.main-item1 {
-  grid-area: main-item1;
-  padding: 20px;
-}
-
-.main-item1 .itemDetail-card.rented {
-  display: block;
-  opacity: 0.5;
-}
-
-.main-item1 .itemDetail-card.not-rented {
-  display: none;
-}
-
-/* 두 번째 영역: 대여 가능한 아이템 */
-.main-item2 {
-  grid-area: main-item2;
-  padding: 20px;
-}
-
-.main-item2 .itemDetail-card.rented {
-  display: none;
-}
-
-.main-item2 .itemDetail-card.not-rented {
-  display: block;
-}
-
-.main-grid-container.with-rented {
-  grid-template-rows: auto 1fr 1fr;
-}
-
-.main-grid-container.without-rented {
-  grid-template-rows: auto 1fr;
-}
-
-.main-grid-container.without-rented .main-item1 {
-  display: none;
-}
-
-.main-grid-container.without-rented .main-item2 {
-  grid-row: 2;
-}
-
-.itemDetail-card {
-  width: 200px;
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  border: 1px solid #ccc;
-}
-
-.itemDetail-card img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.item-buttons {
-    margin-top: 10px;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 .logout-btn {
-  margin-top: 10px;
-  padding: 8px 16px;
-  background-color: #ff5c5c;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background-color 0.3s;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    background-color: #f44336;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
 }
-.logout-btn:hover {
-  background-color: #e60000;
+
+.main-item1 {
+    grid-area: main-item1;
+}
+
+.main-item2 {
+    grid-area: main-item2;
+}
+
+.itemDetail-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+}
+
+.itemDetail-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.item-buttons button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.reserve-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.cancel-reservation-btn {
+    background-color: #ff9800;
+    color: white;
+}
+
+/* 반응형 웹을 위한 미디어 쿼리 */
+@media (max-width: 768px) {
+    .main-grid-container {
+        grid-template-areas:
+            'header'
+            'main-item1'
+            'main-item2';
+        grid-template-columns: 1fr;
+    }
+
+    .bottom-text {
+        font-size: 14px;
+    }
 }
