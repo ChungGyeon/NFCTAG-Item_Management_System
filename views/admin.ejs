@@ -23,12 +23,12 @@
     <% items.forEach(item => { %>
       <div class="table-card">
         <h3><%= item.itemName %></h3>
+        <img id="itemImg" src="/images/<%= item.img %>" alt="이미지가 안보인다고요? 어쩌라구요">
         <ul>
-          <li>
             <h2><%= item.status %></h2>
-          </li>
         </ul>
         <label><input type="checkbox" class="table-check"> 선택</label>
+        <label><button onclick="editModalOpen(this)" class="edit-btn">수정</button></label>
       </div>
     <% }) %>
   </main>
@@ -65,6 +65,18 @@
         </form>
       </div>
     </div>
+    </div>
+  </section>
+
+  <section><!--아이템 수정 섹션-->
+    <div id="editItemModal" class="editItemModal">
+      <div class="editItemModal-content">
+        <span class="close" onclick="CloseModal()">&times;</span>
+
+        <p class="editItemModalContainer" id ="editItemModalContainer">
+
+        </p>
+      </div>
     </div>
   </section>
 </div>

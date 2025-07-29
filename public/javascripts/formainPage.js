@@ -4,6 +4,7 @@ function OpenAddAcountModal() {
 }
 function CloseModal(){
     document.getElementById("AddAcountModal").style.display = "none";
+    document.getElementById("editItemModal").style.display = "none";
 }
 
 
@@ -55,4 +56,26 @@ function signUpquery() {
             });
     }*/
         });
-};
+}
+
+//아이템수정 섹션 여는 놈
+function editModalOpen(button) {
+    document.getElementById("editItemModal").style.display = "block";
+    const tableCard = button.closest('.table-card');
+    const itemName = tableCard.querySelector('h3').textContent;
+
+    const img = tableCard.querySelector('img').getAttribute('src');
+
+    const container = document.getElementById('editItemModalContainer');
+        container.innerHTML = '';
+
+    const div = document.createElement('div');
+        div.innerHTML = `
+            <p>${itemName}</p>
+            <img id="itemImg" src="${img}" alt="이미지가 안보인다고요? 어쩌라구요">
+            <hr>
+            `;
+        container.appendChild(div);
+
+
+}
