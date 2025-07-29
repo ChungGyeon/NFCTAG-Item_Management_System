@@ -22,8 +22,10 @@
   <% items.filter(item => item.status === 1).forEach(item => { %>
     <div class="itemDetail-card rented" data-item-name="<%= item.itemName %>">
       <input type="hidden" name="status" value="<%= item.status %>">
-      <h3><%= item.itemName %></h3>
-      <p style="color: red; font-weight: bold;">대여중</p>
+      <p>
+       <h3><%= item.itemName %></h3>
+      </p>
+      <p style="color: red; font-weight: bold;"><%= item.whoAreRent %> - 대여중</p>
       <ul>
         <li>
           <img src="<%= item.img %>" alt="<%= item.itemName %>" />
