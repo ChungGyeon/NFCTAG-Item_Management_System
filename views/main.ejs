@@ -18,7 +18,7 @@
   </header>
 
 <div class="main-item1">
-  <h1>지금 빌린거에요</h1>
+  <h1>빌린 품목이에요</h1>
   <% items.filter(item => item.status === 1).forEach(item => { %>
     <div class="itemDetail-card rented" data-item-name="<%= item.itemName %>">
       <input type="hidden" name="status" value="<%= item.status %>">
