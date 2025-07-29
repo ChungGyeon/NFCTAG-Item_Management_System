@@ -19,8 +19,8 @@
   </header>
 
 <div class="main-item1">
-  <input type="time" name="appointment" />
   <h1>빌린 품목이에요</h1>
+  <div class="item-grid">
   <% items.filter(item => item.status === 1).forEach(item => { %>
     <div class="itemDetail-card rented" data-item-name="<%= item.itemName %>">
       <input type="hidden" name="status" value="<%= item.status %>">
@@ -45,11 +45,13 @@
       </div>
     </div>
   <% }) %>
+  </div>
   <br><br><hr><br>
 </div>
 
 <div class="main-item2">
   <h1>빌릴 수 있는 거에요</h1>
+  <div class="item-grid">
   <% items.filter(item => item.status === 0).forEach(item => { %>
     <div class="itemDetail-card not-rented" data-item-name="<%= item.itemName %>">
       <input type="hidden" name="status" value="<%= item.status %>">
@@ -70,6 +72,7 @@
       </div>
     </div>
   <% }) %>
+  </div>
 </div>
 
     <!-- ✅ 대여 확정 버튼 추가 테스트용임 추후 삭제 예정-->
