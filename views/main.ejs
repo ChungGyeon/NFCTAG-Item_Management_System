@@ -18,6 +18,7 @@
     <a href="/users/logout" class="logout-btn">로그아웃</a>
   </header>
 
+<% if (items.some(item => item.status === 1)) { %>
 <div class="main-item1">
   <h1>빌린 품목이에요</h1>
   <div class="item-grid">
@@ -46,6 +47,7 @@
   </div>
   <br><br><hr><br>
 </div>
+<% } %>
 
 <div class="main-item2">
   <h1>빌릴 수 있는 거에요</h1>
