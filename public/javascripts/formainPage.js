@@ -63,19 +63,30 @@ function editModalOpen(button) {
     document.getElementById("editItemModal").style.display = "block";
     const tableCard = button.closest('.table-card');
     const itemName = tableCard.querySelector('h3').textContent;
-
-    const img = tableCard.querySelector('img').getAttribute('src');
+    const imgSrc = tableCard.querySelector('img').getAttribute('src');
 
     const container = document.getElementById('editItemModalContainer');
-        container.innerHTML = '';
 
-    const div = document.createElement('div');
-        div.innerHTML = `
-            <p>${itemName}</p>
-            <img id="itemImg" src="${img}" alt="이미지가 안보인다고요? 어쩌라구요">
-            <hr>
-            `;
-        container.appendChild(div);
+    //메모리관리용, 기존내용제거
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
 
+    // 텍스트 요소 생성
+    const paragraph = document.createElement('p');
+    paragraph.textContent = itemName;
 
+    // 이미지 요소 생성
+    const img = document.createElement('img');
+    img.id = 'itemImg';
+    img.src = imgSrc;
+    img.alt = '이미지가 안보인다고요? 어쩌라구요';
+
+    // 구분선 생성
+    const hr = document.createElement('hr');
+
+    // 요소들을 순서대로 추가
+    container.appendChild(paragraph);
+    container.appendChild(img);
+    container.appendChild(hr);
 }
