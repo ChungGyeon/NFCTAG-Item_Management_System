@@ -23,7 +23,6 @@
     <% items.forEach(item => { %>
       <div class="table-card">
         <h3><%= item.itemName %></h3>
-        <input type="text" id="studentnum" name="studentnum" placeholder="이 요소를 css로 지정하면 꾸밀수도 있어" required>
         <img id="itemImg" src="/images/<%= item.img %>" alt="이미지가 안보인다고요? 어쩌라구요">
         <ul>
             <h2><%= item.status %></h2>
@@ -73,11 +72,9 @@
     <div id="editItemModal" class="editItemModal">
       <div class="editItemModal-content">
         <span class="close" onclick="CloseModal()">&times;</span>
-
         <!--여기에 자동으로 입력 됨-->
-        <p class="editItemModalContainer" id ="editItemModalContainer">
-
-        </p>
+        <p class="editItemModalContainer" id ="editItemModalContainer"></p>
+        <button class="editItemModalSendBtn" id="editItemModalSendBtn" onclick="updateItem()">수정</button>
       </div>
     </div>
   </section>

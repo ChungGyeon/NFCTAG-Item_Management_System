@@ -16,6 +16,7 @@ const express = require('express');
 const router = express.Router();
 const multer  = require('multer');
 const path = require("path");
+const { db }= require('./IMS_db'); // DB 연결
 
 
 const upload = multer({
@@ -23,7 +24,7 @@ const upload = multer({
         //파일저장 위치 지정, file의 이름을 로그에 출력하고 images 폴더에 이미지 저장
         destination(req, file, done) {
             console.log(file);
-            done(null, path.join(__dirname, "public/images"));
+            done(null, "public/images");
         },
         filename(req, file, done) {
             const ext = path.extname(file.originalname);
@@ -37,15 +38,42 @@ const upload = multer({
 });
 
 //menu_modify.ejs에서 이미지 선택 후 업로드 클릭 시 서버 로그에 파일 디테일을 출력함, 336~342line
-app.post('/StoreImg_upload', upload.single('myFile'), (req, res) => {
-    try{
-        if (!req.file) {
-            return res.status(400).json({ error: "파일이 업로드되지 않았습니다." });
+router.post('/updateItem', upload.single('image'), (req, res) => {
+    try {
+        if(!req.file && !req.body.itemName){ //이미지랑 수정된 이름 둘다 제공 x시
+            return res.status(400).json({
+                success: false,
+                error: "이미지와 수정된 이름이 제공되지 않았습니다."
+            });
         }
-        res.redirect(`UserStore/UserStore_admin/Modifying_menu_page/UserStore_menu_modify?filename=${encodeURIComponent(req.file.originalname)}`);
+
+        const updateData = {};
+        if(req.file) updateData.img = req.file.filename;
+        if(req.body.itemName) updateData.itemName = req.body.itemName;
+
+
+        const setClause = Object.keys(updateData)
+            .map(key => `${key} = ?`)
+            .join(', ');
+
+        const sql = `UPDATE Items SET ${setClause} WHERE itemName = ?`
+        const values = [...Object.values(updateData), req.body.originItemName];
+
+        db.query(sql, values, (err, result) => {
+            if (err) throw err;
+            res.json({
+                success: true,
+                message: "아이템이 성공적으로 업데이트되었습니다.",
+                updates: updateData
+            });
+        });
+
     } catch (error) {
-        console.error('이미지 업로드 중 에러 발생: ', error);
-        res.status(500).send('서버 에러');
+        console.error('아이템 업데이트 중 에러 발생:', error);
+        res.status(500).json({
+            success: false,
+            error: "서버 에러가 발생했습니다."
+        });
     }
 });
 

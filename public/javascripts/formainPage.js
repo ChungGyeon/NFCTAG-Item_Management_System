@@ -72,21 +72,82 @@ function editModalOpen(button) {
         container.removeChild(container.firstChild);
     }
 
-    // 텍스트 요소 생성
-    const paragraph = document.createElement('p');
-    paragraph.textContent = itemName;
+    //itemName가져오는놈
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.id = 'itemName';
+    hiddenInput.value = itemName;
+    container.appendChild(hiddenInput);
 
-    // 이미지 요소 생성
+    // 텍스트 요소 생성
+    const paragraph = document.createElement('input');
+    paragraph.type = 'text';
+    paragraph.id = 'textInput';
+    paragraph.placeholder = '이름 수정 시 이곳에 입력   현재이름 : itemName';
+
+    // 이미지 업로드를 위한 input 생성
+    const imageInput = document.createElement('input');
+    imageInput.type = 'file';
+    imageInput.accept = 'image/*';
+    imageInput.id = 'imageInput';
+    imageInput.style.display = 'none';
+
+    // 이미지 프리뷰 요소 생성
     const img = document.createElement('img');
     img.id = 'itemImg';
     img.src = imgSrc;
-    img.alt = '이미지가 안보인다고요? 어쩌라구요';
+    img.alt = '이미지가 안보인다구요? 어쩌라구여';
+    img.style.cursor = 'pointer';
+
+    // 이미지 클릭 시 파일 선택 창 열기
+    img.addEventListener('click', () => imageInput.click());
+
+    // 이미지 파일이 선택되면 프리뷰 업데이트
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => img.src = e.target.result;
+            reader.readAsDataURL(file);
+        }
+    });
 
     // 구분선 생성
     const hr = document.createElement('hr');
 
     // 요소들을 순서대로 추가
     container.appendChild(paragraph);
+    container.appendChild(imageInput);
     container.appendChild(img);
     container.appendChild(hr);
+}
+
+
+//수정 내용을 서버에 전송하여 수정하는 함수
+function updateItem() {
+    const formData = new FormData();
+    const originItemName = document.getElementById('itemName').value;
+    const textInput = document.getElementById('textInput');
+    const imageInput = document.getElementById('imageInput');
+
+    if(!textInput.value && !imageInput.value) {
+        return console.error('입력된게 아무것도 없는뎁슝');
+    }
+    if(textInput.value) formData.append('itemName', textInput.value);
+    if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
+    formData.append('originItemName', originItemName);
+
+    fetch('/imgProcess/updateItem', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('수정이 완료되었습니다.');
+                CloseModal();
+                location.reload();
+            }
+        })
+        .catch(error => alert('수정 중 오류가 발생했습니다.'));
 }

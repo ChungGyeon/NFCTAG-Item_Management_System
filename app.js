@@ -14,6 +14,7 @@ const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
 const detCookie = require('./routes/detectCookie'); //쿠키 감지 처리 관련 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
+const imgProcessor = require('./routes/imgProcess');
 
 // === [여기부터 추가] ===
 let currentSeed = generateRandomSeed();
@@ -86,6 +87,7 @@ app.use('/:seed', (req, res, next) => {
     next();
 }, detCookie);
 
+app.use('/imgProcess',imgProcessor);
 
 
 

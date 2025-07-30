@@ -357,6 +357,41 @@ aside adjust-button-caluelate-logVer:hover {
     width: 80%;
     animation: slide-down 0.5s ease-out;
 }
+
+.editItemModalContainer {
+    display: flex;
+    flex-direction: column;  /* 수직 배치 */
+    align-items: center;     /* 가운데 정렬 */
+    gap: 20px;              /* 요소 간 간격 */
+}
+
+/* 이미지 크기 조절이 필요한 경우 */
+.editItemModalContainer img {
+    width: 80%;             /* 컨테이너 너비의 80% */
+    max-width: 300px;       /* 최대 너비 제한 */
+    height: auto;           /* 비율 유지 */
+}
+
+/* input 스타일링 */
+.editItemModalContainer input {
+    width: 80%;             /* 컨테이너 너비의 80% */
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.editItemModalSendBtn {
+    margin: 20px auto;  /* 상하 여백과 좌우 중앙 정렬 */
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: block;  /* 블록 레벨 요소로 변경 */
+}
+
+
+
 .AddAcountModal-content p {
     display: flex;
     flex-direction: column;
@@ -380,3 +415,4 @@ aside adjust-button-caluelate-logVer:hover {
     cursor: pointer;
     margin: 0 10px;
 }
+
