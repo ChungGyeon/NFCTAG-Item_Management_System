@@ -56,10 +56,10 @@ router.post('/updateItem', upload.single('image'), (req, res) => {
             .map(key => `${key} = ?`)
             .join(', ');
 
-        const sql = `UPDATE Items SET ${setClause} WHERE itemName = ?`
+        const updateSQL = `UPDATE Items SET ${setClause} WHERE itemName = ?`
         const values = [...Object.values(updateData), req.body.originItemName];
 
-        db.query(sql, values, (err, result) => {
+        db.query(updateSQL, values, (err, result) => {
             if (err) throw err;
             res.json({
                 success: true,
