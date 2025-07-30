@@ -60,12 +60,29 @@ router.post('/updateItem', upload.single('image'), (req, res) => {
         const updateSQL = `UPDATE Items SET ${setClause} WHERE itemName = ?`
         const values = [...Object.values(updateData), req.body.originItemName];
 
-        db.query(updateSQL, values, (err, result) => {
-            if (err) throw err;
-            res.json({
-                success: true,
-                message: "아이템이 성공적으로 업데이트되었습니다.",
-                updates: updateData
+        const imgDeleteSQL = `SELECT img FROM Items WHERE itemName = ?`;
+        db.query(imgDeleteSQL, [req.body.originItemName], (err, result) => {
+            if(err) throw err;
+
+            const oldImage = result[0]?.img; // 이전 이미지 파일명
+
+            // 이전 이미지가 있다면 삭제
+            if (oldImage) {
+                const imagePath = path.join('public/images', oldImage);
+                fs.unlink(imagePath, (err) => {
+                    if (err && err.code !== 'ENOENT') {
+                        console.error('이전 이미지 삭제 중 에러:', err);
+                    }
+                });
+            }
+
+            db.query(updateSQL, values, (err, result) => {
+                if (err) throw err;
+                res.json({
+                    success: true,
+                    message: "아이템이 성공적으로 업데이트되었습니다.",
+                    updates: updateData
+                });
             });
         });
 
