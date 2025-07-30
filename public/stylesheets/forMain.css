@@ -120,6 +120,15 @@ header {
 
 @media (max-width: 480px) {
     .item-grid {
-        grid-template-columns: 2fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px; /* 아이템 간격 조정 */
+    }
+
+    .itemDetail-card {
+        padding: 10px; /* 아이템 패딩 조정 */
+    }
+
+    .itemDetail-card h3 {
+        font-size: 1em; /* 제목 폰트 크기 조정 */
     }
 }
