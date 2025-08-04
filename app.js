@@ -16,22 +16,25 @@ const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져�
 const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
 const imgProcessor = require('./routes/imgProcess');
 
-// === [여기부터 추가] ===
-let currentSeed = generateRandomSeed();
-let lastSeed = null; // (선택) 이전 시드도 잠깐 허용하려면 사용
 
 function generateRandomSeed() {
     return Math.random().toString(36).substr(2, 10);
 }
 
-// 5분마다 시드 갱신
-setInterval(() => {
-    lastSeed = currentSeed;
-    currentSeed = generateRandomSeed();
-    console.log('새 시드:', currentSeed);
-}, 10 * 1000);
-// === [여기까지 추가] ===
+const seedGenerator = {
+    currentSeed: generateRandomSeed(),
+    lastSeed: null,
+    getCurrentSeed() {
+        return this.currentSeed;
+    }
+};
 
+setInterval(() => {
+    seedGenerator.lastSeed = seedGenerator.currentSeed;
+    seedGenerator.currentSeed = generateRandomSeed();
+    console.log('새 시드:', seedGenerator.currentSeed);
+}, 10 * 1000);
+module.exports.seedGenerator = seedGenerator;
 
 const app = express();
 
@@ -50,12 +53,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-//랜덤시드 생성시키는 그시기
-app.get('/get-current-seed', (req, res) => {
-    res.json({ seed: currentSeed });
-});
-
 
 /* 세션설정 */
 app.use(session({
@@ -82,8 +79,8 @@ app.use('/util', genCookie);
 //랜덤시드 적용
 //app.use('/detect', detCookie);
 app.use('/:seed', (req, res, next) => {
-    req.currentSeed = currentSeed;
-    req.lastSeed = lastSeed;
+    req.currentSeed = seedGenerator.currentSeed;
+    req.lastSeed = seedGenerator.lastSeed;
     next();
 }, detCookie);
 

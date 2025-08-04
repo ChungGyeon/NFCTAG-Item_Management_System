@@ -1,10 +1,10 @@
 const fs = require('fs').promises;
-const { v4: uuidv4 } = require('uuid');
+const { seedEmitter } = require('../app');  // app.js에서 시드 생성기 가져오기
 
 async function writeUrlToNfc(url) {
     try {
         const data = { url };
-        await fs.writeFile('/tmp/nfc_url.json', JSON.stringify(data));
+        await fs.writeFile('./randURL/nfc_url.json', JSON.stringify(data));
         console.log(`${new Date().toISOString()} - URL 저장됨: ${url}`);
         return { status: 'success', message: 'URL 파일에 저장됨' };
     } catch (err) {
@@ -12,13 +12,18 @@ async function writeUrlToNfc(url) {
         return { status: 'error', message: `파일 쓰기 오류: ${err.message}` };
     }
 }
-
+/*
 async function generateAndWriteUrl() {
     setInterval(async () => {
-        const url = `여기에 랜덤화된 주소 전달`;
+        const currentSeed = seedGenerator.getCurrentSeed();
+        const url = `https://localhost:3001/${currentSeed}`;
         const result = await writeUrlToNfc(url);
-        console.log(`${new Date().toISOString()} - 결과: ${JSON.stringify(result)}`);
+        console.log(`${new Date().toISOString()} - URL 생성됨: ${url}`);
     }, 30000);
 }
-
-generateAndWriteUrl();
+generateAndWriteUrl();*/
+seedEmitter.on('seedUpdated', async ({ currentSeed }) => {
+    const url = `https://localhost:3001/${currentSeed}`;
+    await writeUrlToNfc(url);
+    console.log(`${new Date().toISOString()} - URL 생성됨: ${url}`);
+});
