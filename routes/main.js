@@ -5,6 +5,9 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('./IMS_db'); // DB 연결
 
+
+//10~22까지 삭제해야하나? app.js에서 생성하잖아
+/*
 let currentSeed = generateRandomSeed();
 let lastSeed = null; // (선택) 이전 시드도 잠깐 허용하려면 사용
 
@@ -18,7 +21,7 @@ setInterval(() => {
     currentSeed = generateRandomSeed();
     console.log('새 시드:', currentSeed);
 }, 20*1000);
-
+*/
 router.get('/', function(req, res, next) {//router123
     const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
     const { currentSeed, lastSeed } = req;
