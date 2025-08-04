@@ -1,5 +1,5 @@
 const fs = require('fs').promises;
-const { seedEmitter } = require('../app');  // app.js에서 시드 생성기 가져오기
+const { seedGenerator } = require('../app'); //앱에서 만든 시드랜덤생성 모듈 가져오기
 
 async function writeUrlToNfc(url) {
     try {
@@ -12,7 +12,7 @@ async function writeUrlToNfc(url) {
         return { status: 'error', message: `파일 쓰기 오류: ${err.message}` };
     }
 }
-/*
+
 async function generateAndWriteUrl() {
     setInterval(async () => {
         const currentSeed = seedGenerator.getCurrentSeed();
@@ -21,9 +21,4 @@ async function generateAndWriteUrl() {
         console.log(`${new Date().toISOString()} - URL 생성됨: ${url}`);
     }, 30000);
 }
-generateAndWriteUrl();*/
-seedEmitter.on('seedUpdated', async ({ currentSeed }) => {
-    const url = `https://localhost:3001/${currentSeed}`;
-    await writeUrlToNfc(url);
-    console.log(`${new Date().toISOString()} - URL 생성됨: ${url}`);
-});
+generateAndWriteUrl();

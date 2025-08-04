@@ -16,7 +16,6 @@ const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져�
 const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
 const imgProcessor = require('./routes/imgProcess');
 
-
 function generateRandomSeed() {
     return Math.random().toString(36).substr(2, 10);
 }
@@ -24,17 +23,15 @@ function generateRandomSeed() {
 const seedGenerator = {
     currentSeed: generateRandomSeed(),
     lastSeed: null,
-    getCurrentSeed() {
-        return this.currentSeed;
+    getCurrentSeed(){
+        return this.currentSeed
     }
-};
-
+}
 setInterval(() => {
     seedGenerator.lastSeed = seedGenerator.currentSeed;
     seedGenerator.currentSeed = generateRandomSeed();
     console.log('새 시드:', seedGenerator.currentSeed);
 }, 10 * 1000);
-module.exports.seedGenerator = seedGenerator;
 
 const app = express();
 
@@ -114,3 +111,7 @@ app.listen(SubpoRt, () => {
   console.log(`서버가 ${SubpoRt} 실행됩니다.`);
 });
 
+//시드생성과 시드생성시 이벤트 발생시키기 위한 모듈들 내보내기
+module.exports = {
+    seedGenerator
+};
