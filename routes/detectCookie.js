@@ -1,7 +1,6 @@
 /*
 reservedList 쿠키를 감지하는 라우트
 
-/detectCookie는 쿠키 감지 테스트용
 /startRentingItem/:seed 는 랜덤 시드를 적용하여 nfc모듈에서 생성하는 주소로만 접근가능하게 만든 파일
 이 라우트 전체가 랜덤시드 영향을 받고 있어 실질적인 쿠키 처리는 verify.js에서 처리함
 
@@ -32,8 +31,6 @@ router.get('/detectCookie',(req,res) => {
     }
 
 })
-
-
 
 /*
 쿠키에 담긴 물품을 토대로 대여 시작하게 하는 라우트 젤 중요한 곳

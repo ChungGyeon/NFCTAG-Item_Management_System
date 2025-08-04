@@ -1,3 +1,7 @@
+/*
+* 예약리스트 쿠키를 검증하여 예약을 진행하는 라우터
+* 취소도 여기서 처리함
+*/
 const express = require('express');
 const router = express.Router();
 const { db } = require('./IMS_db');

@@ -1,27 +1,13 @@
 /*
-* 가장 중요*/
+* 가장 중요
+* 예약리스트 쿠키생성, 쿠키 취소
+* 이용자가 메인으로 접근하는 페이지를 전부 다루는 곳
+* */
 
 const express = require('express');
 const router = express.Router();
 const { db } = require('./IMS_db'); // DB 연결
 
-
-//10~22까지 삭제해야하나? app.js에서 생성하잖아
-/*
-let currentSeed = generateRandomSeed();
-let lastSeed = null; // (선택) 이전 시드도 잠깐 허용하려면 사용
-
-function generateRandomSeed() {
-    return Math.random().toString(36).substr(2, 10);
-}
-
-// 5분마다 시드 갱신
-setInterval(() => {
-    lastSeed = currentSeed;
-    currentSeed = generateRandomSeed();
-    console.log('새 시드:', currentSeed);
-}, 20*1000);
-*/
 router.get('/', function(req, res, next) {//router123
     const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
     const { currentSeed, lastSeed } = req;
@@ -76,7 +62,9 @@ router.get('/', function(req, res, next) {//router123
     });
 });
 
-/* ✅ 예약하기 */
+/* 예약하기
+* 쿠키도 여기서 구워줌
+*/
 router.post('/reservation', (req, res) => {
     const itemName = req.body.itemName;
     const studentnum = req.session.user?.studentnum;
@@ -114,7 +102,7 @@ router.post('/reservation', (req, res) => {
     res.send({ success: true, message: `${itemName} 예약되었습니다.` });
 });
 
-/* ✅ 예약 취소하기 */
+/* 예약 취소하기 */
 router.post('/reservation/cancel', (req, res) => {
     const itemName = req.body.itemName;
     const studentnum = req.session.user?.studentnum;

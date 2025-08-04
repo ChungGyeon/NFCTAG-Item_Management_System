@@ -1,5 +1,9 @@
-var express = require('express');
-var router = express.Router();
+/*
+ 이용자가 주도적으로 요청하는 내용을 처리하는 라우트
+ 로그인,회원가입,로그아웃 등
+ */
+const express = require('express');
+const router = express.Router();
 const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
 router.get('/', (req, res) => {

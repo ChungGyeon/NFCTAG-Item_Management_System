@@ -25,4 +25,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-window.onload = detectRunCookie;
+//window.onload = detectRunCookie;
