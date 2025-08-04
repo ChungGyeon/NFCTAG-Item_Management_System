@@ -10,7 +10,7 @@ async function writeUrlToNfc(url) {
             const fileContent = await fs.readFile(filePath, 'utf-8');
             data = JSON.parse(fileContent);
         } catch (error) {
-            // 파일이 존재하지 않는 경우(ENOENT)는 패스, 다른 읽기 오류는 로그 기록
+            // 파일이 존재하지 않는 경우(ENOENT)는 패스(자기가 직접 생성), 다른 읽기 오류는 로그 기록
             if (error.code !== 'ENOENT') {
                 console.error(`${new Date().toISOString()} - 기존 URL 파일 읽기 오류: ${error.message}`);
             }
