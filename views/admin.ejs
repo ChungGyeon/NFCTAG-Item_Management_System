@@ -24,9 +24,7 @@
       <div class="table-card">
         <h3><%= item.itemName %></h3>
         <img id="itemImg" src="/images/<%= item.img %>" alt="이미지가 안보인다고요? 어쩌라구요">
-        <ul>
             <h2><%= item.status %></h2>
-        </ul>
         <label><input type="checkbox" class="table-check"> 선택</label>
         <label><button onclick="editModalOpen(this)" class="edit-btn">수정</button></label>
       </div>
@@ -57,27 +55,70 @@
           <label for="studentnum">학번</label>
           <input type="number" id="studentnum" name="studentnum" required>
 
-          <label for="password">비밀번호</label>
-          <input type="password" id="password" name="password" required>
-          <div class="AddAcountModal-buttons">
-            <button type="submit">추가</button>
+           <label for="password">비밀번호</label>
+           <input type="password" id="password" name="password" required>
+            <div class="AddAcountModal-buttons">
+              <button type="submit">추가</button>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
+        </div>
     </div>
-    </div>
-  </section>
+   </section>
 
-  <section><!--아이템 수정 섹션-->
-    <div id="editItemModal" class="editItemModal">
-      <div class="editItemModal-content">
-        <span class="close" onclick="CloseModal()">&times;</span>
-        <!--여기에 자동으로 입력 됨-->
-        <p class="editItemModalContainer" id ="editItemModalContainer"></p>
-        <button class="editItemModalSendBtn" id="editItemModalSendBtn" onclick="updateItem()">수정</button>
+
+
+      <!--아이템 추가 모달-->
+      <div id="AddItemModal" class="AddAcountModal">
+        <div class="AddAcountModal-content">
+          <span class="close" onclick="CloseAddItemModal()">&times;</span>
+          <p>아이템 추가</p><br>
+          <div class="signUp-container">
+            <form method="POST" onsubmit="addItemQuery(); return false;">
+              <label for="itemName">아이템 이름</label>
+              <input type="text" id="itemName" name="itemName" required>
+              <div class="AddAcountModal-buttons">
+                <button type="submit">추가</button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+
+    <section><!--아이템 수정 섹션-->
+        <div id="editItemModal" class="editItemModal">
+            <div class="editItemModal-content">
+                <span class="close" onclick="CloseModal()">&times;</span>
+                <!--여기에 자동으로 입력 됨-->
+                <p class="editItemModalContainer" id ="editItemModalContainer"></p>
+                <button class="editItemModalSendBtn" id="editItemModalSendBtn" onclick="updateItem()">수정</button>
+            </div>
+        </div>
+    </section>
+
+      <!--계정 확인 모달-->
+      <div id="ViewAccountsModal" class="AddAcountModal">
+        <div class="AddAcountModal-content" style="max-width: 90%; width: 900px; margin: 0 auto;">
+          <span class="close" onclick="CloseViewAccountsModal()">&times;</span>
+          <p style="text-align: center; font-size: 22px;">전체 계정 목록</p><br>
+
+          <div style="overflow-x: auto; display: flex; justify-content: center;">
+            <table border="1" style="width: 100%; max-width: 800px; border-collapse: collapse; text-align: center; font-size: 16px;">
+              <thead style="background-color: #f2f2f2;">
+              <tr>
+                <th style="padding: 12px;">학번</th>
+                <th style="padding: 12px;">이름</th>
+                <th style="padding: 12px;">학년</th>
+                <th style="padding: 12px;">대여 물품</th>
+              </tr>
+              </thead>
+              <tbody id="account-table-body">
+              <!-- JS로 채워짐 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 </div>
 </body>
 </html>

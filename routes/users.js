@@ -85,6 +85,25 @@ router.get('/logout', (req, res) => {
   });
 });
 
+router.get('/list', (req, res) => {
+  const sql = `
+    SELECT
+      Users.studentnum,
+      Users.name,
+      Users.grade,
+      GROUP_CONCAT(Rent_status.itemName SEPARATOR ', ') AS rentedItems
+    FROM Users
+           LEFT JOIN Rent_status ON Users.name = Rent_status.whoAreRent
+    GROUP BY Users.studentnum, Users.name, Users.grade
+  `;
 
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('DB 오류:', err);
+      return res.status(500).json({ message: 'DB 오류' });
+    }
+    return res.json(results);
+  });
+});
 
 module.exports = router;
