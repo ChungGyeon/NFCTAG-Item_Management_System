@@ -25,7 +25,7 @@
         <h3><%= item.itemName %></h3>
         <img id="itemImg" src="/images/<%= item.img %>" alt="이미지가 안보인다고요? 어쩌라구요">
             <h2><%= item.status %></h2>
-        <label><input type="checkbox" class="table-check"> 선택</label>
+        <label><input type="checkbox" class="table-check" id="data-item-name"> 선택</label>
         <label><button onclick="editModalOpen(this)" class="edit-btn">수정</button></label>
       </div>
     <% }) %>
@@ -133,12 +133,13 @@ function deleteSelectedItems() {
     }
 
     const selectedItems = Array.from(selectedCheckboxes).map(checkbox =>
+            //data-item-name이 없는데 뭐임
         checkbox.getAttribute('data-item-name')
     );
 
     if (confirm(`선택된 ${selectedItems.length}개의 물건을 삭제하시겠습니까?`)) {
         // 서버에 삭제 요청 보내기
-        fetch('/admin/delete-items', {
+        fetch('/admin/deleteItems', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

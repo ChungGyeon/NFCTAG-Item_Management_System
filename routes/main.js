@@ -102,6 +102,10 @@ router.post('/reservation', (req, res) => {
     res.send({ success: true, message: `${itemName} 예약되었습니다.` });
 });
 
+
+
+
+
 /* 예약 취소하기 */
 router.post('/reservation/cancel', (req, res) => {
     const itemName = req.body.itemName;
@@ -165,7 +169,7 @@ router.get('/admin',(req,res)=> {
 
 
 /* ✅ 관리자 물건 삭제 기능 */
-router.post('/admin/delete-items', (req, res) => {
+router.post('/admin/deleteItems', (req, res) => {
     const { items } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
