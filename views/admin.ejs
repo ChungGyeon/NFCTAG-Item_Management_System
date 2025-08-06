@@ -25,7 +25,7 @@
         <h3><%= item.itemName %></h3>
         <img id="itemImg" src="/images/<%= item.img %>" alt="이미지가 안보인다고요? 어쩌라구요">
             <h2><%= item.status %></h2>
-        <label><input type="checkbox" class="table-check" id="data-item-name"> 선택</label>
+        <label><input type="checkbox" class="table-check" data-item-name = "<%= item.itemName %>"> 선택</label>
         <label><button onclick="editModalOpen(this)" class="edit-btn">수정</button></label>
       </div>
     <% }) %>
