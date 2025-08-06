@@ -164,11 +164,47 @@ router.get('/admin',(req,res)=> {
 
 
 
+/* ✅ 관리자 물건 삭제 기능 */
+router.post('/admin/delete-items', (req, res) => {
+    const { items } = req.body;
 
+    if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: '삭제할 물건이 선택되지 않았습니다.'
+        });
+    }
 
+    // 관리자 권한 확인 (선택사항)
+    /*
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).json({
+            success: false,
+            message: '관리자 권한이 필요합니다.'
+        });
+    */
 
+    // 선택된 물건들을 데이터베이스에서 삭제
+    const placeholders = items.map(() => '?').join(',');
+    const sql = `DELETE FROM Items WHERE itemName IN (${placeholders})`;
 
+    db.query(sql, items, (err, result) => {
+        if (err) {
+            console.error('DB 삭제 오류:', err);
+            return res.status(500).json({
+                success: false,
+                message: '데이터베이스 오류가 발생했습니다.'
+            });
+        }
 
+        console.log(`${items.length}개의 물건이 삭제되었습니다:`, items);
+        res.json({
+            success: true,
+            message: `${items.length}개의 물건이 성공적으로 삭제되었습니다.`,
+            deletedItems: items
+        });
+    });
+});
 
 module.exports = router;
 
