@@ -1,73 +1,113 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title><%= baseTitle %> <%= title%></title>
-  <link href="/stylesheets/forAdmin.css" rel="stylesheet">
-  <script src="/javascripts/formainPage.js"></script>
-</head>
-<body>
-<div class="test-container"> <!-- 물건 컨테이너 -->
-  <main id="main-content">
-    <div class="table-card">
-      <h3>무슨무슨 아이템</h3>
-      <ul>
-        <li>
-          <h2>보루펜 </h2>
-        </li>
-      </ul>
-      <label><input type="checkbox" class="table-check"> 선택</label>
-    </div>
-
-    <% items.forEach(item => { %>
+  <!DOCTYPE html>
+  <html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title><%= baseTitle %> <%= title%></title>
+    <link href="/stylesheets/forAdmin.css" rel="stylesheet">
+    <script src="/javascripts/formainPage.js"></script>
+  </head>
+  <body>
+  <div class="test-container"> <!-- 물건 컨테이너 -->
+    <main id="main-content">
       <div class="table-card">
-        <h3><%= item.itemName %></h3>
+        <h3>무슨무슨 아이템</h3>
         <ul>
           <li>
-            <h2><%= item.status %></h2>
+            <h2>보루펜 </h2>
           </li>
         </ul>
         <label><input type="checkbox" class="table-check"> 선택</label>
       </div>
-    <% }) %>
-  </main>
-  <aside>
-    <!--아래 세 개 버튼의 온클릭은 따로 함수 제작 필요 25.4.29-->
-    <button class="aside adjust-button">물건 추가</button>
-    <button class="aside adjust-button">물건 삭제</button>
-    <button class="aside adjust-button">계정 확인</button>
-    <button class="aside adjust-button" onclick="OpenAddAcountModal()">계정추가</button>
-  </aside>
 
-  <section><!--계정 추가 모달-->
-    <div id="AddAcountModal" class="AddAcountModal">
-      <div class="AddAcountModal-content">
-        <span class="close" onclick="CloseModal()">&times;</span>
-        <p>계정추가</p><br>
-        <div class="signUp-container">
-        <form method="POST" onsubmit="signUpquery(); return false;">
+      <% items.forEach(item => { %>
+        <div class="table-card">
+          <h3><%= item.itemName %></h3>
+          <ul>
+            <li>
+              <h2><%= item.status %></h2>
+            </li>
+          </ul>
+          <label><input type="checkbox" class="table-check"> 선택</label>
+        </div>
+      <% }) %>
+    </main>
+    <aside>
+      <!--아래 세 개 버튼의 온클릭은 따로 함수 제작 필요 25.4.29-->
+      <button class="aside adjust-button" onclick="OpenAddItemModal()">물건 추가</button>
+      <button class="aside adjust-button">물건 삭제</button>
+      <button class="aside adjust-button" onclick="OpenViewAccountsModal()">계정 확인</button>
+      <button class="aside adjust-button" onclick="OpenAddAcountModal()">계정추가</button>
+    </aside>
 
-          <label for="grade">학년</label>
-          <input type="number" id="grade" name="grade" required>
+    <section><!--계정 추가 모달-->
+      <div id="AddAcountModal" class="AddAcountModal">
+        <div class="AddAcountModal-content">
+          <span class="close" onclick="CloseModal()">&times;</span>
+          <p>계정추가</p><br>
+          <div class="signUp-container">
+            <form method="POST" onsubmit="signUpquery(); return false;">
 
-          <label for="name">이름</label>
-          <input type="text" id="name" name="name" required>
+              <label for="grade">학년</label>
+              <input type="number" id="grade" name="grade" required>
 
-          <label for="studentnum">학번</label>
-          <input type="number" id="studentnum" name="studentnum" required>
+              <label for="name">이름</label>
+              <input type="text" id="name" name="name" required>
 
-          <label for="password">비밀번호</label>
-          <input type="password" id="password" name="password" required>
-          <div class="AddAcountModal-buttons">
-            <button type="submit">추가</button>
+              <label for="studentnum">학번</label>
+              <input type="number" id="studentnum" name="studentnum" required>
+
+              <label for="password">비밀번호</label>
+              <input type="password" id="password" name="password" required>
+              <div class="AddAcountModal-buttons">
+                <button type="submit">추가</button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
-    </div>
-  </section>
-</div>
-</body>
-</html>
 
+      <!--아이템 추가 모달-->
+      <div id="AddItemModal" class="AddAcountModal">
+        <div class="AddAcountModal-content">
+          <span class="close" onclick="CloseAddItemModal()">&times;</span>
+          <p>아이템 추가</p><br>
+          <div class="signUp-container">
+            <form method="POST" onsubmit="addItemQuery(); return false;">
+              <label for="itemName">아이템 이름</label>
+              <input type="text" id="itemName" name="itemName" required>
+              <div class="AddAcountModal-buttons">
+                <button type="submit">추가</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!--계정 확인 모달-->
+      <div id="ViewAccountsModal" class="AddAcountModal">
+        <div class="AddAcountModal-content" style="max-width: 90%; width: 900px; margin: 0 auto;">
+          <span class="close" onclick="CloseViewAccountsModal()">&times;</span>
+          <p style="text-align: center; font-size: 22px;">전체 계정 목록</p><br>
+
+          <div style="overflow-x: auto; display: flex; justify-content: center;">
+            <table border="1" style="width: 100%; max-width: 800px; border-collapse: collapse; text-align: center; font-size: 16px;">
+              <thead style="background-color: #f2f2f2;">
+              <tr>
+                <th style="padding: 12px;">학번</th>
+                <th style="padding: 12px;">이름</th>
+                <th style="padding: 12px;">학년</th>
+                <th style="padding: 12px;">대여 물품</th>
+              </tr>
+              </thead>
+              <tbody id="account-table-body">
+              <!-- JS로 채워짐 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  </body>
+  </html>
