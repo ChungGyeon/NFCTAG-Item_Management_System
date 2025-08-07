@@ -60,17 +60,9 @@
   <section><!--아이템 추가 섹션-->
    <div id="AddItemModal" class="AddAcountModal">
     <div class="AddAcountModal-content">
-     <span class="close" onclick="CloseAddItemModal()">&times;</span>
+     <span class="close" onclick="CloseModal()">&times;</span>
       <p>아이템 추가</p><br>
-       <div class="signUp-container">
-        <form method="POST" onsubmit="addItemQuery(); return false;">
-         <label for="addItem_itemName">아이템 이름</label>
-         <input type="text" id="addItem_itemName" name="itemName" required>
-         <div class="AddAcountModal-buttons">
-          <button type="submit">추가</button>
-         </div>
-         </form>
-        </div>
+       <div class="signUp-container" id="addItemModalContainer"></div>
     </div>
    </div>
   </section>

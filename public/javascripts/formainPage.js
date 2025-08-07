@@ -5,6 +5,7 @@ function OpenAddAcountModal() {
 function CloseModal(){
     document.getElementById("AddAcountModal").style.display = "none";
     document.getElementById("editItemModal").style.display = "none";
+    document.getElementById("AddItemModal").style.display = "none";
 }
 
 
@@ -153,14 +154,6 @@ function updateItem() {
 }
 
 
-//아이템 추가용 모달창 오픈
-function OpenAddItemModal() {
-    document.getElementById("AddItemModal").style.display = "block";
-}
-function CloseAddItemModal() {
-    document.getElementById("AddItemModal").style.display = "none";
-}
-
 
 //아이템 추가 쿼리
 function addItemQuery() {
@@ -188,6 +181,47 @@ function addItemQuery() {
             alert('아이템 추가 실패: ' + error.message);
         });
 }
+//아이템 추가 모달창 생성
+function OpenAddItemModal(button){
+    document.getElementById("AddItemModal").style.display = "block";
+    const container = document.getElementById('addItemModalContainer');
+
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
+    const addForm = document.createElement('form');
+    addForm.method = 'POST';
+    addForm.addEventListener('submit', function(event){
+        event.preventDefault();
+        addItemQuery();
+    });
+
+    const addLabel = document.createElement('label');
+    addLabel.setAttribute('for', 'addItem_itemName');
+    addLabel.textContent = '아이템 이름';
+
+    const addInput = document.createElement('input');
+    addInput.type = 'text';
+    addInput.id = 'addItem_itemName';
+    addInput.name = 'itemName';
+    addInput.required = true;
+
+    const buttonDiv = document.createElement('div');
+    buttonDiv.className = 'AddAcountModal-buttons';
+
+    const addButton = document.createElement('button');
+    addButton.type = 'submit';
+    addButton.textContent = '추가';
+
+    addForm.appendChild(addLabel);
+    addForm.appendChild(addInput);
+    buttonDiv.appendChild(addButton);
+    addForm.appendChild(buttonDiv);
+    container.appendChild(addForm);
+}
+
+//사용자 리스트 출력
 function OpenViewAccountsModal() {
     document.getElementById("ViewAccountsModal").style.display = "block";
 
