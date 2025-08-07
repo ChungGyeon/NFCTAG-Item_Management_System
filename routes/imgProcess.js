@@ -41,28 +41,31 @@ const upload = multer({
 //menu_modify.ejs에서 이미지 선택 후 업로드 클릭 시 서버 로그에 파일 디테일을 출력함, 336~342line
 router.post('/updateItem', upload.single('image'), (req, res) => {
     try {
-        if(!req.file && !req.body.itemName){ //이미지랑 수정된 이름 둘다 제공 x시
+        if (!req.file && !req.body.itemName) { //이미지랑 수정된 이름 둘다 제공 x시
             return res.status(400).json({
                 success: false,
                 error: "이미지와 수정된 이름이 제공되지 않았습니다."
             });
         }
-
         const updateData = {};
-        if(req.file) updateData.img = req.file.filename;
-        if(req.body.itemName) updateData.itemName = req.body.itemName;
+        if (req.file) updateData.img = req.file.filename;
+        if (req.body.itemName) updateData.itemName = req.body.itemName;
 
 
         const setClause = Object.keys(updateData)
             .map(key => `${key} = ?`)
             .join(', ');
 
-        const updateSQL = `UPDATE Items SET ${setClause} WHERE itemName = ?`
-        const values = [...Object.values(updateData), req.body.originItemName];
+            const updateSQL = `UPDATE Items
+                               SET ${setClause}
+                               WHERE itemName = ?`
+            const values = [...Object.values(updateData), req.body.originItemName];
+            const imgDeleteSQL = `SELECT img
+                                  FROM Items
+                                  WHERE itemName = ?`;
 
-        const imgDeleteSQL = `SELECT img FROM Items WHERE itemName = ?`;
         db.query(imgDeleteSQL, [req.body.originItemName], (err, result) => {
-            if(err) throw err;
+            if (err) throw err;
 
             const oldImage = result[0]?.img; // 이전 이미지 파일명
 

@@ -210,16 +210,21 @@ router.post('/admin/deleteItems', (req, res) => {
     });
 });
 
-// 관리자 물건 추가 라우트
-router.post('/admin/addItem', (req, res) => {
-    const { itemName } = req.body;
 
-    if (!itemName) {
-        return res.status(400).json({ message: '아이템 이름이 필요합니다.' });
+
+// 관리자 물건 추가 라우트
+const multer = require('multer');
+const upload = multer({ dest: 'public/images/' });
+router.post('/admin/addItem', upload.single('itemImg'), (req, res) => {
+    const { itemName } = req.body;
+    const itemImg = req.file;
+
+    if (!itemName || !itemImg) {
+        return res.status(400).json({ message: '아이템 이름과 이미지가 필요합니다.' });
     }
 
-    const sql = 'INSERT INTO Items (itemName, status) VALUES (?, 0)';
-    db.query(sql, [itemName], (err, result) => {
+    const sql = 'INSERT INTO Items (itemName, img, status) VALUES (?, ?, 0)';
+    db.query(sql, [itemName, itemImg.filename], (err, result) => {
         if (err) {
             console.error('DB 오류:', err);
             return res.status(500).json({ message: 'DB 오류 발생' });

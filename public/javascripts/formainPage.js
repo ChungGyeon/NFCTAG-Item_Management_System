@@ -137,7 +137,7 @@ function updateItem() {
     if(textInput.value) formData.append('itemName', textInput.value);
     if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
     formData.append('originItemName', originItemName);
-
+    formData.append('whatIstype', whatIstype);
     fetch('/imgProcess/updateItem', {
         method: 'POST',
         body: formData
@@ -157,19 +157,18 @@ function updateItem() {
 
 //아이템 추가 쿼리
 function addItemQuery() {
+    const formData = new FormData();
     const itemName = document.getElementById("addItem_itemName").value;
-
-    if (!itemName) {
-        alert("아이템 이름을 입력해주세요.");
-        return;
+    const itemImg = document.getElementById("addimageInput");
+    if (!itemName || !itemImg.files[0]) {
+        return console.error('입력된게 아무것도 없는뎁슝');
     }
+    formData.append('itemName', itemName);
+    formData.append('itemImg', itemImg.files[0]);
 
     fetch('/admin/addItem', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ itemName })
+        body: formData
     })
         .then(async (response) => {
             const result = await response.json();
@@ -209,11 +208,12 @@ function OpenAddItemModal(button){
     addInput.name = 'itemName';
     addInput.required = true;
 
-    const imageInput = document.createElement('input');
-    imageInput.type = 'file';
-    imageInput.accept = 'image/*';
-    imageInput.id = 'imageInput';
-    imageInput.style.display = 'none';
+    const addimageInput = document.createElement('input');
+    addimageInput.type = 'file';
+    addimageInput.accept = 'image/*';
+    addimageInput.id = 'addimageInput';
+    addimageInput.required = true;
+    addimageInput.style.display = 'none';
 
     const img = document.createElement('img');
     img.id = 'itemImg';
@@ -225,10 +225,10 @@ function OpenAddItemModal(button){
     img.style.cursor = 'pointer';
 
     // 이미지 클릭 시 파일 선택 창 열기
-    img.addEventListener('click', () => imageInput.click());
+    img.addEventListener('click', () => addimageInput.click());
 
     // 이미지 파일이 선택되면 프리뷰 업데이트
-    imageInput.addEventListener('change', (e) => {
+    addimageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -246,7 +246,7 @@ function OpenAddItemModal(button){
 
     addForm.appendChild(addLabel);
     addForm.appendChild(addInput);
-    addForm.appendChild(imageInput);
+    addForm.appendChild(addimageInput);
     addForm.appendChild(img);
     buttonDiv.appendChild(addButton);
     addForm.appendChild(buttonDiv);
