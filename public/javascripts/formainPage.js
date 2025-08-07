@@ -253,9 +253,9 @@ function OpenAddItemModal(button){
     container.appendChild(addForm);
 }
 
-let originalAccounts = [];
-let sortedAccounts = [];
-let sortState = {};
+let originalAccounts = []; //불러오는대로 정렬한 배열
+let sortedAccounts = []; //정렬된 배열
+let sortState = {}; //현 정렬 상태 (오름차,내림차,원래)
 
 //사용자 리스트 출력
 function OpenViewAccountsModal() {
