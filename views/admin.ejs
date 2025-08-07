@@ -10,16 +10,6 @@
 <body>
 <div class="test-container"> <!-- 물건 컨테이너 -->
   <main id="main-content">
-    <div class="table-card">
-      <h3>무슨무슨 아이템</h3>
-      <ul>
-        <li>
-          <h2>보루펜 </h2>
-        </li>
-      </ul>
-      <label><input type="checkbox" class="table-check"> 선택</label>
-    </div>
-
     <% items.forEach(item => { %>
       <div class="table-card">
         <h3><%= item.itemName %></h3>
@@ -59,44 +49,49 @@
            <input type="password" id="password" name="password" required>
             <div class="AddAcountModal-buttons">
               <button type="submit">추가</button>
-              </div>
-            </form>
-          </div>
+            </div>
+        </form>
         </div>
+      </div>
     </div>
    </section>
 
 
 
-      <!--아이템 추가 모달-->
-      <div id="AddItemModal" class="AddAcountModal">
-        <div class="AddAcountModal-content">
-          <span class="close" onclick="CloseAddItemModal()">&times;</span>
-          <p>아이템 추가</p><br>
-          <div class="signUp-container">
-            <form method="POST" onsubmit="addItemQuery(); return false;">
-              <label for="itemName">아이템 이름</label>
-              <input type="text" id="itemName" name="itemName" required>
-              <div class="AddAcountModal-buttons">
-                <button type="submit">추가</button>
-              </div>
-            </form>
-          </div>
+  <section><!--아이템 추가 섹션-->
+   <div id="AddItemModal" class="AddAcountModal">
+    <div class="AddAcountModal-content">
+     <span class="close" onclick="CloseAddItemModal()">&times;</span>
+      <p>아이템 추가</p><br>
+       <div class="signUp-container">
+        <form method="POST" onsubmit="addItemQuery(); return false;">
+         <label for="itemName">아이템 이름</label>
+         <input type="text" id="itemName" name="itemName" required>
+         <div class="AddAcountModal-buttons">
+          <button type="submit">추가</button>
+         </div>
+         </form>
         </div>
-      </div>
+    </div>
+   </div>
+  </section>
 
-    <section><!--아이템 수정 섹션-->
-        <div id="editItemModal" class="editItemModal">
-            <div class="editItemModal-content">
-                <span class="close" onclick="CloseModal()">&times;</span>
+
+
+  <section><!--아이템 수정 섹션-->
+      <div id="editItemModal" class="editItemModal">
+          <div class="editItemModal-content">
+              <span class="close" onclick="CloseModal()">&times;</span>
                 <!--여기에 자동으로 입력 됨-->
                 <p class="editItemModalContainer" id ="editItemModalContainer"></p>
                 <button class="editItemModalSendBtn" id="editItemModalSendBtn" onclick="updateItem()">수정</button>
-            </div>
-        </div>
-    </section>
+          </div>
+      </div>
+  </section>
 
-      <!--계정 확인 모달-->
+
+
+  <section> <!--계정 확인 섹션-->
       <div id="ViewAccountsModal" class="AddAcountModal">
         <div class="AddAcountModal-content" style="max-width: 90%; width: 900px; margin: 0 auto;">
           <span class="close" onclick="CloseViewAccountsModal()">&times;</span>
@@ -119,6 +114,11 @@
           </div>
         </div>
       </div>
+  </section>
+
+
+
+
 </div>
 </body>
 </html>
