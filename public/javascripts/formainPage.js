@@ -171,7 +171,7 @@ function addItemQuery() {
         return;
     }
 
-    fetch('/util/addItem', {
+    fetch('/admin/addItem', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -215,4 +215,43 @@ function OpenViewAccountsModal() {
 
 function CloseViewAccountsModal() {
     document.getElementById("ViewAccountsModal").style.display = "none";
+}
+
+//물건 삭제 요청 쿼리
+function deleteSelectedItems() {
+    const selectedCheckboxes = document.querySelectorAll('.table-check:checked');
+
+    if (selectedCheckboxes.length === 0) {
+        alert('삭제할 물건을 선택해주세요.');
+        return;
+    }
+
+    const selectedItems = Array.from(selectedCheckboxes).map(checkbox =>
+        //data-item-name이 없는데 뭐임
+        checkbox.getAttribute('data-item-name')
+    );
+
+    if (confirm(`선택된 ${selectedItems.length}개의 물건을 삭제하시겠습니까?`)) {
+        // 서버에 삭제 요청 보내기
+        fetch('/admin/deleteItems', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ items: selectedItems })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('물건이 성공적으로 삭제되었습니다.');
+                    location.reload(); // 페이지 새로고침
+                } else {
+                    alert('삭제 실패: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            });
+    }
 }

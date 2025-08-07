@@ -79,27 +79,3 @@ app.get('/get-cookie', (req, res) => {
   res.send(req.cookies);  // { username: 'imjaehyeog' }
 });
 */
-
-
-
-
-// 아이템 추가 라우트 (임시 운영 중)
-//이 라우트가 왜 여깄는거지?
-const { db } = require('./IMS_db');
-
-router.post('/addItem', (req, res) => {
-    const { itemName } = req.body;
-
-    if (!itemName) {
-        return res.status(400).json({ message: '아이템 이름이 필요합니다.' });
-    }
-
-    const sql = 'INSERT INTO Items (itemName, status) VALUES (?, 0)';
-    db.query(sql, [itemName], (err, result) => {
-        if (err) {
-            console.error('DB 오류:', err);
-            return res.status(500).json({ message: 'DB 오류 발생' });
-        }
-        return res.status(200).json({ message: '아이템 추가 성공!' });
-    });
-});

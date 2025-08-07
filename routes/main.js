@@ -210,6 +210,24 @@ router.post('/admin/deleteItems', (req, res) => {
     });
 });
 
+// 관리자 물건 삭제 라우트
+router.post('/admin/addItem', (req, res) => {
+    const { itemName } = req.body;
+
+    if (!itemName) {
+        return res.status(400).json({ message: '아이템 이름이 필요합니다.' });
+    }
+
+    const sql = 'INSERT INTO Items (itemName, status) VALUES (?, 0)';
+    db.query(sql, [itemName], (err, result) => {
+        if (err) {
+            console.error('DB 오류:', err);
+            return res.status(500).json({ message: 'DB 오류 발생' });
+        }
+        return res.status(200).json({ message: '아이템 추가 성공!' });
+    });
+});
+
 module.exports = router;
 
 
