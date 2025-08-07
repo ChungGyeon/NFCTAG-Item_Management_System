@@ -166,7 +166,7 @@ function addItemQuery() {
     formData.append('itemName', itemName);
     formData.append('itemImg', itemImg.files[0]);
 
-    fetch('/admin/addItem', {
+    fetch('/imgProcess/addItem', {
         method: 'POST',
         body: formData
     })
@@ -299,7 +299,7 @@ function deleteSelectedItems() {
 
     if (confirm(`선택된 ${selectedItems.length}개의 물건을 삭제하시겠습니까?`)) {
         // 서버에 삭제 요청 보내기
-        fetch('/admin/deleteItems', {
+        fetch('/imgProcess/deleteItems', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

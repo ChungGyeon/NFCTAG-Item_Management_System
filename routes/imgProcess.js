@@ -99,6 +99,84 @@ router.post('/updateItem', upload.single('image'), (req, res) => {
 });
 
 
+// 관리자 물건 추가 라우트
+router.post('/addItem', upload.single('itemImg'), (req, res) => {
+    const { itemName } = req.body;
+    const itemImg = req.file;
+
+    if (!itemName || !itemImg) {
+        return res.status(400).json({ message: '아이템 이름과 이미지가 필요합니다.' });
+    }
+
+    const sql = 'INSERT INTO Items (itemName, img, status) VALUES (?, ?, 0)';
+    db.query(sql, [itemName, itemImg.filename], (err, result) => {
+        if (err) {
+            console.error('DB 오류:', err);
+            return res.status(500).json({ message: 'DB 오류 발생' });
+        }
+        return res.status(200).json({ message: '아이템 추가 성공!' });
+    });
+});
+
+
+/* ✅ 관리자 물건 삭제 기능 */
+router.post('/deleteItems', (req, res) => {
+    const { items } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: '삭제할 물건이 선택되지 않았습니다.'
+        });
+    }
+
+    // 관리자 권한 확인 (선택사항)
+    /*
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).json({
+            success: false,
+            message: '관리자 권한이 필요합니다.'
+        });
+    */
+
+    // 선택된 물건들을 데이터베이스에서 삭제
+    const placeholders = items.map(() => '?').join(',');
+    const selectSQL = `SELECT img FROM Items WHERE itemName IN (${placeholders})`;
+
+    db.query(selectSQL, items, (err, result) => {
+        if (err) {
+            console.error('DB 이미지 조회 오류:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'DB에서 이미지 조회 오류'
+            });
+        }
+
+        const deleteSQL = `DELETE FROM Items WHERE itemName IN (${placeholders})`;
+        db.query(deleteSQL, items, (err, deleteResult) => {
+            if (err) {
+                console.log('DB 삭제 오류: ',error);
+                return res.status(500).json({
+                    success: false,
+                    message: 'DB 삭제 오류'
+                });
+            }
+
+            //삭제 로직
+            result.forEach(row => {
+                if(row.img){
+                    const imgPath = path.join(__dirname, '../public/images', row.img);
+                    fs.unlink(imgPath, (err) => {
+                        if(err) console.log('이미지 파일 삭제 오류: ', err);
+                        else console.log('이미지 삭제 완료', row.img);
+                    });
+                }
+            });
+            res.json({ success: true, message: `${deleteResult.affectedRows}개의 아이템이 삭제되었습니다.` });
+        });
+    });
+
+});
 
 
 module.exports = router;
