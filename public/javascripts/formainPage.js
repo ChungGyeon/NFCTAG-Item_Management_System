@@ -253,6 +253,10 @@ function OpenAddItemModal(button){
     container.appendChild(addForm);
 }
 
+let originalAccounts = [];
+let sortedAccounts = [];
+let sortState = {};
+
 //사용자 리스트 출력
 function OpenViewAccountsModal() {
     document.getElementById("ViewAccountsModal").style.display = "block";
@@ -260,23 +264,57 @@ function OpenViewAccountsModal() {
     fetch('/users/list')
         .then(res => res.json())
         .then(data => {
-            const tbody = document.getElementById("account-table-body");
-            tbody.innerHTML = ''; // 초기화
-            data.forEach(user => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${user.studentnum}</td>
-                    <td>${user.name}</td>
-                    <td>${user.grade}</td>
-                    <td>${user.rentedItems || '-'}</td> <!-- ❗ 없는 경우 '-' 표시 -->
-                `;
-                tbody.appendChild(tr);
-            });
+            originalAccounts = [...data];
+            sortedAccounts = [...data];
+            renderAccountTable(sortedAccounts);
         })
         .catch(err => {
             alert('계정 목록 로딩 실패');
             console.error(err);
         });
+}
+
+function renderAccountTable(accounts) {
+    const tbody = document.getElementById("account-table-body");
+    tbody.innerHTML = ''; // 초기화
+    accounts.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${user.studentnum}</td>
+            <td>${user.name}</td>
+            <td>${user.grade}</td>
+            <td>${user.rentedItems || '-'}</td> <!-- ❗ 없는 경우 '-' 표시 -->
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function sortAccounts(key) {
+    if (!sortState[key]) {
+        sortState[key] = 'asc';
+    } else if (sortState[key] === 'asc') {
+        sortState[key] = 'desc';
+    } else {
+        sortState[key] = null;
+    }
+
+    for (let k in sortState) {
+        if (k !== key) {
+            sortState[k] = null;
+        }
+    }
+
+    if (sortState[key]) {
+        sortedAccounts.sort((a, b) => {
+            if (a[key] < b[key]) return sortState[key] === 'asc' ? -1 : 1;
+            if (a[key] > b[key]) return sortState[key] === 'asc' ? 1 : -1;
+            return 0;
+        });
+    } else {
+        sortedAccounts = [...originalAccounts];
+    }
+
+    renderAccountTable(sortedAccounts);
 }
 
 function CloseViewAccountsModal() {

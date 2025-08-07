@@ -421,3 +421,6 @@ aside adjust-button-caluelate-logVer:hover {
     margin: 0 10px;
 }
 
+th[onclick] {
+    cursor: pointer;
+}
