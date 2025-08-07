@@ -210,7 +210,7 @@ router.post('/admin/deleteItems', (req, res) => {
     });
 });
 
-// 관리자 물건 삭제 라우트
+// 관리자 물건 추가 라우트
 router.post('/admin/addItem', (req, res) => {
     const { itemName } = req.body;
 

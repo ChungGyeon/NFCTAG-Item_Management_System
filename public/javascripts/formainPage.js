@@ -54,7 +54,7 @@ function signUpquery() {
             .catch(error => {
                 alert('계정 추가 실패 : ' + error.message);
             });
-    }*/
+    */
         });
 }
 
@@ -75,7 +75,7 @@ function editModalOpen(button) {
     //itemName가져오는놈
     const hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
-    hiddenInput.id = 'itemName';
+    hiddenInput.id = 'edit_itemName';
     hiddenInput.value = itemName;
     container.appendChild(hiddenInput);
 
@@ -126,7 +126,7 @@ function editModalOpen(button) {
 //수정 내용을 서버에 전송하여 수정하는 함수
 function updateItem() {
     const formData = new FormData();
-    const originItemName = document.getElementById('itemName').value;
+    const originItemName = document.getElementById('edit_itemName').value;
     const textInput = document.getElementById('textInput');
     const imageInput = document.getElementById('imageInput');
 
@@ -164,7 +164,7 @@ function CloseAddItemModal() {
 
 //아이템 추가 쿼리
 function addItemQuery() {
-    const itemName = document.getElementById("itemName").value;
+    const itemName = document.getElementById("addItem_itemName").value;
 
     if (!itemName) {
         alert("아이템 이름을 입력해주세요.");

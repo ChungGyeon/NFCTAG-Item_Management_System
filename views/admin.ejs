@@ -21,10 +21,9 @@
     <% }) %>
   </main>
   <aside>
-    <!--아래 세 개 버튼의 온클릭은 따로 함수 제작 필요 25.4.29-->
-    <button class="aside adjust-button">물건 추가</button>
+    <button class="aside adjust-button" onclick="OpenAddItemModal()">물건 추가</button>
     <button class="aside adjust-button" onclick="deleteSelectedItems()">물건 삭제</button>
-    <button class="aside adjust-button">계정 확인</button>
+    <button class="aside adjust-button" onclick="OpenViewAccountsModal()">계정 확인</button>
     <button class="aside adjust-button" onclick="OpenAddAcountModal()">계정추가</button>
   </aside>
 
@@ -65,8 +64,8 @@
       <p>아이템 추가</p><br>
        <div class="signUp-container">
         <form method="POST" onsubmit="addItemQuery(); return false;">
-         <label for="itemName">아이템 이름</label>
-         <input type="text" id="itemName" name="itemName" required>
+         <label for="addItem_itemName">아이템 이름</label>
+         <input type="text" id="addItem_itemName" name="itemName" required>
          <div class="AddAcountModal-buttons">
           <button type="submit">추가</button>
          </div>
