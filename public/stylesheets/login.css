@@ -10,7 +10,7 @@ body, html {
 }
 
 /* 로그인 박스 */
-.login-container {
+.login-container, .signUp-container {
     background-color: white;
     padding: 50px 60px;
     border-radius: 20px;
@@ -20,6 +20,10 @@ body, html {
     box-sizing: border-box;
     text-align: center;
     transition: all 0.3s ease;
+    position: fixed; /* 변경 */
+    top: 50%; /* 변경 */
+    left: 50%; /* 변경 */
+    transform: translate(-50%, -50%); /* 변경 */
 }
 
 /* 제목 */

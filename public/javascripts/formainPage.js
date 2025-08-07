@@ -181,6 +181,8 @@ function addItemQuery() {
             alert('아이템 추가 실패: ' + error.message);
         });
 }
+
+
 //아이템 추가 모달창 생성
 function OpenAddItemModal(button){
     document.getElementById("AddItemModal").style.display = "block";
@@ -207,6 +209,34 @@ function OpenAddItemModal(button){
     addInput.name = 'itemName';
     addInput.required = true;
 
+    const imageInput = document.createElement('input');
+    imageInput.type = 'file';
+    imageInput.accept = 'image/*';
+    imageInput.id = 'imageInput';
+    imageInput.style.display = 'none';
+
+    const img = document.createElement('img');
+    img.id = 'itemImg';
+    img.src = '/images/이미지추가안내.png';
+    img.alt = '이미지가 안보인다구요? 어쩌라구여';
+    img.style.width = '320px';
+    img.style.height = '320px';
+    img.style.objectFit = 'cover';
+    img.style.cursor = 'pointer';
+
+    // 이미지 클릭 시 파일 선택 창 열기
+    img.addEventListener('click', () => imageInput.click());
+
+    // 이미지 파일이 선택되면 프리뷰 업데이트
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => img.src = e.target.result;
+            reader.readAsDataURL(file);
+        }
+    });
+
     const buttonDiv = document.createElement('div');
     buttonDiv.className = 'AddAcountModal-buttons';
 
@@ -216,6 +246,8 @@ function OpenAddItemModal(button){
 
     addForm.appendChild(addLabel);
     addForm.appendChild(addInput);
+    addForm.appendChild(imageInput);
+    addForm.appendChild(img);
     buttonDiv.appendChild(addButton);
     addForm.appendChild(buttonDiv);
     container.appendChild(addForm);

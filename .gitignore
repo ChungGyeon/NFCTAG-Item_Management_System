@@ -18,4 +18,4 @@ views/.DS_Store
 /public/images/*
 
 #randURL파일은 무시, 없으면 알아서 생성할거임
-/routes/randURL/nfc_url.json
+/routes/randURL/

@@ -144,6 +144,13 @@ header {
     border-color: #aaa;
 }
 
+#addItemModalContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
 /* 데스크톱 최적화 */
 @media (min-width: 1024px) {
     .main-grid-container {

@@ -192,11 +192,16 @@ aside adjust-button-caluelate-logVer:hover {
 .AddAcountModal-content {
     position: relative;
     background-color: #fefefe;
-    margin: 5% auto;
+    margin: auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
+    max-width: 500px;
     animation: slide-down 0.5s ease-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 .AddAcountModal-content p {
     display: flex;
@@ -227,7 +232,7 @@ aside adjust-button-caluelate-logVer:hover {
     padding: 50px 60px;
     border-radius: 20px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-    width: 450px;
+    width: 100%;
     max-width: 90%;
     box-sizing: border-box;
     text-align: center;
