@@ -66,6 +66,7 @@ router.get('/', function(req, res, next) {//router123
 * 쿠키도 여기서 구워줌
 */
 router.post('/reservation', (req, res) => {
+    const rentalStatus = "rent";
     const itemName = req.body.itemName;
     const studentnum = req.session.user?.studentnum;
 
@@ -90,7 +91,7 @@ router.post('/reservation', (req, res) => {
     }
 
     reservedList.push(itemName);
-    const newCookieValue = `${studentnum}:${reservedList.join(',')}`;
+    const newCookieValue = `${rentalStatus}:${studentnum}:${reservedList.join(',')}`;
 
     res.cookie('reservedItems', newCookieValue, {
         maxAge: 3600000,
