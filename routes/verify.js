@@ -179,6 +179,7 @@ router.post('/verify-step3', (req, res) => {
     return handler(req, res, cookieStudentNum ,cookieItemList);
 });
 
+
 //대여 로직
 function hadleRental(req, res, cookieStudentNum ,cookieItemList) {
 
@@ -262,22 +263,25 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList) {
 
         const userName = results[0].name;
 
-        // ✅ 먼저 해당 대여 기록이 존재하는지 확인
-        //최적화가 필요해보이는 군
-
-        const sqlCheck = 'SELECT * FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
-        db.query(sqlCheck, [itemName, userName], (err, checkResult) => {
+        //현재 대여한 아이템을 불러오기
+        const sqlCheck = 'SELECT * FROM Rent_status WHERE whoAreRent = ?';
+        db.query(sqlCheck, [userName], (err, checkResult) => {
             if (err) {
                 return res.status(500).json({ success: false, message: '대여 기록 확인 실패' });
             }
 
-            if (checkResult.length === 0) {
-                return res.json({ success: false, message: `${itemName}은(는) 현재 대여하지 않았습니다.` });
-            }
+            const dbItemList = checkResult.map(row => row.itemName);
+            const localItemlist = cookieItemList.map(item => item.itemName);
+            dbItemList.sorted();
+            localItemlist.sorted();
 
+            const targetItemList = [];
+            for(let i = 0; i < dbItemList.length; i++) {
+                if(dbItemList[i].itemName === localItemlist[i].itemName) targetItemList.push(localItemlist[i].itemName);
+            }
             // ✅ 실제로 대여 중일 경우만 삭제 수행
             const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
-            db.query(sqlDelete, [itemName, userName], (err, deleteResult) => {
+            db.query(sqlDelete, [targetItemList ,userName], (err, deleteResult) => {
                 if (err) {
                     console.error('[❌ 대여 취소 실패]', err);
                     return res.status(500).json({ success: false, message: '대여 취소 실패' });
@@ -285,7 +289,7 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList) {
 
                 //대여가능임을 명시하도록 INSERT
                 const sqlUpdateStatus = 'UPDATE Items SET status = 0 WHERE itemName = ?';
-                db.query(sqlUpdateStatus, [itemName], (err, results) => {
+                db.query(sqlUpdateStatus, [targetItemList], (err, results) => {
                     if (err) {
                         console.error('[❌ status 업데이트 실패]', err);
                         return res.status(500).json({ success: false, message: 'status 업데이트 실패' });
