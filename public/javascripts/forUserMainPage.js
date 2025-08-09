@@ -86,6 +86,51 @@ function cancelRental(itemName) {
     }
 }
 
+
+//반납 예약 테스트
+function reserveFromServer2(itemName) {
+    if (confirm(`${itemName} 을 반납 예약 하겠습니까?`)) {
+        fetch('/reservation2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ itemName })
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(err => {
+                alert("반납 신청 중 오류가 발생했습니다.");
+                console.error(err);
+            });
+    }
+}
+
+//반납 예약 취소
+function cancelRental2(itemName) {
+    if (confirm(`${itemName} 을 반납 예약 취소 하시겠습니까?`)) {
+        fetch('/reservation/cancel2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ itemName })
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(err => {
+                alert("반납 취소 중 오류가 발생했습니다.");
+                console.error(err);
+            });
+    }
+}
+
 //남은 대여시간 계산 함수
 function initCountdowns() {
     const countdowns = document.querySelectorAll('.countdown');

@@ -38,7 +38,8 @@
       </p>
       <img src="/images/<%= item.img %>" alt="<%= item.itemName %>" />
       <div class="item-buttons">
-        <button onclick="cancelRental('<%= item.itemName %>')">대여 취소하기 (DB)</button>
+        <button onclick="reserveFromServer2('<%= item.itemName %>')">반납예약</button>
+        <button onclick="cancelRental2('<%= item.itemName %>')">반납 예약 취소</button>
       </div>
     </div>
   <% }) %>

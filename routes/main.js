@@ -66,7 +66,6 @@ router.get('/', function(req, res, next) {//router123
 * 쿠키도 여기서 구워줌
 */
 router.post('/reservation', (req, res) => {
-    const rentalStatus = "rent";
     const itemName = req.body.itemName;
     const studentnum = req.session.user?.studentnum;
 
@@ -91,7 +90,7 @@ router.post('/reservation', (req, res) => {
     }
 
     reservedList.push(itemName);
-    const newCookieValue = `${rentalStatus}:${studentnum}:${reservedList.join(',')}`;
+    const newCookieValue = `${studentnum}:${reservedList.join(',')}`;
 
     res.cookie('reservedItems', newCookieValue, {
         maxAge: 3600000,
@@ -167,6 +166,88 @@ router.get('/admin',(req,res)=> {
     });
 });
 
+
+//반납 예약 쿠키
+router.post('/reservation2', (req, res) => {
+    const itemName = req.body.itemName;
+    const studentnum = req.session.user?.studentnum;
+
+    if (!studentnum) {
+        return res.status(401).send('로그인 세션 없음');
+    }
+
+    let currentReserved = req.cookies.returnItemList || '';
+    let returnedList = [];
+
+    if (currentReserved.includes(':')) {
+        const [cookieStudentNum, items] = currentReserved.split(':');
+        if (cookieStudentNum === String(studentnum)) {
+            returnedList = items.split(',').filter(Boolean);
+        } else {
+            returnedList = [];
+        }
+    }
+
+    if (returnedList.includes(itemName)) {
+        return res.send({ success: false, message: `${itemName}은(는) 이미 예약됨` });
+    }
+
+    returnedList.push(itemName);
+    const newCookieValue = `${studentnum}:${returnedList.join(',')}`;
+
+    res.cookie('returnItemList', newCookieValue, {
+        maxAge: 3600000,
+        httpOnly: false,
+        path: '/'
+    });
+
+    console.log('반납 예정 목록:', returnedList);
+    res.send({ success: true, message: `${itemName} 반납 신청되었습니다.` });
+});
+
+
+/* 반납예약취소는 안만드는게 좋겠지만 일단 해보자 */
+router.post('/reservation/cancel2', (req, res) => {
+    const itemName = req.body.itemName;
+    const studentnum = req.session.user?.studentnum;
+
+    if (!studentnum) {
+        return res.status(401).send('로그인 세션 없음');
+    }
+
+    let currentReserved = req.cookies.returnItemList || '';
+    let returnList = [];
+
+    if (currentReserved.includes(':')) {
+        const [cookieStudentNum, items] = currentReserved.split(':');
+        if (cookieStudentNum === String(studentnum)) {
+            returnList = items.split(',').filter(Boolean);
+        }
+    }
+
+    if (!returnList.includes(itemName)) {
+        return res.send({
+            success: false,
+            message: `${itemName}은(는) 예정된 반납 목록이 아닙니다.`
+        });
+    }
+
+    // ✅ 실제 취소 처리
+    const updatedList = returnList.filter(item => item !== itemName);
+    const newCookieValue = `${studentnum}:${updatedList.join(',')}`;
+
+    res.cookie('returnItemList', newCookieValue, {
+        httpOnly: false,
+        path: '/'
+        // maxAge 생략 → 브라우저 종료 시 자동 삭제
+    });
+
+    console.log(`${itemName} 반납 예정 취소됨. 현재 목록:`, updatedList);
+    res.send({
+        success: true,
+        message: `${itemName} 반납이 취소되었습니다.`
+    });
+});
 module.exports = router;
 
 
