@@ -157,15 +157,89 @@ const actionMode ={
 router.post('/verify-step3', (req, res) => {
     const sessionUser = req.session.user;
     const cookieReserved = req.cookies.reservedItems;
+    const cookieReturn = req.cookies.returnItemList;
 
-    if (!sessionUser || !cookieReserved.length) {
+    if (!sessionUser) {
         return res.status(401).send('로그인 후 시도해주세요');
     }
 
-    const [mode, cookieStudentNum, itemListStr] = cookieReserved.split(':');
-    const cookieItemList = itemListStr?.split(',').filter(Boolean).sort();
-    const handler = actionMode[mode];
+    const hasReserved = cookieReserved.length > 0;
+    const hasReturn = cookieReserved.length > 0;
+    if(!hasReturn && !hasReserved) return res.status(400).json({ success: false, message:'처리할 항목이 없음'});
 
+    const results = { success: true, messages: [] };
+    const operations = [];
+
+    //대여 쿠키 처리
+    if (hasReserved) {
+        const [cookieStudentNum, itemListStr] = cookieReserved.split(':');
+        const cookieItemList = itemListStr?.split(',').filter(Boolean).sort();
+
+        // 학번 변조 검사
+        if (cookieStudentNum !== sessionUser.studentnum) {
+            res.clearCookie('reservedItems');
+            return res.status(403).json({ success: false, message: '쿠키 학번 변조 감지' });
+        }
+
+        //아이템이 없다면 패스
+        if(cookieItemList.length <= 0) return;
+
+        operations.push(
+            new Promise((resolve, reject) => {
+                handleRental(req, res, cookieStudentNum, cookieItemList, (result) => {
+                    if (result.success) {
+                        results.messages.push(`대여: ${result.message}`);
+                        res.clearCookie('reservedItems');
+                    }
+                    resolve(result);
+                });
+            })
+        );
+    }
+
+    //반납 쿠키 처리
+    if (hasReturn) {
+        const [returnStudentNum, returnItemListStr] = cookieReturn.split(':');
+        const returnItemList = returnItemListStr?.split(',').filter(Boolean).sort();
+
+        // 학번 변조 검사
+        if (returnStudentNum !== sessionUser.studentnum) {
+            res.clearCookie('returnItemList');
+            return res.status(403).json({ success: false, message: '반납 쿠키 학번 변조 감지' });
+        }
+
+        //아이템이 없다면
+        if(returnItemList.length <= 0) return;
+
+        operations.push(
+            new Promise((resolve, reject) => {
+                handleReturn(req, res, returnStudentNum, returnItemList, (result) => {
+                    if (result.success) {
+                        results.messages.push(`반납: ${result.message}`);
+                        res.clearCookie('returnItemList');
+                    }
+                    resolve(result);
+                });
+            })
+        );
+    }
+
+    // 모든 작업 완료 후 응답
+    Promise.all(operations)
+        .then(operationResults => {
+            const allSuccess = operationResults.every(result => result.success);
+            return res.json({
+                success: allSuccess,
+                message: results.messages.join(' / '),
+                details: operationResults
+            });
+        })
+        .catch(error => {
+            console.error('처리 중 오류:', error);
+            return res.status(500).json({ success: false, message: '처리 중 오류가 발생했습니다' });
+        });
+
+    /*
     // 대여,반납 이외의 예외처리
     if (!handler) {
         return res.status(400).json({ error: '모드 변조 감지' });
@@ -176,12 +250,12 @@ router.post('/verify-step3', (req, res) => {
         return res.status(403).send('쿠키 학번 변조 감지');
     }
 
-    return handler(req, res, cookieStudentNum ,cookieItemList);
+    return handler(req, res, cookieStudentNum ,cookieItemList);*/
 });
 
 
 //대여 로직
-function hadleRental(req, res, cookieStudentNum ,cookieItemList) {
+function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
 
     // 이름 조회
     const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
@@ -221,8 +295,7 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList) {
 
             db.query(sqlInsert, [insertValues], (err, insertResult) => {
                 if (err) {
-                    console.error('[❌ INSERT 실패]', err);
-                    return res.status(500).send('대여 정보 저장 실패');
+                    return callback({ success: false, message: '대여정보 저장 실패' });
                 }
 
                 // 모든 아이템의 status 업데이트
@@ -235,12 +308,10 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList) {
                     })
                 ))
                     .then(() => {
-                        res.clearCookie('reservedItems');
-                        return res.send({
+                        callback({
                             success: true,
-                            message: '대여 완료 ✅',
-                            rented: newItemsToRent,
-                            skipped: dbItemList.filter(item => cookieItemList.includes(item))
+                            message: '대여 완료',
+                            rented: newItemsToRent
                         });
                     })
                     .catch(err => {
@@ -253,7 +324,7 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList) {
 }
 
 //반납 로직
-function handleReturn(req, res, cookieStudentNum ,cookieItemList) {
+function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
 
     const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
     db.query(sqlName, [cookieStudentNum], (err, results) => {
@@ -291,10 +362,9 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList) {
                 const sqlUpdateStatus = 'UPDATE Items SET status = 0 WHERE itemName = ?';
                 db.query(sqlUpdateStatus, [targetItemList], (err, results) => {
                     if (err) {
-                        console.error('[❌ status 업데이트 실패]', err);
-                        return res.status(500).json({ success: false, message: 'status 업데이트 실패' });
+                        return callback({ success: false, message: 'status 업데이트 실패' });
                     }
-                    return res.json({ success: true, message: `${itemName} 대여 취소 완료` });
+                    return callback({ success: true, message: '반납 완료' });
                 });
             });
         });
