@@ -152,17 +152,32 @@ router.post('/reservation/cancel', (req, res) => {
 
 //관리자 페이지
 router.get('/admin',(req,res)=> {
-    /* 관리자 권한 췤
-    if (!req.session.user || req.session.user.role !== 'admin') {
-        return res.status(403).send('관리자 권한이 필요합니다.');
-    }*/
-    const sql = 'SELECT itemName, status, img FROM Items';
-    db.query(sql, (err, results)=> {
-        if(err) {
-            console.error('DB 오류:', err);
-            return res.status(500).send('데이터베이스 오류');
+    //관리자 권한 췤
+    //그전에 로그인 했는지 확인
+    if (!req.session.user) {
+        return res.redirect('/users/login');
+    }
+
+    const userStudentNum = req.session.user?.studentnum;
+    const verificate_perm = 'SELECT studentNum FROM user_permissions WHERE studentNum = ? AND (president = true OR vice_president = true)';
+    db.query(verificate_perm, [userStudentNum],(err, results) => {
+        if(err){
+            console.error('권한 확인 중 DB 오류:', err);
+            return res.status(500).send('권한 확인 오류');
         }
-        res.render('admin', { title: '관리자 페이지', items: results });
+
+        if (results.length === 0) {
+            return res.status(403).send('관리자 권한이 필요합니다');
+        }
+
+        const sql = 'SELECT itemName, status, img FROM Items';
+        db.query(sql, (err, results)=> {
+            if(err) {
+                console.error('DB 오류:', err);
+                return res.status(500).send('데이터베이스 오류');
+            }
+            res.render('admin', { title: '관리자 페이지', items: results });
+        });
     });
 });
 
