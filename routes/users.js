@@ -169,4 +169,31 @@ router.get('/list', (req, res) => {
   });
 });
 
+
+
+
+router.get('/DOA',(req, res) => {
+  //로그인한 사용자의 학번을 세션에서 가져옴
+  const presidentNum = req.session.user ? req.session.user.studentnum : null;
+
+  if (!presidentNum) {
+    return res.redirect('/users/login');
+  }
+
+  //권한 확인 쿼리
+  const president_verificate = 'SELECT president FROM user_permissions WHERE studentNum = ?';
+  db.query(president_verificate, [presidentNum], (err, verifyRows) => {
+    if (err) {
+      console.error('권한 확인 중 DB 오류:', err);
+      return res.status(500).send('서버 오류');
+    }
+    //권한 없으면 그냥 빠꾸
+    if (verifyRows.length === 0 || !verifyRows[0].president) {
+      return res.redirect('/users/login');
+    }
+
+    res.render('successionToTheThrone', {title: '신성한 왕위를 계승 하는 곳'});
+  });
+});
+
 module.exports = router;
