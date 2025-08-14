@@ -46,6 +46,43 @@ router.post('/signUpquery', async (req,res)=> {
   if (!studentnum || !name || !grade || !password) {
     return res.status(400).json({message: '모든 필드를 입력해주세요.'});
   }
+
+  const presidentNum = req.session.studentnum;
+  const president_verificate = `SELECT president, vice_president FROM user_permissions WHERE studentNum = ?`;
+  db.query(president_verificate, [presidentNum], (err, result) => {
+    if(err){
+      console.error('회장, 부회장 권한 없음:', err);
+      return res.status(500).send('어드민 계정이 아님');
+    }
+  });
+
+  try {
+    await db.beginTransaction();
+
+    // Users 테이블에 삽입
+    const [result] = await db.execute(
+        'INSERT INTO Users (name, studentNum, grade, password) VALUES (?, ?, ?, ?)',
+        [name, studentnum, grade, password]
+    );
+
+    const userId = result.insertId; // 자동생성된 user ID
+
+    // user_permissions 테이블에 삽입
+    await db.execute(
+        'INSERT INTO user_permissions (user_id, rent_perm) VALUES (?, ?)',
+        [userId, true] // rent_perm을 true로 설정
+    );
+
+    await db.commit();
+    console.log('사용자와 권한이 성공적으로 생성되었습니다.');
+
+  } catch (error) {
+    await db.rollback();
+    console.error('오류 발생:', error);
+  } finally {
+    await db.end();
+  }
+  /*
   // 계정 중복 확인
   const sql = 'SELECT * FROM Users WHERE studentNum = ?';
   db.query(sql, [studentnum], (err, result) => {
@@ -69,6 +106,8 @@ router.post('/signUpquery', async (req,res)=> {
       });
     }
   });
+
+   */
 });
 
 router.get('/logout', (req, res) => {
