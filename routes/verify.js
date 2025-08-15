@@ -68,6 +68,16 @@ router.post('/verify-step2', (req, res) => {
                     return res.status(500).send('대여 정보 저장 실패');
                 }
 
+                // ✅ Log_rent에도 대여 기록 INSERT
+                const logValues = newItemsToRent.map(item => [userName, item]);
+                const sqlLogInsert = 'INSERT INTO Log_rent (name, itemName) VALUES ?';
+                db.query(sqlLogInsert, [logValues], (logErr) => {
+                    if (logErr) {
+                        console.error('[❌ Log_rent INSERT 실패]', logErr);
+                        // 계속 진행
+                    }
+                });
+
                 // 모든 아이템의 status 업데이트
                 Promise.all(newItemsToRent.map(item =>
                     new Promise((resolve, reject) => {
@@ -112,9 +122,6 @@ router.post('/cancel', (req, res) => {
 
         const userName = results[0].name;
 
-        // ✅ 먼저 해당 대여 기록이 존재하는지 확인
-        //최적화가 필요해보이는 군
-
         const sqlCheck = 'SELECT * FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
         db.query(sqlCheck, [itemName, userName], (err, checkResult) => {
             if (err) {
@@ -125,7 +132,6 @@ router.post('/cancel', (req, res) => {
                 return res.json({ success: false, message: `${itemName}은(는) 현재 대여하지 않았습니다.` });
             }
 
-            // ✅ 실제로 대여 중일 경우만 삭제 수행
             const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
             db.query(sqlDelete, [itemName, userName], (err, deleteResult) => {
                 if (err) {
@@ -133,13 +139,24 @@ router.post('/cancel', (req, res) => {
                     return res.status(500).json({ success: false, message: '대여 취소 실패' });
                 }
 
-                //대여가능임을 명시하도록 INSERT
                 const sqlUpdateStatus = 'UPDATE Items SET status = 0 WHERE itemName = ?';
                 db.query(sqlUpdateStatus, [itemName], (err, results) => {
                     if (err) {
                         console.error('[❌ status 업데이트 실패]', err);
                         return res.status(500).json({ success: false, message: 'status 업데이트 실패' });
                     }
+
+                    // ✅ Log_rent 반납 기록 + 연체시간 계산
+                    const sqlUpdateLog = `
+                        UPDATE Log_rent
+                        SET returnTime = NOW(),
+                            delinquencyTime = SEC_TO_TIME(TIMESTAMPDIFF(SECOND, rentTime, NOW()))
+                        WHERE name = ? AND itemName = ? AND returnTime IS NULL
+                    `;
+                    db.query(sqlUpdateLog, [userName, itemName], (logErr) => {
+                        if (logErr) console.error('[❌ Log_rent UPDATE 실패]', logErr);
+                    });
+
                     return res.json({ success: true, message: `${itemName} 대여 취소 완료` });
                 });
             });
@@ -147,17 +164,11 @@ router.post('/cancel', (req, res) => {
     });
 });
 
-
-
-
-//대여,반납 함수를 객체로 선언
 const actionMode ={
     rent: hadleRental,
     return: handleReturn,
 };
 
-//대여,반납 예약 공동 처리 라우트
-//각 대여, 반납로직은 이 라우트 아래의 hadleRental, handleReturn함수들이 처리
 router.post('/verify-step3', (req, res) => {
     const sessionUser = req.session.user;
     const cookieReserved = req.cookies.reservedItems;
@@ -174,18 +185,15 @@ router.post('/verify-step3', (req, res) => {
     const results = { success: true, messages: [] };
     const operations = [];
 
-    //대여 쿠키 처리
     if (hasReserved) {
         const [cookieStudentNum, itemListStr] = cookieReserved.split(':');
         const cookieItemList = itemListStr?.split(',').filter(Boolean).sort();
 
-        // 학번 변조 검사
         if (cookieStudentNum !== sessionUser.studentnum) {
             res.clearCookie('reservedItems');
             return res.status(403).json({ success: false, message: '쿠키 학번 변조 감지' });
         }
 
-        //아이템이 없다면 패스
         if(cookieItemList.length <= 0) return;
 
         operations.push(
@@ -201,18 +209,15 @@ router.post('/verify-step3', (req, res) => {
         );
     }
 
-    //반납 쿠키 처리
     if (hasReturn) {
         const [returnStudentNum, returnItemListStr] = cookieReturn.split(':');
         const returnItemList = returnItemListStr?.split(',').filter(Boolean).sort();
 
-        // 학번 변조 검사
         if (returnStudentNum !== sessionUser.studentnum) {
             res.clearCookie('returnItemList');
             return res.status(403).json({ success: false, message: '반납 쿠키 학번 변조 감지' });
         }
 
-        //아이템이 없다면
         if(returnItemList.length <= 0) return;
 
         operations.push(
@@ -228,7 +233,6 @@ router.post('/verify-step3', (req, res) => {
         );
     }
 
-    // 모든 작업 완료 후 응답
     Promise.all(operations)
         .then(operationResults => {
             const allSuccess = operationResults.every(result => result.success);
@@ -244,11 +248,7 @@ router.post('/verify-step3', (req, res) => {
         });
 });
 
-
-//대여용 쿠키 처리
 function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
-
-    // 이름 조회
     const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
     db.query(sqlName, [cookieStudentNum], (err, results) => {
         if (err || results.length === 0) {
@@ -257,7 +257,6 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
 
         const userName = results[0].name;
 
-        // 기존 대여 내역 조회
         const sqlRent = 'SELECT itemName FROM Rent_status WHERE whoAreRent = ?';
         db.query(sqlRent, [userName], (err, rentResults) => {
             if (err) {
@@ -267,7 +266,6 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
             const dbItemList = rentResults.map(row => row.itemName);
             const alreadyRentedSet = new Set(dbItemList);
 
-            // 이미 대여된 항목 제외
             const newItemsToRent = cookieItemList.filter(item => !alreadyRentedSet.has(item));
 
             if (newItemsToRent.length === 0) {
@@ -279,13 +277,19 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
                 });
             }
 
-            // rentToHour 기본값 1시간으로 설정
             const insertValues = newItemsToRent.map(item => [item, userName, 1, new Date()]);
             const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date) VALUES ?';
             db.query(sqlInsert, [insertValues], (err, insertResult) => {
                 if (err) {
                     return callback({ success: false, message: '대여정보 저장 실패' });
                 }
+
+                // ✅ Log_rent 기록 추가
+                const logValues = newItemsToRent.map(item => [userName, item]);
+                const sqlLogInsert = 'INSERT INTO Log_rent (name, itemName) VALUES ?';
+                db.query(sqlLogInsert, [logValues], (logErr) => {
+                    if (logErr) console.error('[❌ Log_rent INSERT 실패]', logErr);
+                });
 
                 Promise.all(newItemsToRent.map(item =>
                     new Promise((resolve, reject) => {
@@ -311,9 +315,7 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
     });
 }
 
-// 반납 예약 쿠키 처리
 function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
-
     const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
     db.query(sqlName, [cookieStudentNum], (err, results) => {
         if (err || results.length === 0) {
@@ -322,7 +324,6 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
 
         const userName = results[0].name;
 
-        //현재 대여한 아이템을 불러오기
         const sqlCheck = 'SELECT itemName FROM Rent_status WHERE whoAreRent = ?';
         db.query(sqlCheck, [userName], (err, checkResult) => {
             if (err) {
@@ -336,7 +337,6 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                 return callback({ success: false, message: '반납할 수 있는 항목이 없습니다' });
             }
 
-            //개별 삭제 처리
             const deletePromises = targetItemList.map(item =>
                 new Promise((resolve, reject) => {
                     const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
@@ -361,6 +361,22 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                     return Promise.all(updatePromises);
                 })
                 .then(() => {
+                    // ✅ Log_rent 반납 처리 + 연체시간 계산
+                    targetItemList.forEach(item => {
+                        const sqlUpdateLog = `
+                            UPDATE Log_rent
+                            SET returnTime = NOW(),
+                                delinquencyTime = SEC_TO_TIME(TIMESTAMPDIFF(SECOND, rentTime, NOW()))
+                            WHERE name = ? AND itemName = ?
+                              AND (returnTime IS NULL OR returnTime = '0000-00-00 00:00:00')
+                            ORDER BY rentTime DESC
+                            LIMIT 1
+                        `;
+                        db.query(sqlUpdateLog, [userName, item], (logErr) => {
+                            if (logErr) console.error('[❌ Log_rent UPDATE 실패]', logErr);
+                        });
+                    });
+
                     callback({ success: true, message: '반납 완료' });
                 })
                 .catch(err => {

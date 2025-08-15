@@ -1,116 +1,130 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title><%= baseTitle %> <%= title%></title>
-  <link href="/stylesheets/forAdmin.css" rel="stylesheet">
-  <script src="/javascripts/formainPage.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title><%= baseTitle %> <%= title %></title>
+    <link href="/stylesheets/forAdmin.css" rel="stylesheet" />
+    <script src="/javascripts/formainPage.js" defer></script>
 </head>
 <body>
-<div class="test-container"> <!-- 물건 컨테이너 -->
-  <main id="main-content">
-    <% items.forEach(item => { %>
-      <div class="table-card">
-        <h3><%= item.itemName %></h3>
-        <img id="itemImg" src="/images/<%= item.img %>" alt="이미지가 안보인다고요? 어쩌라구요">
-            <h2><%= item.status %></h2>
-        <label><input type="checkbox" class="table-check" data-item-name = "<%= item.itemName %>"> 선택</label>
-        <label><button onclick="editModalOpen(this)" class="edit-btn">수정</button></label>
-      </div>
-    <% }) %>
-  </main>
-  <aside>
-    <button class="aside adjust-button" onclick="OpenAddItemModal()">물건 추가</button>
-    <button class="aside adjust-button" onclick="deleteSelectedItems()">물건 삭제</button>
-    <button class="aside adjust-button" onclick="OpenViewAccountsModal()">계정 확인</button>
-    <button class="aside adjust-button" onclick="OpenAddAcountModal()">계정추가</button>
-  </aside>
+<div class="test-container"><!-- 물건 컨테이너 / 좌: aside, 우: main 구조라고 가정 -->
 
-  <section><!--계정 추가 모달-->
-    <div id="AddAcountModal" class="AddAcountModal">
-      <div class="AddAcountModal-content">
-        <span class="close" onclick="CloseModal()">&times;</span>
-        <p>계정추가</p><br>
-        <div class="signUp-container">
-        <form method="POST" onsubmit="signUpquery(); return false;">
+    <!-- ✅ 좌측 사이드: 버튼 5개로 확대 -->
+    <aside class="admin-aside">
+        <button class="aside adjust-button" onclick="OpenAddItemModal()">물건 추가</button>
+        <button class="aside adjust-button" onclick="deleteSelectedItems()">물건 삭제</button>
+        <button class="aside adjust-button" onclick="OpenViewAccountsModal()">계정 확인</button>
+        <button class="aside adjust-button" onclick="OpenAddAcountModal()">계정 추가</button>
+        <!-- 신규: 장부 열람 -->
+        <a class="aside adjust-button solid" href="/log" aria-label="장부 열람으로 이동">장부 열람</a>
+    </aside>
 
-          <label for="grade">학년</label>
-          <input type="number" id="grade" name="grade" required>
+    <!-- 우측 메인: 아이템 카드 목록 -->
+    <main id="main-content" aria-live="polite">
+        <% if (items && items.length) { %>
+            <% items.forEach(item => { %>
+                <div class="table-card">
+                    <h3><%= item.itemName %></h3>
+                    <img id="itemImg" src="/images/<%= item.img %>" alt="<%= item.itemName %> 이미지" />
+                    <h2><%= item.status %></h2>
 
-          <label for="name">이름</label>
-          <input type="text" id="name" name="name" required>
+                    <label>
+                        <input
+                                type="checkbox"
+                                class="table-check"
+                                data-item-name="<%= item.itemName %>"
+                        /> 선택
+                    </label>
 
-          <label for="studentnum">학번</label>
-          <input type="number" id="studentnum" name="studentnum" required>
+                    <button
+                            type="button"
+                            class="edit-btn"
+                            onclick="editModalOpen(this)"
+                            data-item-name="<%= item.itemName %>"
+                    >수정</button>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p>표시할 아이템이 없습니다.</p>
+        <% } %>
+    </main>
 
-           <label for="password">비밀번호</label>
-           <input type="password" id="password" name="password" required>
-            <div class="AddAcountModal-buttons">
-              <button type="submit">추가</button>
+    <!-- 계정 추가 모달 -->
+    <section aria-hidden="true">
+        <div id="AddAcountModal" class="AddAcountModal">
+            <div class="AddAcountModal-content">
+                <span class="close" onclick="CloseModal()" role="button" aria-label="닫기">&times;</span>
+                <p>계정추가</p><br />
+                <div class="signUp-container">
+                    <form method="POST" onsubmit="signUpquery(); return false;">
+                        <label for="grade">학년</label>
+                        <input type="number" id="grade" name="grade" required />
+
+                        <label for="name">이름</label>
+                        <input type="text" id="name" name="name" required />
+
+                        <label for="studentnum">학번</label>
+                        <input type="number" id="studentnum" name="studentnum" required />
+
+                        <label for="password">비밀번호</label>
+                        <input type="password" id="password" name="password" required />
+
+                        <div class="AddAcountModal-buttons">
+                            <button type="submit">추가</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
         </div>
-      </div>
-    </div>
-   </section>
+    </section>
 
+    <!-- 아이템 추가 모달 -->
+    <section aria-hidden="true">
+        <div id="AddItemModal" class="AddAcountModal">
+            <div class="AddAcountModal-content">
+                <span class="close" onclick="CloseModal()" role="button" aria-label="닫기">&times;</span>
+                <p>아이템 추가</p><br />
+                <div class="signUp-container" id="addItemModalContainer"></div>
+            </div>
+        </div>
+    </section>
 
-
-  <section><!--아이템 추가 섹션-->
-   <div id="AddItemModal" class="AddAcountModal">
-    <div class="AddAcountModal-content">
-     <span class="close" onclick="CloseModal()">&times;</span>
-      <p>아이템 추가</p><br>
-       <div class="signUp-container" id="addItemModalContainer"></div>
-    </div>
-   </div>
-  </section>
-
-
-
-  <section><!--아이템 수정 섹션-->
-      <div id="editItemModal" class="editItemModal">
-          <div class="editItemModal-content">
-              <span class="close" onclick="CloseModal()">&times;</span>
-                <!--여기에 자동으로 입력 됨-->
-                <p class="editItemModalContainer" id ="editItemModalContainer"></p>
+    <!-- 아이템 수정 모달 -->
+    <section aria-hidden="true">
+        <div id="editItemModal" class="editItemModal">
+            <div class="editItemModal-content">
+                <span class="close" onclick="CloseModal()" role="button" aria-label="닫기">&times;</span>
+                <p class="editItemModalContainer" id="editItemModalContainer"><!-- 자동 채움 --></p>
                 <button class="editItemModalSendBtn" id="editItemModalSendBtn" onclick="updateItem()">수정</button>
-          </div>
-      </div>
-  </section>
-
-
-
-  <section> <!--계정 확인 섹션-->
-      <div id="ViewAccountsModal" class="AddAcountModal">
-        <div class="AddAcountModal-content" style="max-width: 90%; width: 900px; margin: 0 auto;">
-          <span class="close" onclick="CloseViewAccountsModal()">&times;</span>
-          <p style="text-align: center; font-size: 22px;">전체 계정 목록</p><br>
-
-          <div style="overflow-x: auto; display: flex; justify-content: center;">
-            <table border="1" style="width: 100%; max-width: 800px; border-collapse: collapse; text-align: center; font-size: 16px;">
-              <thead style="background-color: #f2f2f2;">
-              <tr>
-                <th style="padding: 12px; cursor: pointer;" onclick="sortAccounts('studentnum')">학번</th>
-                <th style="padding: 12px; cursor: pointer;" onclick="sortAccounts('name')">이름</th>
-                <th style="padding: 12px; cursor: pointer;" onclick="sortAccounts('grade')">학년</th>
-                <th style="padding: 12px;">대여 물품</th>
-              </tr>
-              </thead>
-              <tbody id="account-table-body">
-              <!-- JS로 채워짐 -->
-              </tbody>
-            </table>
-          </div>
+            </div>
         </div>
-      </div>
-  </section>
+    </section>
 
+    <!-- 계정 확인 모달 -->
+    <section aria-hidden="true">
+        <div id="ViewAccountsModal" class="AddAcountModal">
+            <div class="AddAcountModal-content" style="max-width: 90%; width: 900px; margin: 0 auto;">
+                <span class="close" onclick="CloseViewAccountsModal()" role="button" aria-label="닫기">&times;</span>
+                <p style="text-align: center; font-size: 22px;">전체 계정 목록</p><br />
 
-
+                <div style="overflow-x: auto; display: flex; justify-content: center;">
+                    <table border="1" style="width: 100%; max-width: 800px; border-collapse: collapse; text-align: center; font-size: 16px;">
+                        <thead style="background-color: #f2f2f2;">
+                        <tr>
+                            <th style="padding: 12px; cursor: pointer;" onclick="sortAccounts('studentnum')">학번</th>
+                            <th style="padding: 12px; cursor: pointer;" onclick="sortAccounts('name')">이름</th>
+                            <th style="padding: 12px; cursor: pointer;" onclick="sortAccounts('grade')">학년</th>
+                            <th style="padding: 12px;">대여 물품</th>
+                        </tr>
+                        </thead>
+                        <tbody id="account-table-body"><!-- JS로 채워짐 --></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
 
 </div>
 </body>
 </html>
-
