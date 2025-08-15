@@ -39,22 +39,26 @@ router.get('/:year/:month', (req, res) => {
 
     // ✅ UNION ALL 정렬은 서브쿼리로 감싸서 ORDER BY 해야 안전
     const sqlLogs = `
-    SELECT *
-    FROM (
-      SELECT id, itemName, studentnum, '대여' AS action, rentTime   AS at
-      FROM Rent_status
-      WHERE rentTime >= ? AND rentTime < ?
-      UNION ALL
-      SELECT id, itemName, studentnum, '반납' AS action, returnTime AS at
-      FROM Rent_status
-      WHERE returnTime IS NOT NULL AND returnTime >= ? AND returnTime < ?
-    ) AS u
-    ORDER BY u.at ASC
-  `;
+        SELECT *
+        FROM (
+                 SELECT id, itemName, name, '대여' AS action, rentTime AS at
+                 FROM Log_rent
+                 WHERE rentTime >= ? AND rentTime < ?
+
+                 UNION ALL
+
+                 SELECT id, itemName, name, '반납' AS action, returnTime AS at
+                 FROM Log_rent
+                 WHERE returnTime IS NOT NULL
+                   AND returnTime >= ? AND returnTime < ?
+             ) AS u
+        ORDER BY u.at ASC;
+
+    `;
 
     const sqlHasPrev = `
         SELECT EXISTS(
-            SELECT 1 FROM Rent_status
+            SELECT 1 FROM Log_rent
             WHERE rentTime < ? OR (returnTime IS NOT NULL AND returnTime < ?)
             LIMIT 1
         ) AS hasPrev
@@ -62,7 +66,7 @@ router.get('/:year/:month', (req, res) => {
 
     const sqlHasNext = `
         SELECT EXISTS(
-            SELECT 1 FROM Rent_status
+            SELECT 1 FROM Log_rent
             WHERE rentTime >= ? OR (returnTime IS NOT NULL AND returnTime >= ?)
             LIMIT 1
         ) AS hasNext

@@ -42,7 +42,7 @@
                     <th>시간</th>
                     <th>구분</th>
                     <th>물품명</th>
-                    <th>학번</th>
+                    <th>이름</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -51,7 +51,7 @@
                         <td><%= new Date(row.at).toLocaleString('ko-KR', { hour12: false }) %></td>
                         <td class="<%= row.action === '대여' ? 'rent' : 'return' %>"><%= row.action %></td>
                         <td><%= row.itemName %></td>
-                        <td><%= row.studentnum %></td>
+                        <td><%= row.name %></td>
                     </tr>
                 <% }) %>
                 </tbody>

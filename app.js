@@ -16,6 +16,8 @@ const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확�
 const imgProcessor = require('./routes/imgProcess'); //이미지처리 라우트
 require('./routes/generateURL'); //nfc_url에 내용 고쳐 쓰는 라우터
 const seedGenerator = require('./routes/seed-generator'); //랜덤시드 라우터
+const logRouter = require('./routes/log'); //장부기능
+
 
 const app = express();
 
@@ -79,6 +81,7 @@ app.use(function(err, req, res, next) {
 
 
 app.use('/rent', verifyRouter);
+app.use('/log', logRouter);
 
 /*
 // catch 404 and forward to error handler
