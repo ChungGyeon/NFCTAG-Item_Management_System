@@ -170,6 +170,121 @@ router.get('/admin',(req,res)=> {
     });
 });
 
+// 사용자 목록 페이지
+router.get('/admin/users', (req, res) => {
+    const sql = `
+        SELECT u.studentNum, u.name, u.grade, 
+               COALESCE(up.president, false) as president,
+               COALESCE(up.vice_president, false) as vice_president,
+               COALESCE(up.rent_perm, false) as rent_perm
+        FROM Users u
+        LEFT JOIN user_permissions up ON u.studentNum = up.studentNum
+        ORDER BY u.studentNum
+    `;
+    
+    db.query(sql, (err, users) => {
+        if(err) {
+            console.error('DB 오류:', err);
+            return res.status(500).send('데이터베이스 오류');
+        }
+        res.render('users', { title: '사용자 관리', users: users });
+    });
+});
+
+
+
+// 계정 삭제 기능
+router.post('/admin/delete-user', (req, res) => {
+    const { studentNum } = req.body;
+    
+    if (!studentNum) {
+        return res.status(400).json({ 
+            success: false, 
+            message: '학번이 제공되지 않았습니다.' 
+        });
+    }
+
+    // 먼저 president, vice_president 권한 확인
+    const checkSql = 'SELECT president, vice_president FROM user_permissions WHERE studentNum = ?';
+    db.query(checkSql, [studentNum], (err, permissions) => {
+        if (err) {
+            console.error('권한 확인 DB 오류:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: '데이터베이스 오류가 발생했습니다.' 
+            });
+        }
+
+        // 권한이 있는 경우 삭제 불가
+        if (permissions.length > 0 && (permissions[0].president || permissions[0].vice_president)) {
+            return res.status(403).json({ 
+                success: false, 
+                message: '회장 또는 부회장은 삭제할 수 없습니다.' 
+            });
+        }
+
+        // 트랜잭션으로 안전하게 삭제
+        db.beginTransaction((err) => {
+            if (err) {
+                console.error('트랜잭션 시작 오류:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: '데이터베이스 오류가 발생했습니다.' 
+                });
+            }
+
+            // user_permissions 테이블에서 삭제 (president, vice_president가 false인 경우만)
+            const deletePermissionsSql = 'DELETE FROM user_permissions WHERE studentNum = ? AND president = false AND vice_president = false';
+            db.query(deletePermissionsSql, [studentNum], (err, permissionsResult) => {
+                if (err) {
+                    return db.rollback(() => {
+                        console.error('user_permissions 삭제 오류:', err);
+                        res.status(500).json({ 
+                            success: false, 
+                            message: '데이터베이스 오류가 발생했습니다.' 
+                        });
+                    });
+                }
+
+                // Users 테이블에서 삭제
+                const deleteUserSql = 'DELETE FROM Users WHERE studentNum = ?';
+                db.query(deleteUserSql, [studentNum], (err, userResult) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            console.error('Users 삭제 오류:', err);
+                            res.status(500).json({ 
+                                success: false, 
+                                message: '데이터베이스 오류가 발생했습니다.' 
+                            });
+                        });
+                    }
+
+                    // 트랜잭션 커밋
+                    db.commit((err) => {
+                        if (err) {
+                            return db.rollback(() => {
+                                console.error('트랜잭션 커밋 오류:', err);
+                                res.status(500).json({ 
+                                    success: false, 
+                                    message: '데이터베이스 오류가 발생했습니다.' 
+                                });
+                            });
+                        }
+
+                        console.log(`학번 ${studentNum} 계정이 삭제되었습니다.`);
+                        res.json({ 
+                            success: true, 
+                            message: '계정이 성공적으로 삭제되었습니다.' 
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+
+
+
 /* ✅ 관리자 물건 삭제 기능 */
 router.post('/admin/delete-items', (req, res) => {
     const { items } = req.body;
