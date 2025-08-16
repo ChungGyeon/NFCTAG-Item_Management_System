@@ -30,7 +30,7 @@
             <td><%= user.name %></td>
             <td><%= user.grade %></td>
             <td>
-              <% if (!user.president && !user.vice_presiden) { %>
+              <% if (!user.president && !user.vice_president) { %>
                 <span style="color: #6c757d;">일반 사용자</span>
               <% } %>
               <% if (user.president) { %>
@@ -44,17 +44,22 @@
               <% } %>
             </td>
             <td>
-              <button class="vicePresident-btn"
-                      onclick="showAppointmentVicePresident('<%= user.studentNum %>', '<%= user.name %>', <%= user.president %>, <%= user.vice_president %>)"
-                      <%= (user.president || user.vice_president) ? 'disabled' : '' %>>
-                부회장 체크
-              </button>
+              <% if (user.vice_president) { %>
+                <button class="vicePresident-btn remove-vice"
+                        onclick="showRemoveVicePresident('<%= user.studentNum %>', '<%= user.name %>')">
+                  부회장 해임
+                </button>
+              <% } else { %>
+                <button class="vicePresident-btn appoint-vice"
+                        onclick="showAppointmentVicePresident('<%= user.studentNum %>', '<%= user.name %>')"
+                        <%= user.president ? 'disabled' : '' %>>
+                  부회장 임명
+                </button>
+              <% } %>
 
-              <button
-                      class="delete-btn"
+              <button class="delete-btn"
                       onclick="showDeleteModal('<%= user.studentNum %>', '<%= user.name %>', <%= user.president %>, <%= user.vice_president %>)"
-                      <%= (user.president || user.vice_president) ? 'disabled' : '' %>
-              >
+                      <%= (user.president || user.vice_president) ? 'disabled' : '' %>>
                 삭제
               </button>
             </td>
@@ -83,6 +88,18 @@
       <p id="appointmentMessage"></p>
       <div class="modal-buttons">
         <button class="modal-btn appointmentConfirm-btn" id="confirmappointment">확인</button>
+        <button class="modal-btn cancel-btn" onclick="closeModal()">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 부회장 해임 모달 -->
+  <div id="removeVicePresidentModal" class="modal">
+    <div class="modal-content">
+      <h3>부회장 해임 확인</h3>
+      <p id="removeMessage"></p>
+      <div class="modal-buttons">
+        <button class="modal-btn removeConfirm-btn" id="confirmRemove">확인</button>
         <button class="modal-btn cancel-btn" onclick="closeModal()">취소</button>
       </div>
     </div>

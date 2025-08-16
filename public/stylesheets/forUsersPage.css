@@ -58,15 +58,34 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    margin-right: 5px;
 }
 
 .vicePresident-btn:hover {
-    background-color: #17a2b8;
+    background-color: #138496;
 }
 
 .vicePresident-btn:disabled {
     background-color: #6c757d;
     cursor: not-allowed;
+}
+
+/* 부회장 임명 버튼 */
+.vicePresident-btn.appoint-vice {
+    background-color: #28a745;
+}
+
+.vicePresident-btn.appoint-vice:hover {
+    background-color: #218838;
+}
+
+/* 부회장 해임 버튼 */
+.vicePresident-btn.remove-vice {
+    background-color: #dc3545;
+}
+
+.vicePresident-btn.remove-vice:hover {
+    background-color: #c82333;
 }
 
 .permission-badge {
@@ -144,7 +163,12 @@
 }
 
 .appointmentConfirm-btn {
-    background-color: #17a2b8;
+    background-color: #28a745;
+    color: white;
+}
+
+.removeConfirm-btn {
+    background-color: #dc3545;
     color: white;
 }
 
