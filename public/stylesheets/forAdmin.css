@@ -29,7 +29,7 @@ aside {
     grid-area: aside;
     background-color: #d0d0d0;
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
 

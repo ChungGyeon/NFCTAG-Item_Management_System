@@ -9,6 +9,7 @@ function CloseModal(){
 }
 
 
+
 //계정 추가 쿼리
 function signUpquery() {
     var studentnum = document.getElementById("studentnum").value;
@@ -415,4 +416,9 @@ function deleteUser() {
         .finally(() => {
             closeDeleteModal();
         });
+}
+
+//관리자 페이지에서 로그 확인하는 곳으로
+function goToLog() {
+    window.location.href = '/log';
 }
