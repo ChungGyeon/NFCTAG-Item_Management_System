@@ -4,149 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title><%= title %></title>
-  <link href="/stylesheets/forAdmin.css" rel="stylesheet">
-  <script src="/javascripts/formainPage.js"></script>
-  <style>
-    .users-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .user-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .user-table th,
-    .user-table td {
-      padding: 12px 15px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-    
-    .user-table th {
-      background-color: #f8f9fa;
-      font-weight: bold;
-      color: #333;
-    }
-    
-    .user-table tr:hover {
-      background-color: #f5f5f5;
-    }
-    
-    .delete-btn {
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    
-    .delete-btn:hover {
-      background-color: #c82333;
-    }
-    
-    .delete-btn:disabled {
-      background-color: #6c757d;
-      cursor: not-allowed;
-    }
-    
-    .permission-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: bold;
-      margin: 2px;
-    }
-    
-    .president {
-      background-color: #ffc107;
-      color: #212529;
-    }
-    
-    .vice-president {
-      background-color: #17a2b8;
-      color: white;
-    }
-    
-    .rent-perm {
-      background-color: #28a745;
-      color: white;
-    }
-    
-    .back-btn {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-    
-    .back-btn:hover {
-      background-color: #0056b3;
-    }
-    
-    /* 모달 스타일 */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-    }
-    
-    .modal-content {
-      background-color: white;
-      margin: 15% auto;
-      padding: 30px;
-      border-radius: 8px;
-      width: 400px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    
-    .modal-buttons {
-      margin-top: 20px;
-    }
-    
-    .modal-btn {
-      padding: 10px 20px;
-      margin: 0 10px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    
-    .confirm-btn {
-      background-color: #dc3545;
-      color: white;
-    }
-    
-    .cancel-btn {
-      background-color: #6c757d;
-      color: white;
-    }
-    
-    .modal-btn:hover {
-      opacity: 0.8;
-    }
-  </style>
+  <link href="/stylesheets/forUsersPage.css" rel="stylesheet">
+  <script src="/javascripts/forUsersPage.js"></script>
 </head>
 <body>
   <div class="users-container">
@@ -171,24 +30,30 @@
             <td><%= user.name %></td>
             <td><%= user.grade %></td>
             <td>
+              <% if (!user.president && !user.vice_presiden) { %>
+                <span style="color: #6c757d;">일반 사용자</span>
+              <% } %>
               <% if (user.president) { %>
                 <span class="permission-badge president">회장</span>
               <% } %>
               <% if (user.vice_president) { %>
                 <span class="permission-badge vice-president">부회장</span>
               <% } %>
-              <% if (user.rent_perm) { %>
-                <span class="permission-badge rent-perm">대여권한</span>
-              <% } %>
-              <% if (!user.president && !user.vice_president && !user.rent_perm) { %>
-                <span style="color: #6c757d;">일반 사용자</span>
+              <% if (!user.rent_perm) { %>
+                <span class="permission-badge rent-perm">대여권한 없음</span>
               <% } %>
             </td>
             <td>
-              <button 
-                class="delete-btn" 
-                onclick="showDeleteModal('<%= user.studentNum %>', '<%= user.name %>', <%= user.president %>, <%= user.vice_president %>)"
-                <%= (user.president || user.vice_president) ? 'disabled' : '' %>
+              <button class="vicePresident-btn"
+                      onclick="showAppointmentVicePresident('<%= user.studentNum %>', '<%= user.name %>', <%= user.president %>, <%= user.vice_president %>)"
+                      <%= (user.president || user.vice_president) ? 'disabled' : '' %>>
+                부회장 체크
+              </button>
+
+              <button
+                      class="delete-btn"
+                      onclick="showDeleteModal('<%= user.studentNum %>', '<%= user.name %>', <%= user.president %>, <%= user.vice_president %>)"
+                      <%= (user.president || user.vice_president) ? 'disabled' : '' %>
               >
                 삭제
               </button>
@@ -205,25 +70,22 @@
       <h3>계정 삭제 확인</h3>
       <p id="deleteMessage"></p>
       <div class="modal-buttons">
-        <button class="modal-btn confirm-btn" id="confirmDelete">확인</button>
-        <button class="modal-btn cancel-btn" onclick="closeDeleteModal()">취소</button>
+        <button class="modal-btn deleteConfirm-btn" id="confirmDelete">확인</button>
+        <button class="modal-btn cancel-btn" onclick="closeModal()">취소</button>
       </div>
     </div>
   </div>
 
-  <script>
-    // 모달 외부 클릭 시 닫기
-    window.onclick = function(event) {
-      const modal = document.getElementById('deleteModal');
-      if (event.target === modal) {
-        closeDeleteModal();
-      }
-    }
-    
-    // 삭제 확인 버튼 이벤트
-    document.getElementById('confirmDelete').addEventListener('click', function() {
-      deleteUser();
-    });
-  </script>
+  <!-- 부회장 임명 모달 -->
+  <div id="appointmentVicePresidentModal" class="modal">
+    <div class="modal-content">
+      <h3>부회장 임명 확인</h3>
+      <p id="appointmentMessage"></p>
+      <div class="modal-buttons">
+        <button class="modal-btn appointmentConfirm-btn" id="confirmappointment">확인</button>
+        <button class="modal-btn cancel-btn" onclick="closeModal()">취소</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html> 
