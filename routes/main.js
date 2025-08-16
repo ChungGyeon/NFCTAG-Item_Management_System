@@ -35,7 +35,7 @@ router.get('/', function(req, res, next) {//router123
     if (!req.session.user) {
         return res.redirect('/users/login');
     }
-    const sql = 'SELECT I.itemName, I.img, I.status, R.whoAreRent, R.date, R.rentToHour FROM Items I LEFT JOIN Rent_status R ON I.itemName = R.itemName';
+    const sql = 'SELECT I.itemName, I.img, I.status, R.whoAreRent, R.studentNum, R.date, R.rentToHour FROM Items I LEFT JOIN Rent_status R ON I.itemName = R.itemName';
 
     db.query(sql, (err, items) => {
         if (err) {
@@ -58,7 +58,11 @@ router.get('/', function(req, res, next) {//router123
             isReserved: userReservedItems.includes(item.itemName)
         }));
 
-        res.render('main', { items: itemsWithStatus, title: '물품대여소' });
+        res.render('main', { 
+            items: itemsWithStatus, 
+            title: '물품대여소',
+            currentUser: req.session.user // 현재 로그인한 사용자 정보 전달
+        });
     });
 });
 
@@ -150,37 +154,6 @@ router.post('/reservation/cancel', (req, res) => {
 });
 
 
-//관리자 페이지
-router.get('/admin',(req,res)=> {
-    //관리자 권한 췤
-    //그전에 로그인 했는지 확인
-    if (!req.session.user) {
-        return res.redirect('/users/login');
-    }
-
-    const userStudentNum = req.session.user?.studentnum;
-    const verificate_perm = 'SELECT studentNum FROM user_permissions WHERE studentNum = ? AND (president = true OR vice_president = true)';
-    db.query(verificate_perm, [userStudentNum],(err, results) => {
-        if(err){
-            console.error('권한 확인 중 DB 오류:', err);
-            return res.status(500).send('권한 확인 오류');
-        }
-
-        if (results.length === 0) {
-            return res.status(403).send('관리자 권한이 필요합니다');
-        }
-
-        const sql = 'SELECT itemName, status, img FROM Items';
-        db.query(sql, (err, results)=> {
-            if(err) {
-                console.error('DB 오류:', err);
-                return res.status(500).send('데이터베이스 오류');
-            }
-            res.render('admin', { title: '관리자 페이지', items: results });
-        });
-    });
-});
-
 
 //반납 예약 쿠키
 router.post('/reservation2', (req, res) => {
@@ -263,6 +236,52 @@ router.post('/reservation/cancel2', (req, res) => {
         message: `${itemName} 반납이 취소되었습니다.`
     });
 });
+
+
+
+
+
+
+
+
+
+
+/*
+어드민 관련 엔드포인트
+*/
+
+//관리자 페이지
+router.get('/admin',(req,res)=> {
+    //관리자 권한 췤
+    //그전에 로그인 했는지 확인
+    if (!req.session.user) {
+        return res.redirect('/users/login');
+    }
+
+    const userStudentNum = req.session.user?.studentnum;
+    const verificate_perm = 'SELECT studentNum FROM user_permissions WHERE studentNum = ? AND (president = true OR vice_president = true)';
+    db.query(verificate_perm, [userStudentNum],(err, results) => {
+        if(err){
+            console.error('권한 확인 중 DB 오류:', err);
+            return res.status(500).send('권한 확인 오류');
+        }
+
+        if (results.length === 0) {
+            return res.status(403).send('관리자 권한이 필요합니다');
+        }
+
+        const sql = 'SELECT itemName, status, img FROM Items';
+        db.query(sql, (err, results)=> {
+            if(err) {
+                console.error('DB 오류:', err);
+                return res.status(500).send('데이터베이스 오류');
+            }
+            res.render('admin', { title: '관리자 페이지', items: results });
+        });
+    });
+});
+
+
 
 // 권한 확인 엔드포인트
 router.post('/admin/check-permission', (req, res) => {

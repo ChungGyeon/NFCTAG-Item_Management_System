@@ -36,8 +36,8 @@ router.post('/verify-step2', (req, res) => {
         const userName = results[0].name;
 
         // 기존 대여 내역 조회
-        const sqlRent = 'SELECT itemName FROM Rent_status WHERE whoAreRent = ?';
-        db.query(sqlRent, [userName], (err, rentResults) => {
+        const sqlRent = 'SELECT itemName FROM Rent_status WHERE studentNum = ?';
+        db.query(sqlRent, [sessionUser.studentnum], (err, rentResults) => {
             if (err) {
                 return res.status(500).send('대여 내역 조회 실패');
             }
@@ -58,8 +58,8 @@ router.post('/verify-step2', (req, res) => {
             }
 
             // rentToHour 기본값 1시간으로 설정
-            const insertValues = newItemsToRent.map(item => [item, userName, 1, new Date()]);
-            const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date) VALUES ?';
+            const insertValues = newItemsToRent.map(item => [item, userName, 1, new Date(), cookieStudentNum]);
+            const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date, studentNum) VALUES ?';
             const rentStatusSqlInsert = 'UPDATE Items SET status = 1 WHERE itemName = ?';
 
             db.query(sqlInsert, [insertValues], (err, insertResult) => {
@@ -122,8 +122,8 @@ router.post('/cancel', (req, res) => {
 
         const userName = results[0].name;
 
-        const sqlCheck = 'SELECT * FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
-        db.query(sqlCheck, [itemName, userName], (err, checkResult) => {
+        const sqlCheck = 'SELECT * FROM Rent_status WHERE itemName = ? AND studentNum = ?';
+        db.query(sqlCheck, [itemName, sessionUser.studentnum], (err, checkResult) => {
             if (err) {
                 return res.status(500).json({ success: false, message: '대여 기록 확인 실패' });
             }
@@ -132,8 +132,8 @@ router.post('/cancel', (req, res) => {
                 return res.json({ success: false, message: `${itemName}은(는) 현재 대여하지 않았습니다.` });
             }
 
-            const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
-            db.query(sqlDelete, [itemName, userName], (err, deleteResult) => {
+            const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND studentNum = ?';
+            db.query(sqlDelete, [itemName, sessionUser.studentnum], (err, deleteResult) => {
                 if (err) {
                     console.error('[❌ 대여 취소 실패]', err);
                     return res.status(500).json({ success: false, message: '대여 취소 실패' });
@@ -257,8 +257,8 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
 
         const userName = results[0].name;
 
-        const sqlRent = 'SELECT itemName FROM Rent_status WHERE whoAreRent = ?';
-        db.query(sqlRent, [userName], (err, rentResults) => {
+        const sqlRent = 'SELECT itemName FROM Rent_status WHERE studentNum = ?';
+        db.query(sqlRent, [cookieStudentNum], (err, rentResults) => {
             if (err) {
                 return callback({ success: false, message: '대여 내역 조회 실패' });
             }
@@ -277,8 +277,8 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
                 });
             }
 
-            const insertValues = newItemsToRent.map(item => [item, userName, 1, new Date()]);
-            const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date) VALUES ?';
+            const insertValues = newItemsToRent.map(item => [item, userName, 1, new Date(), cookieStudentNum]);
+            const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date, studentNum) VALUES ?';
             db.query(sqlInsert, [insertValues], (err, insertResult) => {
                 if (err) {
                     return callback({ success: false, message: '대여정보 저장 실패' });
@@ -324,8 +324,8 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
 
         const userName = results[0].name;
 
-        const sqlCheck = 'SELECT itemName FROM Rent_status WHERE whoAreRent = ?';
-        db.query(sqlCheck, [userName], (err, checkResult) => {
+        const sqlCheck = 'SELECT itemName FROM Rent_status WHERE studentNum = ?';
+        db.query(sqlCheck, [cookieStudentNum], (err, checkResult) => {
             if (err) {
                 return callback({ success: false, message: '대여 기록 확인 실패' });
             }
@@ -339,8 +339,8 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
 
             const deletePromises = targetItemList.map(item =>
                 new Promise((resolve, reject) => {
-                    const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND whoAreRent = ?';
-                    db.query(sqlDelete, [item, userName], (err, result) => {
+                    const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND studentNum = ?';
+                    db.query(sqlDelete, [item, cookieStudentNum], (err, result) => {
                         if (err) reject(err);
                         else resolve(result);
                     });

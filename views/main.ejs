@@ -38,10 +38,12 @@
         </span>
       </p>
       <img src="/images/<%= item.img %>" alt="<%= item.itemName %>" />
-      <div class="item-buttons">
-        <button onclick="reserveFromServer2('<%= item.itemName %>')">반납예약</button>
-        <button onclick="cancelRental2('<%= item.itemName %>')">반납 예약 취소</button>
-      </div>
+      <% if (currentUser && item.studentNum === currentUser.studentnum) { %>
+        <div class="item-buttons">
+          <button onclick="reserveFromServer2('<%= item.itemName %>')">반납예약</button>
+          <button onclick="cancelRental2('<%= item.itemName %>')">반납 예약 취소</button>
+        </div>
+      <% } %>
     </div>
   <% }) %>
   </div>
