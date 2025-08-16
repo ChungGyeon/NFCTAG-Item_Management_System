@@ -166,3 +166,74 @@ function initCountdowns() {
 }
 document.addEventListener('DOMContentLoaded', initCountdowns);
 
+
+// 비밀번호 변경 모달 표시
+function showChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'block';
+}
+
+// 비밀번호 변경 모달 닫기
+function closeChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'none';
+    document.getElementById('changePasswordForm').reset();
+}
+
+// 비밀번호 변경 폼 제출 처리
+document.addEventListener('DOMContentLoaded', function() {
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // 새 비밀번호 확인
+            if (newPassword !== confirmPassword) {
+                alert('새 비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            
+            // 비밀번호 길이 확인
+            if (newPassword.length < 6) {
+                alert('새 비밀번호는 최소 6자 이상이어야 합니다.');
+                return;
+            }
+            
+            // 서버에 비밀번호 변경 요청
+            fetch('/users/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('비밀번호가 성공적으로 변경되었습니다.');
+                    closeChangePasswordModal();
+                } else {
+                    alert('비밀번호 변경 실패: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('비밀번호 변경 중 오류가 발생했습니다.');
+            });
+        });
+    }
+    
+    // 모달 외부 클릭 시 닫기
+    window.onclick = function(event) {
+        const modal = document.getElementById('changePasswordModal');
+        if (event.target === modal) {
+            closeChangePasswordModal();
+        }
+    }
+});
+

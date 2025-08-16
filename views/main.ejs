@@ -16,6 +16,7 @@
       <p class="bottom-text">잠시 빌리려 왔습니다</p>
     </div>
     <a href="/users/logout" class="logout-btn">로그아웃</a>
+    <button class="change-password-btn" onclick="showChangePasswordModal()">비밀번호 변경</button>
   </header>
 
 <% if (items.some(item => item.status === 1)) { %>
@@ -75,6 +76,31 @@
       <button onclick="location.href='/detect/startRentingItem'" style="padding: 12px 24px; font-size: 16px;">대여 확정</button>
     </div>
   </main>
+</div>
+
+<!-- 비밀번호 변경 모달 -->
+<div id="changePasswordModal" class="modal">
+  <div class="modal-content">
+    <h3>비밀번호 변경</h3>
+    <form id="changePasswordForm">
+      <div class="form-group">
+        <label for="currentPassword">현재 비밀번호</label>
+        <input type="password" id="currentPassword" name="currentPassword" required>
+      </div>
+      <div class="form-group">
+        <label for="newPassword">새 비밀번호</label>
+        <input type="password" id="newPassword" name="newPassword" required>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">새 비밀번호 확인</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required>
+      </div>
+      <div class="modal-buttons">
+        <button type="submit" class="modal-btn confirm-btn">변경</button>
+        <button type="button" class="modal-btn cancel-btn" onclick="closeChangePasswordModal()">취소</button>
+      </div>
+    </form>
+  </div>
 </div>
 </body>
 </html>
