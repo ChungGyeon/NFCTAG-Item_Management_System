@@ -264,23 +264,84 @@ router.post('/reservation/cancel2', (req, res) => {
     });
 });
 
-router.get('/admin/users', (req, res) => {
-    const sql = `
-        SELECT u.studentNum, u.name, u.grade, 
-               COALESCE(up.president, false) as president,
-               COALESCE(up.vice_president, false) as vice_president,
-               COALESCE(up.rent_perm, false) as rent_perm
-        FROM Users u
-        LEFT JOIN user_permissions up ON u.studentNum = up.studentNum
-        ORDER BY u.studentNum
-    `;
+// 권한 확인 엔드포인트
+router.post('/admin/check-permission', (req, res) => {
+    // 세션에서 현재 로그인한 사용자 정보 가져오기
+    const userStudentNum = req.session.user?.studentnum;
+    
+    if (!userStudentNum) {
+        return res.status(401).json({
+            success: false,
+            message: '로그인이 필요합니다.'
+        });
+    }
 
-    db.query(sql, (err, users) => {
-        if(err) {
-            console.error('DB 오류:', err);
+    // 회장 또는 부회장 권한 확인
+    const verificate_permSQL = `SELECT president, vice_president FROM user_permissions WHERE studentNum = ?`;
+    db.query(verificate_permSQL, [userStudentNum], (err, result) => {
+        if (err) {
+            console.error('권한 확인 DB 오류:', err);
+            return res.status(500).json({
+                success: false,
+                message: '데이터베이스 오류가 발생했습니다.'
+            });
+        }
+
+        if (result.length === 0 || (!result[0].president && !result[0].vice_president)) {
+            return res.status(403).json({
+                success: false,
+                message: '회장 또는 부회장 권한이 필요합니다.'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: '권한 확인 완료',
+            isPresident: result[0].president,
+            isVicePresident: result[0].vice_president
+        });
+    });
+});
+
+// 계정 관리 페이지 (권한 확인 후 접근)
+router.get('/admin/users', (req, res) => {
+    // 세션에서 현재 로그인한 사용자 정보 가져오기
+    const userStudentNum = req.session.user?.studentnum;
+    
+    if (!userStudentNum) {
+        return res.redirect('/users/login');
+    }
+
+    // 회장 권한 확인
+    const verificate_permSQL = `SELECT president FROM user_permissions WHERE studentNum = ?`;
+    db.query(verificate_permSQL, [userStudentNum], (err, result) => {
+        if (err) {
+            console.error('권한 확인 DB 오류:', err);
             return res.status(500).send('데이터베이스 오류');
         }
-        res.render('users', { title: '사용자 관리', users: users });
+
+        if (result.length === 0 || (!result[0].president)) {
+            return res.status(403).send('회장 권한이 필요합니다.');
+        }
+
+        // 권한이 있으면 사용자 목록 조회
+        const sql = `
+            SELECT u.studentNum, u.name, u.grade, 
+                 COALESCE(up.president, false) as president,
+                 COALESCE(up.vice_president, false) as vice_president,
+                 COALESCE(up.rent_perm, false) as rent_perm
+           FROM Users u
+           LEFT JOIN user_permissions up ON u.studentNum = up.studentNum
+           ORDER BY u.studentNum
+        `;
+
+        db.query(sql, (err, users) => {
+            if (err) {
+                console.error('DB 오류:', err);
+                return res.status(500).send('데이터베이스 오류');
+            }
+            res.render('users', { title: '사용자 관리', users: users });
+        });
     });
 });
 

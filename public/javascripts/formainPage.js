@@ -366,3 +366,29 @@ function deleteSelectedItems() {
 function goToLog() {
     window.location.href = '/log';
 }
+
+//관리자 페이지에서 계정 확인하는 곳으로
+function goToAccountList() {
+    // 현재 로그인한 사용자의 학번을 서버에 전송하여 권한 확인
+    fetch('/admin/check-permission', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // 권한이 있으면 계정 관리 페이지로 이동
+            window.location.href = '/admin/users';
+        } else {
+            // 권한이 없으면 에러 메시지 표시
+            alert('권한이 없습니다: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('권한 확인 중 오류가 발생했습니다.');
+    });
+}
