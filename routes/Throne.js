@@ -95,4 +95,45 @@ router.get('/confirmation', (req, res) => {
 });
 
 
+// 권한 양도 처리 엔드포인트
+router.post('/transfer', (req, res) => {
+    const { studentNum, name, grade } = req.body;
+    const currentPresidentNum = req.session.user ? req.session.user.studentnum : null;
+
+    if (!currentPresidentNum) {
+        return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    }
+
+    // 현재 회장 권한 제거
+    const removePresidentSQL = 'UPDATE user_permissions SET president = 0 WHERE studentNum = ?';
+    db.query(removePresidentSQL, [currentPresidentNum], (err) => {
+        if (err) {
+            console.error('현재 회장 권한 제거 오류:', err);
+            return res.status(500).json({ success: false, message: '권한 제거 중 오류가 발생했습니다.' });
+        }
+
+        // 새로운 회장 권한 부여
+        const grantPresidentSQL = 'UPDATE user_permissions SET president = 1 WHERE studentNum = ?';
+        db.query(grantPresidentSQL, [studentNum], (err) => {
+            if (err) {
+                console.error('새 회장 권한 부여 오류:', err);
+                return res.status(500).json({ success: false, message: '권한 부여 중 오류가 발생했습니다.' });
+            }
+
+            res.json({ success: true, message: '권한이 성공적으로 양도되었습니다.', redirectUrl: '/Throne/lastToTheThrone' });
+        });
+    });
+});
+
+router.get('/lastToTheThrone', (req, res) => {
+    const presidentNum = req.session.user ? req.session.user.studentnum : null;
+
+    if (!presidentNum) {
+        return res.redirect('/users/login');
+    }
+
+    if(!req.session.nextPresident) return res.redirect('/');
+
+    res.render('Throne/lastToTheThrone', {title: '마지막을 기념하며'});
+});
 module.exports = router;
