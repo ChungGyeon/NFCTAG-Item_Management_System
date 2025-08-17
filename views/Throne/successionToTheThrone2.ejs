@@ -226,11 +226,15 @@
         }
 
         .person-label {
-            margin-top: 20px;
+            margin-top: 30px;
             color: white;
             font-size: 18px;
             font-weight: bold;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .drop-zone {
@@ -300,7 +304,7 @@
             <div class="leg leg-left"></div>
             <div class="leg leg-right"></div>
         </div>
-        <div class="person-label">왕</div>
+        <div class="person-label">당신</div>
     </div>
 
     <div class="person" id="person2">
@@ -319,7 +323,7 @@
             <div class="leg leg-left"></div>
             <div class="leg leg-right"></div>
         </div>
-        <div class="person-label">시민</div>
+        <div class="person-label"><%= name %></div>
     </div>
 </div>
 
@@ -392,14 +396,17 @@
                 // 현재 소유자 업데이트
                 currentOwner = person;
 
-                // 라벨 업데이트
-                updateLabels();
 
                 // 성공 효과
                 person.style.transform = 'scale(1.1)';
                 setTimeout(() => {
                     person.style.transform = 'scale(1)';
                 }, 200);
+
+                //서버로 전달
+                if (person === person2) {
+                    await transferAuthority();
+                }
             }
         });
     });
@@ -419,10 +426,31 @@
         crown = crownElement; // 전역 변수 업데이트
     }
 
-    function updateLabels() {
-        const labels = document.querySelectorAll('.person-label');
-        labels[0].textContent = currentOwner === person1 ? '왕' : '시민';
-        labels[1].textContent = currentOwner === person2 ? '왕' : '시민';
+    async function transferAuthority() {
+        try {
+            const response = await fetch('/Throne/transfer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    studentNum: '<%= studentNum %>',
+                    name: '<%= name %>',
+                    grade: '<%= grade %>'
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.href = '/Throne/DOA';
+            } else {
+                alert('권한 양도 실패: ' + result.message);
+            }
+        } catch (error) {
+            console.error('권한 양도 중 오류:', error);
+            alert('서버 통신 오류가 발생했습니다.');
+        }
     }
 
     // 초기 설정

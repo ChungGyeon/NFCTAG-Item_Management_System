@@ -6,6 +6,13 @@
   <title><%= baseTitle %> <%= title%></title>
   <link rel="stylesheet" href="/stylesheets/login.css">
   <script src="/javascripts/forLoginPage.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error === 'already_president') {
+      alert('이미 회장입니다.');
+    }
+  </script>
 </head>
 <body>
   <div class="login-container">
