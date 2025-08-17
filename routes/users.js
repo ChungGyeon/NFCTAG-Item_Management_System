@@ -247,6 +247,15 @@ router.post('/change-password', (req, res) => {
   });
 });
 
+
+
+
+
+
+
+//회장 권한 위임 엔드포인트
+
+//페이지 접근 엔드포인트
 router.get('/DOA',(req, res) => {
   //로그인한 사용자의 학번을 세션에서 가져옴
   const presidentNum = req.session.user ? req.session.user.studentnum : null;
@@ -267,8 +276,13 @@ router.get('/DOA',(req, res) => {
       return res.redirect('/users/login');
     }
 
-    res.render('successionToTheThrone', {title: '신성한 왕위를 계승 하는 곳'});
+    res.render('Thron/successionToTheThrone', {title: '신성한 왕위를 계승 하는 곳'});
   });
 });
+
+
+
+
+
 
 module.exports = router;
