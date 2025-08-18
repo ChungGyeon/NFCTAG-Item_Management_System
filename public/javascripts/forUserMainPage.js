@@ -15,7 +15,7 @@ function updateButtonVisibility(itemName, isReserved) {
         }
     }
 }
-
+/* 기존버전 현버전은 맨 아래에
 function reserveFromServer(itemName) {
     if (confirm(`${itemName} 예약 하시겠습니까?`)) {
         fetch('/reservation', {
@@ -38,7 +38,7 @@ function reserveFromServer(itemName) {
         });
     }
 }
-
+*/
 function cancelReservation(itemName) {
     if (confirm(`${itemName} 예약을 취소하시겠습니까?`)) {
         fetch('/reservation/cancel', {
@@ -237,3 +237,244 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+
+let selectedItemName = null;
+let currentSelectedHour = 1;
+
+function reserveFromServer(itemName) {
+    selectedItemName = itemName;
+    currentSelectedHour = 1;
+
+    // 모달 표시
+    document.getElementById("timePickerModal").style.display = "block";
+
+    // 휠 초기화
+    initializeWheel();
+}
+
+function closeTimePickerModal() {
+    document.getElementById("timePickerModal").style.display = "none";
+    selectedItemName = null;
+    currentSelectedHour = 1;
+    isDragging = false;
+}
+
+function initializeWheel() {
+    const wheelPicker = document.getElementById('wheelPicker');
+
+    // 기존 리스트 아이템 제거
+    wheelPicker.innerHTML = '';
+
+    // 1~12시간 리스트 아이템 생성
+    for (let i = 1; i <= 12; i++) {
+        const li = document.createElement('li');
+        li.textContent = i;
+        li.dataset.hour = i;
+
+        // 클릭 이벤트 추가
+        li.addEventListener('click', function(e) {
+            if (!isDragging) {
+                selectHour(i);
+            }
+        });
+
+        wheelPicker.appendChild(li);
+    }
+
+    // 드래그 이벤트 리스너 추가
+    addDragListeners(wheelPicker);
+
+    // 첫 번째 아이템 선택
+    selectHour(1);
+}
+function addDragListeners(wheelPicker) {
+    // 마우스 이벤트
+    wheelPicker.addEventListener('mousedown', handleDragStart);
+    document.addEventListener('mousemove', handleDragMove);
+    document.addEventListener('mouseup', handleDragEnd);
+
+    // 터치 이벤트 (모바일)
+    wheelPicker.addEventListener('touchstart', handleDragStart, { passive: false });
+    document.addEventListener('touchmove', handleDragMove, { passive: false });
+    document.addEventListener('touchend', handleDragEnd);
+
+    // 드래그 방지
+    wheelPicker.addEventListener('dragstart', e => e.preventDefault());
+}
+
+function handleDragStart(e) {
+    isDragging = true;
+    startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+
+    const wheelPicker = document.getElementById('wheelPicker');
+    wheelPicker.style.transition = 'none';
+
+    e.preventDefault();
+}
+
+function handleDragMove(e) {
+    if (!isDragging) return;
+
+    const currentY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+    const deltaY = currentY - startY;
+
+    const wheelPicker = document.getElementById('wheelPicker');
+    const newTransform = currentTransform + deltaY;
+
+    // 드래그 범위 제한 (1시간~12시간)
+    const minTransform = 50 - (12 - 1) * 50; // -500px
+    const maxTransform = 50; // 50px
+
+    const clampedTransform = Math.max(minTransform, Math.min(maxTransform, newTransform));
+    wheelPicker.style.transform = `translateY(${clampedTransform}px)`;
+
+    e.preventDefault();
+}
+
+function handleDragEnd(e) {
+    if (!isDragging) return;
+
+    isDragging = false;
+
+    const wheelPicker = document.getElementById('wheelPicker');
+    const currentY = e.type === 'mouseup' ? e.clientY : (e.changedTouches ? e.changedTouches[0].clientY : startY);
+    const deltaY = currentY - startY;
+
+    // 최종 위치 계산
+    const newTransform = currentTransform + deltaY;
+
+    // 가장 가까운 시간으로 스냅
+    const hourIndex = Math.round((50 - newTransform) / 50);
+    const clampedHourIndex = Math.max(0, Math.min(11, hourIndex));
+    const selectedHour = clampedHourIndex + 1;
+
+    // 트랜지션 다시 활성화
+    wheelPicker.style.transition = 'transform 0.3s ease';
+
+    // 선택된 시간으로 이동
+    selectHour(selectedHour);
+}
+
+
+function selectHour(hour) {
+    currentSelectedHour = hour;
+    currentTransform = 50 - (hour - 1) * 50;
+
+    const wheelPicker = document.getElementById('wheelPicker');
+    const items = wheelPicker.querySelectorAll('li');
+
+    // 모든 아이템에서 selected 클래스 제거
+    items.forEach(item => item.classList.remove('selected'));
+
+    // 선택된 아이템에 selected 클래스 추가
+    const selectedItem = wheelPicker.querySelector(`li[data-hour="${hour}"]`);
+    if (selectedItem) {
+        selectedItem.classList.add('selected');
+    }
+
+    // 휠 위치 조정 (선택된 아이템이 중앙에 오도록)
+    wheelPicker.style.transform = `translateY(${currentTransform}px)`;
+
+    const displayElement = document.getElementById('selectedHourDisplay');
+    if (displayElement) {
+        displayElement.textContent = hour;
+    }
+}
+
+function confirmWheel() {
+    if (!selectedItemName || !currentSelectedHour) {
+        alert('오류가 발생했습니다. 다시 시도해주세요.');
+        return;
+    }
+
+    if (confirm(`${selectedItemName}을(를) ${currentSelectedHour}시간 동안 예약하시겠습니까?`)) {
+        // 서버에 예약 요청
+        fetch('/reservation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                itemName: selectedItemName,
+                rentalHours: currentSelectedHour
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    updateButtonVisibility(selectedItemName, true);
+                    closeTimePickerModal();
+                }
+            })
+            .catch(err => {
+                alert("예약 중 오류가 발생했습니다.");
+                console.error(err);
+            });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 기존 비밀번호 변경 폼 코드
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('새 비밀번호가 일치하지 않습니다.');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                alert('새 비밀번호는 최소 6자 이상이어야 합니다.');
+                return;
+            }
+
+            fetch('/users/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('비밀번호가 성공적으로 변경되었습니다.');
+                        closeChangePasswordModal();
+                    } else {
+                        alert('비밀번호 변경 실패: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('비밀번호 변경 중 오류가 발생했습니다.');
+                });
+        });
+    }
+
+    // 모달 외부 클릭 이벤트
+    window.onclick = function(event) {
+        const passwordModal = document.getElementById('changePasswordModal');
+        const timeModal = document.getElementById('timePickerModal');
+
+        if (event.target === passwordModal) {
+            closeChangePasswordModal();
+        }
+        if (event.target === timeModal) {
+            closeTimePickerModal();
+        }
+    }
+
+    // 카운트다운 초기화
+    initCountdowns();
+});
