@@ -49,7 +49,6 @@ router.post('/verify-step2', (req, res) => {
             const newItemsToRent = cookieItemList.filter(item => !alreadyRentedSet.has(item));
 
             if (newItemsToRent.length === 0) {
-                res.clearCookie('reservedItems');
                 return res.send({
                     success: true,
                     message: '이미 대여된 항목입니다.',
@@ -69,15 +68,11 @@ router.post('/verify-step2', (req, res) => {
                 }
 
                 // ✅ Log_rent에도 대여 기록 INSERT
-                const logValues = newItemsToRent.map(item => [userName, item]);
+                const logValues = newItemsToRent.map(item => [userName, item.itemName]);
                 const sqlLogInsert = 'INSERT INTO Log_rent (name, itemName) VALUES ?';
                 db.query(sqlLogInsert, [logValues], (logErr) => {
-                    if (logErr) {
-                        console.error('[❌ Log_rent INSERT 실패]', logErr);
-                        // 계속 진행
-                    }
+                    if (logErr) console.error('[❌ Log_rent INSERT 실패]', logErr);
                 });
-
                 // 모든 아이템의 status 업데이트
                 Promise.all(newItemsToRent.map(item =>
                     new Promise((resolve, reject) => {
@@ -301,7 +296,7 @@ function handleRental(req, res, cookieStudentNum, cookieItemData, callback) {
                 }
 
                 // ✅ Log_rent 기록 추가
-                const logValues = newItemsToRent.map(item => [userName, item]);
+                const logValues = newItemsToRent.map(item => [userName, item.itemName]);
                 const sqlLogInsert = 'INSERT INTO Log_rent (name, itemName) VALUES ?';
                 db.query(sqlLogInsert, [logValues], (logErr) => {
                     if (logErr) console.error('[❌ Log_rent INSERT 실패]', logErr);
@@ -385,7 +380,7 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                             SET returnTime = NOW(),
                                 delinquencyTime = SEC_TO_TIME(TIMESTAMPDIFF(SECOND, rentTime, NOW()))
                             WHERE name = ? AND itemName = ?
-                              AND (returnTime IS NULL OR returnTime = '0000-00-00 00:00:00')
+                              AND returnTime IS NULL
                             ORDER BY rentTime DESC
                             LIMIT 1
                         `;
