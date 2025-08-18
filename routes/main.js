@@ -47,7 +47,9 @@ router.get('/', function(req, res, next) {//router123
         const studentnum = req.session.user?.studentnum;
         const reservedCookie = req.cookies.reservedItems || '';
         let userReservedItems = [];
+        let userReservedData = {}; // 새로추가. 아이템명:시간 매핑
 
+        /*
         if (studentnum && reservedCookie.startsWith(studentnum + ':')) {
             userReservedItems = reservedCookie.split(':')[1].split(',').filter(Boolean);
         }
@@ -63,6 +65,37 @@ router.get('/', function(req, res, next) {//router123
             title: '물품대여소',
             currentUser: req.session.user // 현재 로그인한 사용자 정보 전달
         });
+    });*/
+
+        if (studentnum && reservedCookie.startsWith(studentnum + ':')) {
+            const reservedItemsString = reservedCookie.split(':')[1];
+            const reservedEntries = reservedItemsString.split(',').filter(Boolean);
+
+            reservedEntries.forEach(entry => {
+                if (entry.includes('#')) {
+                    const [itemName, hours] = entry.split('#');
+                    userReservedItems.push(itemName);
+                    userReservedData[itemName] = parseInt(hours) || 1;
+                } else {
+                    // 기존 형식 호환성 (시간 정보 없는 경우)
+                    userReservedItems.push(entry);
+                    userReservedData[entry] = 1;
+                }
+            });
+        }
+
+        // 각 아이템에 예약 상태와 시간 정보 추가
+        const itemsWithStatus = items.map(item => ({
+            ...item,
+            isReserved: userReservedItems.includes(item.itemName),
+            reservedHours: userReservedData[item.itemName] || null
+        }));
+
+        res.render('main', {
+            items: itemsWithStatus,
+            title: '물품대여소',
+            currentUser: req.session.user
+        });
     });
 });
 
@@ -71,6 +104,7 @@ router.get('/', function(req, res, next) {//router123
 */
 router.post('/reservation', (req, res) => {
     const itemName = req.body.itemName;
+    const rentalHours = req.body.rentalHours || 1; //기본은 1시간
     const studentnum = req.session.user?.studentnum;
 
     if (!studentnum) {
@@ -89,11 +123,27 @@ router.post('/reservation', (req, res) => {
         }
     }
 
-    if (reservedList.includes(itemName)) {
-        return res.send({ success: false, message: `${itemName}은(는) 이미 예약됨` });
+    /*기존 저장법
+        if (reservedList.includes(itemName)) {
+            return res.send({ success: false, message: `${itemName}은(는) 이미 예약됨` });
+        }
+        reservedList.push(itemName);
+        const newCookieValue = `${studentnum}:${reservedList.join(',')}`;
+
+        res.cookie('reservedItems', newCookieValue, {
+            maxAge: 3600000,
+            httpOnly: false,
+            path: '/'
+        });
+    */
+    const alreadyReserved = reservedList.some(item => item.split('#')[0] === itemName);
+    if (alreadyReserved) {
+        return res.json({ success: false, message: `${itemName}은(는) 이미 예약됨` });
     }
 
-    reservedList.push(itemName);
+    // 새로운 형식으로 추가: 아이템명#시간
+    const newReservation = `${itemName}#${rentalHours}`;
+    reservedList.push(newReservation);
     const newCookieValue = `${studentnum}:${reservedList.join(',')}`;
 
     res.cookie('reservedItems', newCookieValue, {
@@ -103,7 +153,7 @@ router.post('/reservation', (req, res) => {
     });
 
     console.log('현재 예약 목록:', reservedList);
-    res.send({ success: true, message: `${itemName} 예약되었습니다.` });
+    res.json({ success: true, message: `${itemName} ${rentalHours}시간 예약되었습니다.` });
 });
 
 
@@ -129,14 +179,24 @@ router.post('/reservation/cancel', (req, res) => {
         }
     }
 
+    /*
     if (!reservedList.includes(itemName)) {
         return res.send({
             success: false,
             message: `${itemName}은(는) 예약된 항목이 아닙니다.`
         });
     }
+*/
+    const reservedIndex = reservedList.findIndex(item => item.split('#')[0] === itemName);
+    if (reservedIndex === -1) {
+        return res.json({
+            success: false,
+            message: `${itemName}은(는) 예약된 항목이 아닙니다.`
+        });
+    }
 
     // ✅ 실제 취소 처리
+    /*
     const updatedList = reservedList.filter(item => item !== itemName);
     const newCookieValue = `${studentnum}:${updatedList.join(',')}`;
 
@@ -148,6 +208,20 @@ router.post('/reservation/cancel', (req, res) => {
 
     console.log(`${itemName} 예약 취소됨. 현재 목록:`, updatedList);
     res.send({
+        success: true,
+        message: `${itemName} 예약이 취소되었습니다.`
+    });
+    */
+    const updatedList = reservedList.filter(item => item.split('#')[0] !== itemName);
+    const newCookieValue = `${studentnum}:${updatedList.join(',')}`;
+
+    res.cookie('reservedItems', newCookieValue, {
+        httpOnly: false,
+        path: '/'
+    });
+
+    console.log(`${itemName} 예약 취소됨. 현재 목록:`, updatedList);
+    res.json({
         success: true,
         message: `${itemName} 예약이 취소되었습니다.`
     });

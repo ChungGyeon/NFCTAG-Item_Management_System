@@ -165,7 +165,7 @@ router.post('/cancel', (req, res) => {
 });
 
 const actionMode ={
-    rent: hadleRental,
+    rent: handleRental,
     return: handleReturn,
 };
 
@@ -187,18 +187,26 @@ router.post('/verify-step3', (req, res) => {
 
     if (hasReserved) {
         const [cookieStudentNum, itemListStr] = cookieReserved.split(':');
-        const cookieItemList = itemListStr?.split(',').filter(Boolean).sort();
-
+        const cookieItemEntries = itemListStr?.split(',').filter(Boolean);
+        const cookieItemData = cookieItemEntries.map(entry => {
+            if (entry.includes('#')) {
+                const [itemName, hours] = entry.split('#');
+                return { itemName, hours: parseInt(hours) || 1 };
+            } else {
+                // 기존 형식 호환성
+                return { itemName: entry, hours: 1 };
+            }
+        });
         if (cookieStudentNum !== sessionUser.studentnum) {
             res.clearCookie('reservedItems');
             return res.status(403).json({ success: false, message: '쿠키 학번 변조 감지' });
         }
 
-        if(cookieItemList.length <= 0) return;
+        if(cookieItemData.length <= 0) return;
 
         operations.push(
             new Promise((resolve, reject) => {
-                hadleRental(req, res, cookieStudentNum, cookieItemList, (result) => {
+                handleRental(req, res, cookieStudentNum, cookieItemData, (result) => {
                     if (result.success) {
                         results.messages.push(`대여: ${result.message}`);
                         res.clearCookie('reservedItems');
@@ -248,7 +256,7 @@ router.post('/verify-step3', (req, res) => {
         });
 });
 
-function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
+function handleRental(req, res, cookieStudentNum, cookieItemData, callback) {
     const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
     db.query(sqlName, [cookieStudentNum], (err, results) => {
         if (err || results.length === 0) {
@@ -266,18 +274,26 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
             const dbItemList = rentResults.map(row => row.itemName);
             const alreadyRentedSet = new Set(dbItemList);
 
-            const newItemsToRent = cookieItemList.filter(item => !alreadyRentedSet.has(item));
+            const newItemsToRent = cookieItemData.filter(item => !alreadyRentedSet.has(item.itemName));
+
 
             if (newItemsToRent.length === 0) {
                 res.clearCookie('reservedItems');
                 return res.send({
                     success: true,
                     message: '이미 대여된 항목입니다.',
-                    skipped: cookieItemList
+                    skipped: cookieItemData.map(item => item.itemName)
                 });
             }
 
-            const insertValues = newItemsToRent.map(item => [item, userName, 1, new Date(), cookieStudentNum]);
+            const insertValues = newItemsToRent.map(item => [
+                item.itemName,
+                userName,
+                item.hours,
+                new Date(),
+                cookieStudentNum
+            ]);
+
             const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date, studentNum) VALUES ?';
             db.query(sqlInsert, [insertValues], (err, insertResult) => {
                 if (err) {
@@ -294,16 +310,17 @@ function hadleRental(req, res, cookieStudentNum ,cookieItemList, callback) {
                 Promise.all(newItemsToRent.map(item =>
                     new Promise((resolve, reject) => {
                         const sqlUpdate = 'UPDATE Items SET status = 1 WHERE itemName = ?';
-                        db.query(sqlUpdate, [item], (err, results) => {
+                        db.query(sqlUpdate, [item.itemName], (err, results) => {
                             if (err) reject(err);
                             else resolve(results);
                         });
                     })
                 ))
                     .then(() => {
+                        const rentedItems = newItemsToRent.map(item => `${item.itemName}(${item.hours}시간)`);
                         callback({
                             success: true,
-                            message: '대여 완료',
+                            message: `대여 완료: ${rentedItems.join(', ')}`,
                             rented: newItemsToRent
                         });
                     })
