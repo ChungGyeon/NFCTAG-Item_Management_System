@@ -161,6 +161,12 @@ router.post('/cancel', (req, res) => {
 
                         // ✅ Log_rent 반납 기록 + 조건부 연체시간 계산
                         if (rentInfo && rentInfo.rentTime && rentInfo.rentToHour) {
+                            // 먼저 연체 여부를 확인
+                            const currentTime = new Date();
+                            const rentTime = new Date(rentInfo.rentTime);
+                            const rentEndTime = new Date(rentTime.getTime() + rentInfo.rentToHour * 60 * 60 * 1000);
+                            const isOverdue = currentTime > rentEndTime;
+
                             const sqlUpdateLog = `
                                 UPDATE Log_rent
                                 SET returnTime = NOW(),
@@ -182,10 +188,30 @@ router.post('/cancel', (req, res) => {
                                 userName,
                                 itemName
                             ], (logErr) => {
-                                if (logErr) console.error('[❌ Log_rent UPDATE 실패]', logErr);
+                                if (logErr) {
+                                    console.error('[❌ Log_rent UPDATE 실패]', logErr);
+                                    return;
+                                }
+
+                                // ✅ 연체가 감지된 경우 rent_perm을 0으로 설정
+                                if (isOverdue) {
+                                    const sqlUpdatePerm = `
+                                        INSERT INTO user_permissions (studentNum, rent_perm) 
+                                        VALUES (?, 0)
+                                        ON DUPLICATE KEY UPDATE rent_perm = 0
+                                    `;
+
+                                    db.query(sqlUpdatePerm, [sessionUser.studentnum], (permErr, permResult) => {
+                                        if (permErr) {
+                                            console.error('[권한 제한 실패]: ', permErr);
+                                        } else {
+                                            console.log(`[🚫 연체로 인한 권한 제한] ${userName}(${sessionUser.studentnum}) - 아이템: ${itemName}`);
+                                        }
+                                    });
+                                }
                             });
                         } else {
-                            console.error('[❌ 대여 정보 누락으로 연체시간 계산 불가]', itemName);
+                            console.error('[❌ 대여 정보 누락으로 연체시간 계산 불가]: ', itemName);
                         }
 
                         return res.json({ success: true, message: `${itemName} 대여 취소 완료` });
@@ -195,6 +221,7 @@ router.post('/cancel', (req, res) => {
         });
     });
 });
+
 
 const actionMode ={
     rent: handleRental,
@@ -451,14 +478,19 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                 })
                 .then(([updateResults, rentInfoList]) => {
                     //Log_rent 반납 처리 + 조건부 연체시간 계산
-                    //그리고 rent_perm도 여기서 조절할 수 있도록 해야지
                     rentInfoList.forEach(rentInfo => {
                         if (!rentInfo.rentTime || !rentInfo.rentToHour) {
-                            console.error('대여 정보 누락', rentInfo.itemName);
+                            console.error('대여 정보 누락: ', rentInfo.itemName);
                             return;
                         }
 
-                        // 대여 기간 초과 여부 확인 후 연체시간 계산
+                        // 먼저 연체 여부를 확인
+                        const currentTime = new Date();
+                        const rentTime = new Date(rentInfo.rentTime);
+                        const rentEndTime = new Date(rentTime.getTime() + rentInfo.rentToHour * 60 * 60 * 1000);
+                        const isOverdue = currentTime > rentEndTime;
+
+                        //대여 기간 초과 여부 확인 후 연체시간 계산
                         const sqlUpdateLog = `
                             UPDATE Log_rent
                             SET returnTime = NOW(),
@@ -481,14 +513,50 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                             userName,
                             rentInfo.itemName
                         ], (logErr) => {
-                            if (logErr) console.error('[❌ Log_rent UPDATE 실패]', logErr);
+                            if (logErr) {
+                                console.error('[❌ Log_rent UPDATE 실패]: ', logErr);
+                                return;
+                            }
+
+                            // ✅ 연체가 감지된 경우 rent_perm을 0으로 설정
+                            if (isOverdue) {
+                                const sqlGetStudentNum = 'SELECT studentNum FROM Users WHERE name = ?';
+                                db.query(sqlGetStudentNum, [userName], (err, userResults) => {
+                                    if (err) {
+                                        console.error('[❌ 사용자 학번 조회 실패]: ', err);
+                                        return;
+                                    }
+
+                                    if (userResults.length === 0) {
+                                        console.error('[❌ 사용자를 찾을 수 없음]: ', userName);
+                                        return;
+                                    }
+
+                                    const studentNum = userResults[0].studentNum;
+
+                                    // user_permissions에서 rent_perm을 0으로 설정
+                                    const sqlUpdatePerm = `
+                                        INSERT INTO user_permissions (studentNum, rent_perm) 
+                                        VALUES (?, 0)
+                                        ON DUPLICATE KEY UPDATE rent_perm = 0
+                                    `;
+
+                                    db.query(sqlUpdatePerm, [studentNum], (permErr, permResult) => {
+                                        if (permErr) {
+                                            console.error('[❌ 권한 제한 실패]: ', permErr);
+                                        } else {
+                                            console.log(`[🚫 연체로 인한 권한 제한] ${userName}(${studentNum}) - 아이템: ${rentInfo.itemName}`);
+                                        }
+                                    });
+                                });
+                            }
                         });
                     });
 
                     callback({ success: true, message: '반납 완료' });
                 })
                 .catch(err => {
-                    console.error('[❌ 반납 처리 중 오류]', err);
+                    console.error('[❌ 반납 처리 중 오류]: ', err);
                     callback({ success: false, message: '반납 처리 실패' });
                 });
         });
