@@ -252,10 +252,10 @@ body {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    color: white;
+    color: #ffd700;
     font-size: 20px;
     text-align: center;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(255, 215, 0, 0.2);
     animation: pulse 2s infinite;
 }
 
