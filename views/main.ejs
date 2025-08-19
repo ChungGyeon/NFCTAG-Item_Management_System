@@ -17,6 +17,26 @@
     </div>
     <a href="/users/logout" class="logout-btn">로그아웃</a>
     <button class="change-password-btn" onclick="showChangePasswordModal()">비밀번호 변경</button>
+
+    <!-- 연체 정보 표시 영역 -->
+    <% if (overdueInfo && overdueInfo.isRestricted) { %>
+      <div class="overdue-notice">
+        <% if (overdueInfo.canRestore) { %>
+          <div class="overdue-alert ready-restore">
+            <h4>⏰ 연체 제재 해제 가능</h4>
+            <p>연체 제재 시간이 만료되었습니다.</p>
+            <p>5분 이내에 자동으로 대여 권한이 복구됩니다.</p>
+          </div>
+        <% } else { %>
+          <div class="overdue-alert active-restriction">
+            <h4>🚫 대여 권한 제한 중</h4>
+            <p>연체로 인해 현재 대여가 제한되어 있습니다.</p>
+            <p>제재 해제까지: <span class="remaining-time" data-remaining="<%= overdueInfo.remainingTimeSeconds %>"><%= overdueInfo.remainingTimeFormatted %></span></p>
+            <p class="small-text">연체 시간: <%= overdueInfo.delinquencyTime %></p>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
   </header>
 
 <% if (items.some(item => item.status === 1)) { %>
@@ -53,19 +73,25 @@
 
 <div class="main-item2">
   <h1>빌릴 수 있는 거에요</h1>
-  <div class="item-grid">
+  <div class="item-grid <% if (overdueInfo && overdueInfo.isRestricted) { %>overdue-restricted<% } %>">
   <% items.filter(item => item.status === 0).forEach(item => { %>
     <div class="itemDetail-card not-rented" data-item-name="<%= item.itemName %>">
       <input type="hidden" name="status" value="<%= item.status %>">
       <h3><%= item.itemName %></h3>
       <img src="/images/<%= item.img %>" alt="<%= item.itemName %>" />
       <div class="item-buttons">
-        <% if (item.isReserved) { %>
-          <button class="cancel-reservation-btn" onclick="cancelReservation('<%= item.itemName %>')">예약 취소하기</button>
-          <button class="reserve-btn" onclick="reserveFromServer('<%= item.itemName %>')" style="display: none;">예약하기</button>
+        <% if (overdueInfo && overdueInfo.isRestricted) { %>
+          <!-- 연체자는 예약 불가 -->
+          <button class="reserve-btn" disabled title="연체로 인해 대여가 제한됩니다.">예약 불가</button>
         <% } else { %>
-          <button class="cancel-reservation-btn" onclick="cancelReservation('<%= item.itemName %>')" style="display: none;">예약 취소하기</button>
-          <button class="reserve-btn" onclick="reserveFromServer('<%= item.itemName %>')">예약하기</button>
+          <!-- 일반 사용자 -->
+          <% if (item.isReserved) { %>
+            <button class="cancel-reservation-btn" onclick="cancelReservation('<%= item.itemName %>')">예약 취소하기</button>
+            <button class="reserve-btn" onclick="reserveFromServer('<%= item.itemName %>')" style="display: none;">예약하기</button>
+          <% } else { %>
+            <button class="cancel-reservation-btn" onclick="cancelReservation('<%= item.itemName %>')" style="display: none;">예약 취소하기</button>
+            <button class="reserve-btn" onclick="reserveFromServer('<%= item.itemName %>')">예약하기</button>
+          <% } %>
         <% } %>
       </div>
     </div>

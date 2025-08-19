@@ -501,3 +501,74 @@ header {
         height: 40px;
     }
 }
+
+/* 연체 정보 표시 스타일 */
+.overdue-notice {
+    margin: 20px 0;
+    padding: 0;
+}
+
+.overdue-alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border-left: 5px solid;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.overdue-alert h4 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.overdue-alert p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.active-restriction {
+    background-color: #fee;
+    border-left-color: #e74c3c;
+    color: #c0392b;
+}
+
+.active-restriction h4 {
+    color: #c0392b;
+}
+
+.ready-restore {
+    background-color: #f0f8ff;
+    border-left-color: #3498db;
+    color: #2980b9;
+}
+
+.ready-restore h4 {
+    color: #2980b9;
+}
+
+.remaining-time {
+    font-weight: bold;
+    font-size: 16px;
+    padding: 2px 6px;
+    background-color: rgba(231, 76, 60, 0.1);
+    border-radius: 4px;
+}
+
+.small-text {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 8px;
+}
+
+/* 연체자 대여 버튼 비활성화 */
+.overdue-restricted .reserve-btn {
+    background-color: #bdc3c7 !important;
+    color: #7f8c8d !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+.overdue-restricted .reserve-btn:hover {
+    background-color: #bdc3c7 !important;
+}

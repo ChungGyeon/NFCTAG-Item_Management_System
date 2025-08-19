@@ -8,6 +8,29 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('./IMS_db'); // DB 연결
 
+// 시간 문자열(HH:MM:SS)을 초 단위로 변환
+function timeToSeconds(timeString) {
+    if (!timeString) return 0;
+
+    const parts = timeString.split(':');
+    if (parts.length !== 3) return 0;
+
+    const hours = parseInt(parts[0]) || 0;
+    const minutes = parseInt(parts[1]) || 0;
+    const seconds = parseInt(parts[2]) || 0;
+
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+// 초를 HH:MM:SS 형태로 변환
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
 router.get('/', function(req, res, next) {//router123
     const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
     const { currentSeed, lastSeed } = req;
@@ -91,10 +114,63 @@ router.get('/', function(req, res, next) {//router123
             reservedHours: userReservedData[item.itemName] || null
         }));
 
-        res.render('main', {
-            items: itemsWithStatus,
-            title: '물품대여소',
-            currentUser: req.session.user
+        // 현재 사용자의 연체 정보 조회
+        const sqlGetUserOverdue = `
+            SELECT 
+                lr.delinquencyTime,
+                lr.returnTime,
+                TIMESTAMPDIFF(SECOND, lr.returnTime, NOW()) as timeSinceReturn,
+                up.rent_perm
+            FROM Users u
+            LEFT JOIN user_permissions up ON u.studentNum = up.studentNum
+            LEFT JOIN Log_rent lr ON u.name = lr.name 
+                AND lr.returnTime IS NOT NULL 
+                AND lr.delinquencyTime IS NOT NULL
+                AND lr.returnTime = (
+                    SELECT MAX(returnTime) 
+                    FROM Log_rent lr2 
+                    WHERE lr2.name = lr.name 
+                    AND lr2.delinquencyTime IS NOT NULL
+                )
+            WHERE u.studentNum = ?
+        `;
+
+        db.query(sqlGetUserOverdue, [studentnum], (err, overdueResult) => {
+            if (err) {
+                console.error('연체 정보 조회 오류:', err);
+                // 연체 정보 조회 실패 시에도 페이지는 렌더링
+                return res.render('main', {
+                    items: itemsWithStatus,
+                    title: '물품대여소',
+                    currentUser: req.session.user,
+                    overdueInfo: null
+                });
+            }
+
+            let overdueInfo = null;
+
+            if (overdueResult.length > 0 && overdueResult[0].rent_perm === 0 && overdueResult[0].delinquencyTime) {
+                const { delinquencyTime, timeSinceReturn } = overdueResult[0];
+
+                // delinquencyTime을 초 단위로 변환
+                const delinquencySeconds = timeToSeconds(delinquencyTime);
+                const remainingTime = Math.max(0, delinquencySeconds - (timeSinceReturn || 0));
+
+                overdueInfo = {
+                    delinquencyTime: delinquencyTime,
+                    remainingTimeSeconds: remainingTime,
+                    remainingTimeFormatted: formatTime(remainingTime),
+                    isRestricted: overdueResult[0].rent_perm === 0,
+                    canRestore: remainingTime <= 0
+                };
+            }
+
+            res.render('main', {
+                items: itemsWithStatus,
+                title: '물품대여소',
+                currentUser: req.session.user,
+                overdueInfo: overdueInfo
+            });
         });
     });
 });
