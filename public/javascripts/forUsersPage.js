@@ -163,4 +163,39 @@ document.addEventListener('DOMContentLoaded', function() {
             changeVicePresidentStatus();
         });
     }
+
+    const restoreRentPermBtns = document.querySelectorAll('.restore-rent-perm-btn');
+    restoreRentPermBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const studentNum = this.getAttribute('data-student-num');
+            const name = this.getAttribute('data-name');
+
+            if (!studentNum) {
+                alert('학번 정보가 없습니다.');
+                return;
+            }
+
+            fetch('/checkOverdue/restore', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({studentNum: studentNum})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`${name}님의 대여권한을 성공적으로 복구했습니다.`);
+                        location.reload();
+                    } else {
+                        alert(`${name}님의 대여권한 복구 실패: ${data.message}`);
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('처리 중 오류가 발생했습니다.');
+                });
+        });
+    });
 });

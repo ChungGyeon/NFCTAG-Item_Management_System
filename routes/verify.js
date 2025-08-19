@@ -494,8 +494,8 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                         const sqlUpdateLog = `
                             UPDATE Log_rent
                             SET returnTime = NOW(),
-                                delinquencyTime = CASE 
-                                    WHEN TIMESTAMPDIFF(HOUR, ?, NOW()) > ?
+                                delinquencyTime = CASE
+                                    WHEN NOW() > DATE_ADD(?, INTERVAL ? HOUR)
                                     THEN SEC_TO_TIME(TIMESTAMPDIFF(SECOND, DATE_ADD(?, INTERVAL ? HOUR), NOW()))
                                     ELSE NULL
                                 END

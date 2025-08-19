@@ -40,7 +40,11 @@
                 <span class="permission-badge vice-president">부회장</span>
               <% } %>
               <% if (!user.rent_perm) { %>
-                <span class="permission-badge rent-perm">대여권한 없음</span>
+                      <button class="permission-badge rent-perm restore-rent-perm-btn"
+                              data-student-num="<%= user.studentNum %>"
+                              data-name="<%= user.name %>">
+                          대여권한 없음
+                      </button>
               <% } %>
             </td>
             <td>

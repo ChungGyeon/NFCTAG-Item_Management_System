@@ -128,8 +128,8 @@ function restrictUserPermission(studentNum, reason = '연체') {
     });
 }
 
-// 정기적으로 연체자 확인 (10분마다)
-const CHECK_INTERVAL = 10 * 60 * 1000; // 10분
+// 정기적으로 연체자 확인 (5분마다)
+const CHECK_INTERVAL = 5 * 60 * 1000; // 5분
 setInterval(checkAndRestoreOverdueUsers, CHECK_INTERVAL);
 
 // 서버 시작 시 즉시 한 번 실행
@@ -153,8 +153,8 @@ router.post('/restrict/:studentNum', (req, res) => {
     res.json({ success: true, message: `사용자(${studentNum}) 권한을 제한했습니다.` });
 });
 
-router.post('/restore/:studentNum', (req, res) => {
-    const { studentNum } = req.params;
+router.post('/restore', (req, res) => {
+    const studentNum = req.body.studentNum;
 
     if (!studentNum) {
         return res.status(400).json({ success: false, message: '학번이 필요합니다.' });
