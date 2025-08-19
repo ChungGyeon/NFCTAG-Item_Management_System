@@ -260,6 +260,7 @@ function handleRental(req, res, cookieStudentNum, cookieItemData, callback) {
 
         const userName = results[0].name;
 
+        //지금은 이미 대여중인지 먼저 확인하는 순서로 시작하는데, 여기에 대여 금지상태인지 먼저 판단하는 코드를 짜면 되겠어
         const sqlRent = 'SELECT itemName FROM Rent_status WHERE studentNum = ?';
         db.query(sqlRent, [cookieStudentNum], (err, rentResults) => {
             if (err) {
@@ -374,6 +375,7 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                 })
                 .then(() => {
                     // ✅ Log_rent 반납 처리 + 연체시간 계산
+                    //연체 시간을 여기서 결정하느 perm도 여기서 0으로 만들자. 이후 시간이 지나면 1로 만드는 코드도 필요해, 이건 어떻게 하지
                     targetItemList.forEach(item => {
                         const sqlUpdateLog = `
                             UPDATE Log_rent

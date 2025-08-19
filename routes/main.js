@@ -111,6 +111,7 @@ router.post('/reservation', (req, res) => {
         return res.status(401).send('로그인 세션 없음');
     }
 
+    //여기에 user_permissions에서 perm상태를 조회 후, 0이면 금지하도록 하자
     let currentReserved = req.cookies.reservedItems || '';
     let reservedList = [];
 
