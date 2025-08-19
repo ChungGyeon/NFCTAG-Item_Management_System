@@ -5,8 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= baseTitle%> <%= title %></title>
     <link rel="stylesheet" href="/stylesheets/Throne/forsuccessionToTheThrone2.css">
+    <style>
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            opacity: 1; /* Ensure it starts opaque */
+            transition: opacity 1s ease-out; /* Add transition for fade-out */
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+        }
+
+        .door {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background-color: rgba(255, 215, 0, 0.5);
+            transition: transform 2s ease-in-out;
+        }
+
+        #left-door {
+            left: 0;
+            border-right: 2px solid #ffd700;
+        }
+
+        #right-door {
+            right: 0;
+            border-left: 2px solid #ffd700;
+        }
+
+        #loading-screen.hidden #left-door {
+            transform: translateX(-100%);
+        }
+
+        #loading-screen.hidden #right-door {
+            transform: translateX(100%);
+        }
+
+        .game-container {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .game-container.fade-in {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
+<div id="loading-screen">
+    <div id="left-door" class="door"></div>
+    <div id="right-door" class="door"></div>
+</div>
+
 <div class="game-container">
     <div class="instructions">당신의 권한을 양도하라</div>
 
@@ -68,6 +130,32 @@
     };
 </script>
 <script src="/javascripts/Throne/forThronePage2.js">
+</script>
+<script>
+    window.addEventListener('load', () => {
+        const loadingScreen = document.getElementById('loading-screen');
+        const gameContainer = document.querySelector('.game-container');
+
+        // Start door opening animation
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+        }, 500); // 0.5초 후 문이 열리기 시작합니다.
+
+        // Start content fade-in
+        setTimeout(() => {
+            gameContainer.classList.add('fade-in');
+        }, 1500); // 1.5초 후 콘텐츠가 페이드인됩니다. (문이 어느정도 열린 시점)
+
+        // Start loading screen fade-out (after doors are mostly open)
+        setTimeout(() => {
+            loadingScreen.classList.add('fade-out');
+        }, 2000); // 2초 후 로딩 화면 전체가 페이드 아웃되기 시작합니다.
+
+        // Hide loading screen completely after fade-out
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 3000); // 2초(페이드 아웃 시작) + 1초(페이드 아웃 지속) 후 로딩 화면이 완전히 사라집니다.
+    });
 </script>
 </body>
 </html>
