@@ -111,24 +111,47 @@ router.post('/reservation', (req, res) => {
         return res.status(401).send('로그인 세션 없음');
     }
 
-    //여기에 user_permissions에서 perm상태를 조회 후, 0이면 금지하도록 하자
-    let currentReserved = req.cookies.reservedItems || '';
-    let reservedList = [];
-
-    if (currentReserved.includes(':')) {
-        const [cookieStudentNum, items] = currentReserved.split(':');
-        if (cookieStudentNum === String(studentnum)) {
-            reservedList = items.split(',').filter(Boolean);
-        } else {
-            reservedList = [];
+    const examineRentPermSQL = `SELECT rent_perm FROM user_permissions WHERE studentNum = ?`
+    db.query(examineRentPermSQL, studentnum, (err, rentPermResult) => {
+        if(err) {
+            console.error('예약에서 대여권한 확인중 DB 오류:', err);
+            return res.status(500).send('권한 확인 오류');
         }
-    }
+        if(!rentPermResult) res.json({ success: false, message: `${studentnum}님은 연체로 인해 대여하실 수 없습니다.` });
 
-    /*기존 저장법
-        if (reservedList.includes(itemName)) {
-            return res.send({ success: false, message: `${itemName}은(는) 이미 예약됨` });
+        let currentReserved = req.cookies.reservedItems || '';
+        let reservedList = [];
+
+        if (currentReserved.includes(':')) {
+            const [cookieStudentNum, items] = currentReserved.split(':');
+            if (cookieStudentNum === String(studentnum)) {
+                reservedList = items.split(',').filter(Boolean);
+            } else {
+                reservedList = [];
+            }
         }
-        reservedList.push(itemName);
+
+        /*기존 저장법
+            if (reservedList.includes(itemName)) {
+                return res.send({ success: false, message: `${itemName}은(는) 이미 예약됨` });
+            }
+            reservedList.push(itemName);
+            const newCookieValue = `${studentnum}:${reservedList.join(',')}`;
+
+            res.cookie('reservedItems', newCookieValue, {
+                maxAge: 3600000,
+                httpOnly: false,
+                path: '/'
+            });
+        */
+        const alreadyReserved = reservedList.some(item => item.split('#')[0] === itemName);
+        if (alreadyReserved) {
+            return res.json({ success: false, message: `${itemName}은(는) 이미 예약됨` });
+        }
+
+        // 새로운 형식으로 추가: 아이템명#시간
+        const newReservation = `${itemName}#${rentalHours}`;
+        reservedList.push(newReservation);
         const newCookieValue = `${studentnum}:${reservedList.join(',')}`;
 
         res.cookie('reservedItems', newCookieValue, {
@@ -136,25 +159,10 @@ router.post('/reservation', (req, res) => {
             httpOnly: false,
             path: '/'
         });
-    */
-    const alreadyReserved = reservedList.some(item => item.split('#')[0] === itemName);
-    if (alreadyReserved) {
-        return res.json({ success: false, message: `${itemName}은(는) 이미 예약됨` });
-    }
 
-    // 새로운 형식으로 추가: 아이템명#시간
-    const newReservation = `${itemName}#${rentalHours}`;
-    reservedList.push(newReservation);
-    const newCookieValue = `${studentnum}:${reservedList.join(',')}`;
-
-    res.cookie('reservedItems', newCookieValue, {
-        maxAge: 3600000,
-        httpOnly: false,
-        path: '/'
+        console.log('현재 예약 목록:', reservedList);
+        res.json({ success: true, message: `${itemName} ${rentalHours}시간 예약되었습니다.` });
     });
-
-    console.log('현재 예약 목록:', reservedList);
-    res.json({ success: true, message: `${itemName} ${rentalHours}시간 예약되었습니다.` });
 });
 
 
