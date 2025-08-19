@@ -18,6 +18,7 @@ require('./routes/generateURL'); //nfc_url에 내용 고쳐 쓰는 라우터
 const seedGenerator = require('./routes/seed-generator'); //랜덤시드 라우터
 const logRouter = require('./routes/log'); //장부기능
 const successionToTheThroneRouter  = require('./routes/Throne'); //회장 권한 양도 라우터
+const checkOverdueRouter = require('./routes/checkOverdue'); //연체자 권한 관리 라우터
 
 const app = express();
 
@@ -83,6 +84,7 @@ app.use(function(err, req, res, next) {
 app.use('/rent', verifyRouter);
 app.use('/log', logRouter);
 app.use('/Throne',successionToTheThroneRouter);
+app.use('/checkOverdue', checkOverdueRouter);
 /*
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
