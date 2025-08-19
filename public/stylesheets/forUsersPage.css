@@ -185,3 +185,449 @@
 .modal-btn:hover {
     opacity: 0.8;
 }
+
+/* 🎭 특별한 권한 양도 버튼 섹션 */
+.throne-transfer-section {
+    margin-top: 50px;
+    padding: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.throne-transfer-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.crown-decoration {
+    font-size: 60px;
+    margin-bottom: 20px;
+    animation: royal-float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+}
+
+.throne-title {
+    color: #fff;
+    font-size: 32px;
+    font-weight: bold;
+    margin: 20px 0 10px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+    font-family: 'Times New Roman', serif;
+}
+
+.throne-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-bottom: 40px;
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 전설적인 권한 양도 버튼 */
+.legendary-throne-button {
+    position: relative;
+    padding: 20px 50px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Times New Roman', serif;
+    color: #fff;
+    background: linear-gradient(45deg, #d4af37, #ffd700, #d4af37);
+    border: 3px solid #ffd700;
+    border-radius: 15px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    box-shadow:
+        0 0 30px rgba(255, 215, 0, 0.5),
+        0 10px 20px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    letter-spacing: 1px;
+    margin: 20px;
+    transform: perspective(1000px) rotateX(0deg);
+    background-size: 200% 200%;
+    animation: royal-shimmer 3s ease-in-out infinite;
+}
+
+.legendary-throne-button:hover {
+    transform: perspective(1000px) rotateX(-5deg) translateY(-5px);
+    box-shadow:
+        0 0 50px rgba(255, 215, 0, 0.8),
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: #ffec8c;
+    animation: royal-pulse 0.8s ease-in-out infinite;
+}
+
+.legendary-throne-button:active {
+    transform: perspective(1000px) rotateX(-2deg) translateY(-2px) scale(0.98);
+}
+
+/* 버튼 내부 요소들 */
+.button-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.legendary-throne-button:hover .button-background {
+    opacity: 1;
+}
+
+.button-shine {
+    position: absolute;
+    top: -2px;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent);
+    transition: left 0.5s ease;
+}
+
+.legendary-throne-button:hover .button-shine {
+    left: 100%;
+}
+
+.button-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.button-particles::before,
+.button-particles::after {
+    content: '✨';
+    position: absolute;
+    font-size: 12px;
+    opacity: 0;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+.button-particles::before {
+    top: 20%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.button-particles::after {
+    top: 60%;
+    right: 20%;
+    animation-delay: 1s;
+}
+
+.button-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.crown-icon {
+    font-size: 24px;
+    animation: crown-rotate 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+}
+
+.button-text {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.royal-symbol {
+    font-size: 20px;
+    animation: royal-glow 2s ease-in-out infinite alternate;
+}
+
+.button-glow {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 20px;
+    z-index: -1;
+}
+
+.legendary-throne-button:hover .button-glow {
+    opacity: 1;
+    animation: glow-pulse 1s ease-in-out infinite;
+}
+
+.throne-warning {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    margin-top: 30px;
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 🎭 숨겨진 특별한 권한 관리 버튼 */
+.hidden-throne-access {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999;
+}
+
+.secret-throne-trigger {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.secret-throne-trigger:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.4);
+    border-color: rgba(255, 215, 0, 0.8);
+}
+
+.secret-throne-trigger::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.secret-throne-trigger:hover::before {
+    opacity: 1;
+}
+
+.secret-text {
+    font-size: 24px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: subtle-glow 3s ease-in-out infinite;
+}
+
+.secret-tooltip {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.secret-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 20px;
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.8);
+}
+
+.secret-throne-trigger:hover .secret-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 권한 양도 섹션 나타나는 애니메이션 */
+.throne-transfer-section {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.throne-transfer-section.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.section-reveal-animation {
+    position: relative;
+    animation: section-entrance 0.8s ease-out;
+}
+
+.close-throne-section {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 35px;
+    height: 35px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.close-throne-section:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* 섹션 나타나는 애니메이션 */
+@keyframes section-entrance {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) rotateX(-10deg);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translateY(-5px) rotateX(2deg);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+    }
+}
+
+@keyframes royal-float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+@keyframes royal-shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes royal-pulse {
+    0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.3); }
+    50% { box-shadow: 0 0 60px rgba(255, 215, 0, 0.8), 0 15px 30px rgba(0, 0, 0, 0.4); }
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+@keyframes crown-rotate {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-5deg) scale(1.1); }
+    75% { transform: rotate(5deg) scale(1.1); }
+}
+
+@keyframes royal-glow {
+    0% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); }
+    100% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1)); }
+}
+
+@keyframes glow-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes subtle-glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .throne-transfer-section {
+        margin-top: 30px;
+        padding: 30px 20px;
+    }
+
+    .throne-title {
+        font-size: 24px;
+    }
+
+    .crown-decoration {
+        font-size: 40px;
+    }
+
+    .legendary-throne-button {
+        padding: 15px 30px;
+        font-size: 18px;
+        margin: 15px;
+    }
+
+    .button-content {
+        gap: 10px;
+    }
+
+    .crown-icon {
+        font-size: 20px;
+    }
+
+    .royal-symbol {
+        font-size: 16px;
+    }
+
+    .hidden-throne-access {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .secret-throne-trigger {
+        width: 50px;
+        height: 50px;
+    }
+
+    .secret-text {
+        font-size: 20px;
+    }
+
+    .secret-tooltip {
+        bottom: 60px;
+        font-size: 11px;
+    }
+}

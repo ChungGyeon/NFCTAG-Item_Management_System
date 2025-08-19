@@ -127,6 +127,73 @@ function changeVicePresidentStatus() {
     });
 }
 
+// 권한 양도 섹션 표시/숨김 기능
+function revealThroneSection() {
+    const throneSection = document.getElementById('throneSection');
+    const secretTrigger = document.querySelector('.secret-throne-trigger');
+
+    // 섹션을 보이게 하고 애니메이션 적용
+    throneSection.style.display = 'block';
+
+    // 약간의 딜레이 후 revealed 클래스 추가 (애니메이션 효과)
+    setTimeout(() => {
+        throneSection.classList.add('revealed');
+    }, 50);
+
+    // 비밀 버튼 일시적으로 숨기기
+    secretTrigger.style.opacity = '0';
+    secretTrigger.style.pointerEvents = 'none';
+
+    // 페이지를 아래로 스크롤하여 섹션이 보이도록
+    setTimeout(() => {
+        throneSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }, 300);
+}
+
+function hideThroneSection() {
+    const throneSection = document.getElementById('throneSection');
+    const secretTrigger = document.querySelector('.secret-throne-trigger');
+
+    // revealed 클래스 제거
+    throneSection.classList.remove('revealed');
+
+    // 애니메이션이 끝난 후 완전히 숨기기
+    setTimeout(() => {
+        throneSection.style.display = 'none';
+    }, 600);
+
+    // 비밀 버튼 다시 보이게 하기
+    setTimeout(() => {
+        secretTrigger.style.opacity = '1';
+        secretTrigger.style.pointerEvents = 'auto';
+    }, 300);
+}
+
+// 페이지 외부 클릭 시 권한 양도 섹션 숨기기
+document.addEventListener('click', function(event) {
+    const throneSection = document.getElementById('throneSection');
+    const secretTrigger = document.querySelector('.secret-throne-trigger');
+
+    // 권한 양도 섹션이 열려있고, 클릭한 요소가 섹션 내부가 아니며, 비밀 버튼도 아닐 때
+    if (throneSection && throneSection.classList.contains('revealed')) {
+        if (!throneSection.contains(event.target) && !secretTrigger.contains(event.target)) {
+            hideThroneSection();
+        }
+    }
+});
+
+// ESC 키로 권한 양도 섹션 닫기
+document.addEventListener('keydown', function(event) {
+    const throneSection = document.getElementById('throneSection');
+
+    if (event.key === 'Escape' && throneSection && throneSection.classList.contains('revealed')) {
+        hideThroneSection();
+    }
+});
+
 // 모달 외부 클릭 시 닫기
 window.onclick = function(event) {
     const deleteModal = document.getElementById('deleteModal');

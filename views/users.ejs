@@ -71,6 +71,41 @@
         <% }) %>
       </tbody>
     </table>
+
+    <!-- 🎭 평소에는 숨어있는 특별한 권한 관리 버튼 -->
+    <div class="hidden-throne-access">
+      <button class="secret-throne-trigger" onclick="revealThroneSection()">
+        <span class="secret-text">👑</span>
+        <div class="secret-tooltip">특별한 권한 관리</div>
+      </button>
+    </div>
+
+    <!-- 🎭 특별한 권한 양도 버튼 섹션 (기본적으로 숨김) -->
+    <div class="throne-transfer-section" id="throneSection" style="display: none;">
+      <div class="section-reveal-animation">
+        <button class="close-throne-section" onclick="hideThroneSection()">✕</button>
+
+        <div class="crown-decoration">👑</div>
+        <h2 class="throne-title">권한 승계의 의식</h2>
+        <p class="throne-subtitle">신중히 고려하신 후 결정하시기 바랍니다</p>
+
+        <button class="legendary-throne-button" onclick="window.location.href='/throne/DOA'">
+          <div class="button-background"></div>
+          <div class="button-shine"></div>
+          <div class="button-particles"></div>
+          <div class="button-content">
+            <span class="crown-icon">👑</span>
+            <span class="button-text">권한 양도</span>
+            <span class="royal-symbol">⚜️</span>
+          </div>
+          <div class="button-glow"></div>
+        </button>
+
+        <p class="throne-warning">
+          ⚠️ 이 기능은 매우 중요한 결정입니다. 신중히 사용하시기 바랍니다.
+        </p>
+      </div>
+    </div>
   </div>
 
   <!-- 삭제 확인 모달 -->
@@ -109,4 +144,4 @@
     </div>
   </div>
 </body>
-</html> 
+</html>
