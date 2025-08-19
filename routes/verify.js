@@ -127,32 +127,69 @@ router.post('/cancel', (req, res) => {
                 return res.json({ success: false, message: `${itemName}은(는) 현재 대여하지 않았습니다.` });
             }
 
-            const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND studentNum = ?';
-            db.query(sqlDelete, [itemName, sessionUser.studentnum], (err, deleteResult) => {
+            // ✅ 먼저 대여 기간 정보를 조회
+            const sqlGetRentInfo = `
+                SELECT lr.rentTime, rs.rentToHour
+                FROM Log_rent lr
+                JOIN Rent_status rs ON lr.itemName = rs.itemName AND lr.name = rs.whoAreRent
+                WHERE lr.name = ? AND lr.itemName = ? AND lr.returnTime IS NULL
+                ORDER BY lr.rentTime DESC
+                LIMIT 1
+            `;
+
+            db.query(sqlGetRentInfo, [userName, itemName], (err, rentInfoResults) => {
                 if (err) {
-                    console.error('[❌ 대여 취소 실패]', err);
-                    return res.status(500).json({ success: false, message: '대여 취소 실패' });
+                    console.error('[❌ 대여 정보 조회 실패]', err);
+                    return res.status(500).json({ success: false, message: '대여 정보 조회 실패' });
                 }
 
-                const sqlUpdateStatus = 'UPDATE Items SET status = 0 WHERE itemName = ?';
-                db.query(sqlUpdateStatus, [itemName], (err, results) => {
+                const rentInfo = rentInfoResults.length > 0 ? rentInfoResults[0] : null;
+
+                const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND studentNum = ?';
+                db.query(sqlDelete, [itemName, sessionUser.studentnum], (err, deleteResult) => {
                     if (err) {
-                        console.error('[❌ status 업데이트 실패]', err);
-                        return res.status(500).json({ success: false, message: 'status 업데이트 실패' });
+                        console.error('[❌ 대여 취소 실패]', err);
+                        return res.status(500).json({ success: false, message: '대여 취소 실패' });
                     }
 
-                    // ✅ Log_rent 반납 기록 + 연체시간 계산
-                    const sqlUpdateLog = `
-                        UPDATE Log_rent
-                        SET returnTime = NOW(),
-                            delinquencyTime = SEC_TO_TIME(TIMESTAMPDIFF(SECOND, rentTime, NOW()))
-                        WHERE name = ? AND itemName = ? AND returnTime IS NULL
-                    `;
-                    db.query(sqlUpdateLog, [userName, itemName], (logErr) => {
-                        if (logErr) console.error('[❌ Log_rent UPDATE 실패]', logErr);
-                    });
+                    const sqlUpdateStatus = 'UPDATE Items SET status = 0 WHERE itemName = ?';
+                    db.query(sqlUpdateStatus, [itemName], (err, results) => {
+                        if (err) {
+                            console.error('[❌ status 업데이트 실패]', err);
+                            return res.status(500).json({ success: false, message: 'status 업데이트 실패' });
+                        }
 
-                    return res.json({ success: true, message: `${itemName} 대여 취소 완료` });
+                        // ✅ Log_rent 반납 기록 + 조건부 연체시간 계산
+                        if (rentInfo && rentInfo.rentTime && rentInfo.rentToHour) {
+                            const sqlUpdateLog = `
+                                UPDATE Log_rent
+                                SET returnTime = NOW(),
+                                    delinquencyTime = CASE 
+                                        WHEN TIMESTAMPDIFF(HOUR, ?, NOW()) > ?
+                                        THEN SEC_TO_TIME(TIMESTAMPDIFF(SECOND, DATE_ADD(?, INTERVAL ? HOUR), NOW()))
+                                        ELSE NULL
+                                    END
+                                WHERE name = ? AND itemName = ? AND returnTime IS NULL
+                                ORDER BY rentTime DESC
+                                LIMIT 1
+                            `;
+
+                            db.query(sqlUpdateLog, [
+                                rentInfo.rentTime,
+                                rentInfo.rentToHour,
+                                rentInfo.rentTime,
+                                rentInfo.rentToHour,
+                                userName,
+                                itemName
+                            ], (logErr) => {
+                                if (logErr) console.error('[❌ Log_rent UPDATE 실패]', logErr);
+                            });
+                        } else {
+                            console.error('[❌ 대여 정보 누락으로 연체시간 계산 불가]', itemName);
+                        }
+
+                        return res.json({ success: true, message: `${itemName} 대여 취소 완료` });
+                    });
                 });
             });
         });
@@ -350,18 +387,56 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                 return callback({ success: false, message: '반납할 수 있는 항목이 없습니다' });
             }
 
-            const deletePromises = targetItemList.map(item =>
+            //먼저 대여 기간 정보를 조회하여 저장
+            const getRentInfoPromises = targetItemList.map(item =>
                 new Promise((resolve, reject) => {
-                    const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND studentNum = ?';
-                    db.query(sqlDelete, [item, cookieStudentNum], (err, result) => {
-                        if (err) reject(err);
-                        else resolve(result);
+                    const sqlGetRentInfo = `
+                        SELECT lr.rentTime, rs.rentToHour
+                        FROM Log_rent lr
+                        JOIN Rent_status rs ON lr.itemName = rs.itemName AND lr.name = rs.whoAreRent
+                        WHERE lr.name = ? AND lr.itemName = ? AND lr.returnTime IS NULL
+                        ORDER BY lr.rentTime DESC
+                        LIMIT 1
+                    `;
+
+                    db.query(sqlGetRentInfo, [userName, item], (err, results) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        if (results.length === 0) {
+                            console.error('대여 정보를 찾을 수 없음', item);
+                            resolve({ itemName: item, rentTime: null, rentToHour: null });
+                            return;
+                        }
+
+                        resolve({
+                            itemName: item,
+                            rentTime: results[0].rentTime,
+                            rentToHour: results[0].rentToHour
+                        });
                     });
                 })
             );
 
-            Promise.all(deletePromises)
-                .then(() => {
+            Promise.all(getRentInfoPromises)
+                .then(rentInfoList => {
+                    //대여중인 상태를 나타내는 Rent_status테이블 업데이트
+                    const deletePromises = targetItemList.map(item =>
+                        new Promise((resolve, reject) => {
+                            const sqlDelete = 'DELETE FROM Rent_status WHERE itemName = ? AND studentNum = ?';
+                            db.query(sqlDelete, [item, cookieStudentNum], (err, result) => {
+                                if (err) reject(err);
+                                else resolve(result);
+                            });
+                        })
+                    );
+
+                    return Promise.all([Promise.all(deletePromises), rentInfoList]);
+                })
+                .then(([deleteResults, rentInfoList]) => {
+                    //Items 테이블 status 업데이트
                     const updatePromises = targetItemList.map(item =>
                         new Promise((resolve, reject) => {
                             const sqlUpdateStatus = 'UPDATE Items SET status = 0 WHERE itemName = ?';
@@ -371,22 +446,41 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                             });
                         })
                     );
-                    return Promise.all(updatePromises);
+
+                    return Promise.all([Promise.all(updatePromises), rentInfoList]);
                 })
-                .then(() => {
-                    // ✅ Log_rent 반납 처리 + 연체시간 계산
-                    //연체 시간을 여기서 결정하느 perm도 여기서 0으로 만들자. 이후 시간이 지나면 1로 만드는 코드도 필요해, 이건 어떻게 하지
-                    targetItemList.forEach(item => {
+                .then(([updateResults, rentInfoList]) => {
+                    //Log_rent 반납 처리 + 조건부 연체시간 계산
+                    //그리고 rent_perm도 여기서 조절할 수 있도록 해야지
+                    rentInfoList.forEach(rentInfo => {
+                        if (!rentInfo.rentTime || !rentInfo.rentToHour) {
+                            console.error('대여 정보 누락', rentInfo.itemName);
+                            return;
+                        }
+
+                        // 대여 기간 초과 여부 확인 후 연체시간 계산
                         const sqlUpdateLog = `
                             UPDATE Log_rent
                             SET returnTime = NOW(),
-                                delinquencyTime = SEC_TO_TIME(TIMESTAMPDIFF(SECOND, rentTime, NOW()))
+                                delinquencyTime = CASE 
+                                    WHEN TIMESTAMPDIFF(HOUR, ?, NOW()) > ?
+                                    THEN SEC_TO_TIME(TIMESTAMPDIFF(SECOND, DATE_ADD(?, INTERVAL ? HOUR), NOW()))
+                                    ELSE NULL
+                                END
                             WHERE name = ? AND itemName = ?
                               AND returnTime IS NULL
                             ORDER BY rentTime DESC
                             LIMIT 1
                         `;
-                        db.query(sqlUpdateLog, [userName, item], (logErr) => {
+
+                        db.query(sqlUpdateLog, [
+                            rentInfo.rentTime,
+                            rentInfo.rentToHour,
+                            rentInfo.rentTime,
+                            rentInfo.rentToHour,
+                            userName,
+                            rentInfo.itemName
+                        ], (logErr) => {
                             if (logErr) console.error('[❌ Log_rent UPDATE 실패]', logErr);
                         });
                     });
@@ -394,6 +488,7 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
                     callback({ success: true, message: '반납 완료' });
                 })
                 .catch(err => {
+                    console.error('[❌ 반납 처리 중 오류]', err);
                     callback({ success: false, message: '반납 처리 실패' });
                 });
         });
