@@ -307,7 +307,7 @@ router.post('/verify-step3', (req, res) => {
             const allSuccess = operationResults.every(result => result.success);
             return res.json({
                 success: allSuccess,
-                message: results.messages.join(' / '),
+                message: results.messages.join(' /itemlist '),
                 details: operationResults
             });
         })

@@ -34,8 +34,7 @@ function formatTime(seconds) {
 router.get('/', function(req, res, next) {//router123
     const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
     const { currentSeed, lastSeed } = req;
-
-    /*  비활성화
+    /*  비활성화 위 두개도
     근데 아직 이 코드의 표준화 사용법을 적지 않아서 냄겨둠
     if (urlSeed === currentSeed || urlSeed === lastSeed) {
         if (!req.session.user) {
@@ -55,6 +54,32 @@ router.get('/', function(req, res, next) {//router123
         res.status(404).send('존재하지 않는 페이지입니다.');
     }
 */
+
+    if (!req.session.user) return res.redirect('/users/login');
+
+    const userStudentNum = req.session.user?.studentnum;
+    const verificate_perm = 'SELECT studentNum FROM user_permissions WHERE studentNum = ? AND (president = true OR vice_president = true)';
+    db.query(verificate_perm, [userStudentNum],(err, results) => {
+        if(err){
+            console.error('권한 확인 중 DB 오류:', err);
+            return res.status(500).send('권한 확인 오류');
+        }
+
+        if (results.length === 0) {
+            return res.redirect('/itemlist');
+        }
+        else if(results.length > 0) {
+            res.render('adminHub', { title: '관리자 허브'});
+        }
+        else{
+            return res.status(404).send('뭔가 일어났음');
+        }
+        });
+});
+
+
+//일반유저 페이지 접근
+router.get('/itemlist', function(req, res, next) {
     if (!req.session.user) {
         return res.redirect('/users/login');
     }
@@ -71,24 +96,6 @@ router.get('/', function(req, res, next) {//router123
         const reservedCookie = req.cookies.reservedItems || '';
         let userReservedItems = [];
         let userReservedData = {}; // 새로추가. 아이템명:시간 매핑
-
-        /*
-        if (studentnum && reservedCookie.startsWith(studentnum + ':')) {
-            userReservedItems = reservedCookie.split(':')[1].split(',').filter(Boolean);
-        }
-
-        // 각 아이템에 예약 상태(isReserved) 추가
-        const itemsWithStatus = items.map(item => ({
-            ...item,
-            isReserved: userReservedItems.includes(item.itemName)
-        }));
-
-        res.render('main', { 
-            items: itemsWithStatus, 
-            title: '물품대여소',
-            currentUser: req.session.user // 현재 로그인한 사용자 정보 전달
-        });
-    });*/
 
         if (studentnum && reservedCookie.startsWith(studentnum + ':')) {
             const reservedItemsString = reservedCookie.split(':')[1];
@@ -174,7 +181,6 @@ router.get('/', function(req, res, next) {//router123
         });
     });
 });
-
 /* 예약하기
 * 쿠키도 여기서 구워줌
 */

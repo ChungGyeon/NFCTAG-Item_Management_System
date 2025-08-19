@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     alert("✅ 완료: " + data.message);
-                    location.href = '/';
+                    location.href = '/itemlist';
                 } else {
                     alert("❌ 실패: " + data.message);
                 }
