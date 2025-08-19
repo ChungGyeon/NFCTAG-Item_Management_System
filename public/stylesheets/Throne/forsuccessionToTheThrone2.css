@@ -263,3 +263,60 @@ body {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
 }
+
+
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 215, 0, 0.31);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    opacity: 1; /* Ensure it starts opaque */
+    transition: opacity 1s ease-out; /* Add transition for fade-out */
+}
+
+#loading-screen.fade-out {
+    opacity: 0;
+}
+
+.door {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-color: rgba(255, 215, 0, 0.31);
+    transition: transform 2s ease-in-out;
+}
+
+#left-door {
+    left: 0;
+    border-right: 2px solid #ffd700;
+}
+
+#right-door {
+    right: 0;
+    border-left: 2px solid #ffd700;
+}
+
+#loading-screen.hidden #left-door {
+    transform: translateX(-100%);
+}
+
+#loading-screen.hidden #right-door {
+    transform: translateX(100%);
+}
+
+.game-container {
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.game-container.fade-in {
+    opacity: 1;
+}

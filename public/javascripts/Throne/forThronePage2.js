@@ -4,6 +4,31 @@ let person2 = document.getElementById('person2');
 let draggedElement = null;
 let currentOwner = person1;
 
+window.addEventListener('load', () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    const gameContainer = document.querySelector('.game-container');
+
+    // Start door opening animation
+    setTimeout(() => {
+        loadingScreen.classList.add('hidden');
+    }, 500); // 0.5초 후 문이 열리기 시작합니다.
+
+    // Start content fade-in
+    setTimeout(() => {
+        gameContainer.classList.add('fade-in');
+    }, 1500); // 1.5초 후 콘텐츠가 페이드인됩니다. (문이 어느정도 열린 시점)
+
+    // Start loading screen fade-out (after doors are mostly open)
+    setTimeout(() => {
+        loadingScreen.classList.add('fade-out');
+    }, 2000); // 2초 후 로딩 화면 전체가 페이드 아웃되기 시작합니다.
+
+    // Hide loading screen completely after fade-out
+    setTimeout(() => {
+        loadingScreen.style.display = 'none';
+    }, 3000); // 2초(페이드 아웃 시작) + 1초(페이드 아웃 지속) 후 로딩 화면이 완전히 사라집니다.
+});
+
 // 드래그 시작
 crown.addEventListener('dragstart', function(e) {
     draggedElement = this;
