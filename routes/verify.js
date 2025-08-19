@@ -394,6 +394,7 @@ function handleRental(req, res, cookieStudentNum, cookieItemData, callback) {
     });
 }
 
+//여러개 한번에 반납하면 Log_rent에 하나만 입력됨, 이거 고쳐야해
 function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
     const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
     db.query(sqlName, [cookieStudentNum], (err, results) => {
