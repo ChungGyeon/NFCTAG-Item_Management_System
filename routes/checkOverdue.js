@@ -1,5 +1,8 @@
 /*
 * 연체된 사람의 시간을 측정하고 이후 권한을 복구하는 라우터
+* 아래 checkAndRestoreOverdueUsers()를 5분마다 동작시키는 several를 시켜놨기에 아래에 선언된 라우터들은 한마ㅏㄹ곤 사용 잘 안됨
+* 수동으로 권한 복구 기능만 남겨놓음
+* 추후 누군가 이를 사용하려고 튜닝한다면 엔드포인트를 참고하시오
 * */
 const express = require('express');
 const router = express.Router();
@@ -135,7 +138,11 @@ setInterval(checkAndRestoreOverdueUsers, CHECK_INTERVAL);
 // 서버 시작 시 즉시 한 번 실행
 checkAndRestoreOverdueUsers();
 
-// API 엔드포인트들
+
+
+//엔드포인트
+
+//수동으로 연체자 권한 확인 실행 엔드포인트, 8월19일기준 사용은 안함
 router.get('/check', (req, res) => {
     checkAndRestoreOverdueUsers();
     res.json({ success: true, message: '연체자 권한 확인을 실행했습니다.' });
@@ -153,6 +160,7 @@ router.post('/restrict/:studentNum', (req, res) => {
     res.json({ success: true, message: `사용자(${studentNum}) 권한을 제한했습니다.` });
 });
 
+//대여권한 수동복구 엔드포인트, 이건 대여권한 금지 버튼에서 사용중
 router.post('/restore', (req, res) => {
     const studentNum = req.body.studentNum;
 
@@ -178,6 +186,7 @@ router.post('/restore', (req, res) => {
 });
 
 // 현재 권한 제한된 사용자 목록 조회
+//지금은 사용하지않는 기능, 애초에 어드민-계정관리페이지에서 볼 수 있으니 별로 필요없을듯
 router.get('/restricted-users', (req, res) => {
     const sqlGetRestrictedUsers = `
         SELECT 
