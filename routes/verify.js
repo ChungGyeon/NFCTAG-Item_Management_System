@@ -196,16 +196,18 @@ router.post('/cancel', (req, res) => {
                                 // ✅ 연체가 감지된 경우 rent_perm을 0으로 설정
                                 if (isOverdue) {
                                     const sqlUpdatePerm = `
-                                        INSERT INTO user_permissions (studentNum, rent_perm) 
-                                        VALUES (?, 0)
-                                        ON DUPLICATE KEY UPDATE rent_perm = 0
+                                        UPDATE user_permissions 
+                                        SET rent_perm = 0 
+                                        WHERE studentNum = ?
                                     `;
 
                                     db.query(sqlUpdatePerm, [sessionUser.studentnum], (permErr, permResult) => {
                                         if (permErr) {
-                                            console.error('[권한 제한 실패]: ', permErr);
-                                        } else {
+                                            console.error('[❌ 권한 제한 실패]', permErr);
+                                        } else if (permResult.affectedRows > 0) {
                                             console.log(`[🚫 연체로 인한 권한 제한] ${userName}(${sessionUser.studentnum}) - 아이템: ${itemName}`);
+                                        } else {
+                                            console.log(`[⚠️ 권한 제한 대상 없음] ${userName}(${sessionUser.studentnum}) - user_permissions 레코드가 없습니다`);
                                         }
                                     });
                                 }
@@ -536,16 +538,18 @@ function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
 
                                     // user_permissions에서 rent_perm을 0으로 설정
                                     const sqlUpdatePerm = `
-                                        INSERT INTO user_permissions (studentNum, rent_perm) 
-                                        VALUES (?, 0)
-                                        ON DUPLICATE KEY UPDATE rent_perm = 0
+                                        UPDATE user_permissions 
+                                        SET rent_perm = 0 
+                                        WHERE studentNum = ?
                                     `;
 
                                     db.query(sqlUpdatePerm, [studentNum], (permErr, permResult) => {
                                         if (permErr) {
-                                            console.error('[❌ 권한 제한 실패]: ', permErr);
-                                        } else {
+                                            console.error('[❌ 권한 제한 실패]', permErr);
+                                        } else if (permResult.affectedRows > 0) {
                                             console.log(`[🚫 연체로 인한 권한 제한] ${userName}(${studentNum}) - 아이템: ${rentInfo.itemName}`);
+                                        } else {
+                                            console.log(`[⚠️ 권한 제한 대상 없음] ${userName}(${studentNum}) - user_permissions 레코드가 없습니다`);
                                         }
                                     });
                                 });

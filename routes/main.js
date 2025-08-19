@@ -429,11 +429,12 @@ router.get('/admin/users', (req, res) => {
         // 권한이 있으면 사용자 목록 조회
         const sql = `
             SELECT u.studentNum, u.name, u.grade, 
-                 COALESCE(up.president, false) as president,
-                 COALESCE(up.vice_president, false) as vice_president,
-                 COALESCE(up.rent_perm, false) as rent_perm
+                 COALESCE(MAX(up.president), false) as president,
+                 COALESCE(MAX(up.vice_president), false) as vice_president,
+                 COALESCE(MAX(up.rent_perm), false) as rent_perm
            FROM Users u
            LEFT JOIN user_permissions up ON u.studentNum = up.studentNum
+           GROUP BY u.studentNum, u.name, u.grade
            ORDER BY u.studentNum
         `;
 
