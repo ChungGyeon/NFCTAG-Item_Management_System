@@ -11,6 +11,11 @@
 * upload.single('myFile') : myFile은 html태그에서 input 태그에 name=여기에 해당함,
 * 즉 name-=yFile인 input태그를 upload.single함수에 인자로 주는거야
 *
+* 지금 이미지 저장위치는 반드시 public/images/item_IMG에만 저장하도록 되어있음
+* 솔직히 말하면 나도 이 저장위치를 어떻게 다르게 할지 모르겠음 ㅋㅋ
+* 하지만 현재로썬 이미지를 추가하는 기능은 IMS에서 물건 추가할떄 빼고는 없으므로 현상황으로 두겠어
+*
+* 추후 누군가 이를 추가적인 개발을 진행하신다면 참고해주십쇼
 *
 * */
 
@@ -27,15 +32,19 @@ const upload = multer({
         //파일저장 위치 지정, file의 이름을 로그에 출력하고 images 폴더에 이미지 저장
         destination(req, file, done) {
             console.log(file);
-            done(null, "public/images");
+            done(null, "public/images/item_IMG");
         },
         filename(req, file, done) {
             const ext = path.extname(file.originalname);
             const basename = path.basename(file.originalname, ext);
             const safeName = Buffer.from(basename, 'latin1').toString('utf8');
             const uniqueSuffix = Date.now();
-            console.log(file);
-            done(null, `${safeName}-${uniqueSuffix}${ext}`);
+            const fileName = `${safeName}-${uniqueSuffix}${ext}`;
+            const fullPath = `/images/item_IMG/${fileName}`;
+            console.log(fullPath); //실제 파일명은 fileName임 주의, 그리고 이건 개발용이니 추후에 주석처리 할 수 있도록
+            done(null, `${safeName}-${uniqueSuffix}${ext}`); //일단 테스트니까 fileName변수에 선언된 그대로 입력해봄
+
+            req.fullImagePath = fullPath; //req갹체에 전체경로를 저장,  DB에 입력할 수 있도록 만듬
         }
     })
 });
@@ -50,7 +59,7 @@ router.post('/updateItem', upload.single('image'), (req, res) => {
             });
         }
         const updateData = {};
-        if (req.file) updateData.img = req.file.filename;
+        if (req.file) updateData.img = req.fullImagePath || `images/item_IMG/${req.file.filename}`;
         if (req.body.itemName) updateData.itemName = req.body.itemName;
 
 
@@ -73,7 +82,7 @@ router.post('/updateItem', upload.single('image'), (req, res) => {
 
             // 이전 이미지가 있다면 삭제
             if (oldImage) {
-                const imagePath = path.join('public/images', oldImage);
+                const imagePath = path.join('public/images/item_IMG', oldImage);
                 fs.unlink(imagePath, (err) => {
                     if (err && err.code !== 'ENOENT') {
                         console.error('이전 이미지 삭제 중 에러:', err);
@@ -110,8 +119,9 @@ router.post('/addItem', upload.single('itemImg'), (req, res) => {
         return res.status(400).json({ message: '아이템 이름과 이미지가 필요합니다.' });
     }
 
+    const imgPath = req.fullImagePath || `images/item_IMG/${itemImg.filename}`;
     const sql = 'INSERT INTO Items (itemName, img, status) VALUES (?, ?, 0)';
-    db.query(sql, [itemName, itemImg.filename], (err, result) => {
+    db.query(sql, [itemName, imgPath], (err, result) => {
         if (err) {
             console.error('DB 오류:', err);
             return res.status(500).json({ message: 'DB 오류 발생' });
@@ -157,7 +167,7 @@ router.post('/deleteItems', (req, res) => {
         const deleteSQL = `DELETE FROM Items WHERE itemName IN (${placeholders})`;
         db.query(deleteSQL, items, (err, deleteResult) => {
             if (err) {
-                console.log('DB 삭제 오류: ',error);
+                console.log('DB 삭제 오류: ', err);
                 return res.status(500).json({
                     success: false,
                     message: 'DB 삭제 오류'
@@ -167,7 +177,13 @@ router.post('/deleteItems', (req, res) => {
             //삭제 로직
             result.forEach(row => {
                 if(row.img){
-                    const imgPath = path.join(__dirname, '../public/images', row.img);
+                    let imgPath;
+                    if(row.img.startsWith('/images/item_IMG')) {
+                        imgPath = path.join(__dirname, '../public', row.img);
+                    }
+                    else{
+                        imgPath = path.join(__dirname, '../public/images/item_IMG', row.img);
+                    }
                     fs.unlink(imgPath, (err) => {
                         if(err) console.log('이미지 파일 삭제 오류: ', err);
                         else console.log('이미지 삭제 완료', row.img);

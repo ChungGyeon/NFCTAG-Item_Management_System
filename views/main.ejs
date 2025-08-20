@@ -57,7 +57,7 @@
               data-rent-start="<%= item.date %>">
         </span>
       </p>
-      <img src="/images/item_IMG/<%= item.img %>" alt="<%= item.itemName %>" />
+      <img src="<%= item.img %>" alt="<%= item.itemName %>" />
       <% if (currentUser && item.studentNum === currentUser.studentnum) { %>
         <div class="item-buttons">
           <button onclick="reserveFromServer2('<%= item.itemName %>')">반납예약</button>
@@ -78,7 +78,7 @@
     <div class="itemDetail-card not-rented" data-item-name="<%= item.itemName %>">
       <input type="hidden" name="status" value="<%= item.status %>">
       <h3><%= item.itemName %></h3>
-      <img src="/images/item_IMG/<%= item.img %>" alt="<%= item.itemName %>" />
+      <img src="<%= item.img %>" alt="<%= item.itemName %>" />
       <div class="item-buttons">
         <% if (overdueInfo && overdueInfo.isRestricted) { %>
           <!-- 연체자는 예약 불가 -->
