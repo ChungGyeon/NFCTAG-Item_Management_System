@@ -196,6 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // 비밀번호 길이 확인
+            //만약 이걸 보고 있는 클라이언트분? 최소 숫자를 맞출필요는 없지만, 이후 책임은 안집니다?
             if (newPassword.length < 6) {
                 alert('새 비밀번호는 최소 6자 이상이어야 합니다.');
                 return;
