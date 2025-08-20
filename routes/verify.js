@@ -318,77 +318,97 @@ router.post('/verify-step3', (req, res) => {
 });
 
 function handleRental(req, res, cookieStudentNum, cookieItemData, callback) {
-    const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
-    db.query(sqlName, [cookieStudentNum], (err, results) => {
-        if (err || results.length === 0) {
-            return callback({ success: false, message: 'DB 오류 또는 사용자 없음' });
+    // 사용자 대여 권한 확인
+    const sqlCheckPerm = 'SELECT rent_perm FROM user_permissions WHERE studentNum = ?';
+    db.query(sqlCheckPerm, [cookieStudentNum], (permErr, permResults) => {
+        if (permErr) {
+            console.error('[❌ 대여 권한 확인 실패]: ', permErr);
+            // 권한 확인 실패시 계속 진행 (기본적으로 대여 허용)
+        } else if (permResults.length > 0 && permResults[0].rent_perm === 0) {
+            return callback({ success: false, message: '대여 권한이 제한된 상태입니다. 관리자에게 문의하세요.' });
         }
 
-        const userName = results[0].name;
-
-        //지금은 이미 대여중인지 먼저 확인하는 순서로 시작하는데, 여기에 대여 금지상태인지 먼저 판단하는 코드를 짜면 되겠어
-        const sqlRent = 'SELECT itemName FROM Rent_status WHERE studentNum = ?';
-        db.query(sqlRent, [cookieStudentNum], (err, rentResults) => {
-            if (err) {
-                return callback({ success: false, message: '대여 내역 조회 실패' });
+        const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
+        db.query(sqlName, [cookieStudentNum], (err, results) => {
+            if (err || results.length === 0) {
+                return callback({ success: false, message: 'DB 오류 또는 사용자 없음' });
             }
 
-            const dbItemList = rentResults.map(row => row.itemName);
-            const alreadyRentedSet = new Set(dbItemList);
+            const userName = results[0].name;
 
-            const newItemsToRent = cookieItemData.filter(item => !alreadyRentedSet.has(item.itemName));
-
-
-            if (newItemsToRent.length === 0) {
-                res.clearCookie('reservedItems');
-                return res.send({
-                    success: true,
-                    message: '이미 대여된 항목입니다.',
-                    skipped: cookieItemData.map(item => item.itemName)
-                });
-            }
-
-            const insertValues = newItemsToRent.map(item => [
-                item.itemName,
-                userName,
-                item.hours,
-                new Date(),
-                cookieStudentNum
-            ]);
-
-            const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date, studentNum) VALUES ?';
-            db.query(sqlInsert, [insertValues], (err, insertResult) => {
+            const sqlRent = 'SELECT itemName FROM Rent_status WHERE studentNum = ?';
+            db.query(sqlRent, [cookieStudentNum], (err, rentResults) => {
                 if (err) {
-                    return callback({ success: false, message: '대여정보 저장 실패' });
+                    return callback({ success: false, message: '대여 내역 조회 실패' });
                 }
 
-                // ✅ Log_rent 기록 추가
-                const logValues = newItemsToRent.map(item => [userName, item.itemName]);
-                const sqlLogInsert = 'INSERT INTO Log_rent (name, itemName) VALUES ?';
-                db.query(sqlLogInsert, [logValues], (logErr) => {
-                    if (logErr) console.error('[❌ Log_rent INSERT 실패]', logErr);
-                });
+                const dbItemList = rentResults.map(row => row.itemName);
+                const alreadyRentedSet = new Set(dbItemList);
 
-                Promise.all(newItemsToRent.map(item =>
-                    new Promise((resolve, reject) => {
-                        const sqlUpdate = 'UPDATE Items SET status = 1 WHERE itemName = ?';
-                        db.query(sqlUpdate, [item.itemName], (err, results) => {
-                            if (err) reject(err);
-                            else resolve(results);
-                        });
-                    })
-                ))
-                    .then(() => {
-                        const rentedItems = newItemsToRent.map(item => `${item.itemName}(${item.hours}시간)`);
-                        callback({
-                            success: true,
-                            message: `대여 완료: ${rentedItems.join(', ')}`,
-                            rented: newItemsToRent
-                        });
-                    })
-                    .catch(err => {
-                        callback({ success: false, message: '렌트 상태 조정 실패' });
+                const newItemsToRent = cookieItemData.filter(item => !alreadyRentedSet.has(item.itemName));
+
+                if (newItemsToRent.length === 0) {
+                    return callback({
+                        success: true,
+                        message: '이미 대여된 항목입니다.',
+                        skipped: cookieItemData.map(item => item.itemName)
                     });
+                }
+
+                const insertValues = newItemsToRent.map(item => [
+                    item.itemName,
+                    userName,
+                    item.hours,
+                    new Date(),
+                    cookieStudentNum
+                ]);
+
+                const sqlInsert = 'INSERT INTO Rent_status (itemName, whoAreRent, rentToHour, date, studentNum) VALUES ?';
+                db.query(sqlInsert, [insertValues], (err, insertResult) => {
+                    if (err) {
+                        return callback({ success: false, message: '대여정보 저장 실패' });
+                    }
+
+                    // ✅ Log_rent 기록 추가 - Promise로 변환하여 완료 여부 확인
+                    const logInsertPromise = new Promise((resolve, reject) => {
+                        const logValues = newItemsToRent.map(item => [userName, item.itemName]);
+                        const sqlLogInsert = 'INSERT INTO Log_rent (name, itemName) VALUES ?';
+                        db.query(sqlLogInsert, [logValues], (logErr, logResult) => {
+                            if (logErr) {
+                                console.error('[❌ Log_rent INSERT 실패]', logErr);
+                                reject(logErr);
+                            } else {
+                                resolve(logResult);
+                            }
+                        });
+                    });
+
+                    // Items 테이블 status 업데이트
+                    const statusUpdatePromises = newItemsToRent.map(item =>
+                        new Promise((resolve, reject) => {
+                            const sqlUpdate = 'UPDATE Items SET status = 1 WHERE itemName = ?';
+                            db.query(sqlUpdate, [item.itemName], (err, results) => {
+                                if (err) reject(err);
+                                else resolve(results);
+                            });
+                        })
+                    );
+
+                    // 모든 작업이 완료된 후에 콜백 호출
+                    Promise.all([logInsertPromise, ...statusUpdatePromises])
+                        .then(() => {
+                            const rentedItems = newItemsToRent.map(item => `${item.itemName}(${item.hours}시간)`);
+                            callback({
+                                success: true,
+                                message: `대여 완료: ${rentedItems.join(', ')}`,
+                                rented: newItemsToRent
+                            });
+                        })
+                        .catch(err => {
+                            console.error('[❌ 대여 처리 중 오류]: ', err);
+                            callback({ success: false, message: '대여 처리 중 오류가 발생했습니다' });
+                        });
+                });
             });
         });
     });
