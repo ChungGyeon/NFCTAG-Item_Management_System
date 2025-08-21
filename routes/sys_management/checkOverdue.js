@@ -6,7 +6,7 @@
 * */
 const express = require('express');
 const router = express.Router();
-const { db } = require('./IMS_db');
+const { db } = require('../IMS_db');
 
 //연체자 권한 확인 및 복구 함수
 function checkAndRestoreOverdueUsers() {

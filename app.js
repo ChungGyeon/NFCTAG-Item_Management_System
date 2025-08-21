@@ -10,15 +10,15 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 //각 실행경로 설정
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
-const detCookie = require('./routes/detectCookie'); //쿠키 감지 처리 관련 라우트
+const detCookie = require('./routes/sys_management/detectCookie'); //쿠키 감지 처리 관련 라우트
 const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
 const imgProcessor = require('./routes/imgProcess'); //이미지처리 라우트
-require('./routes/generateURL'); //nfc_url에 내용 고쳐 쓰는 라우터
-const seedGenerator = require('./routes/seed-generator'); //랜덤시드 라우터
+require('./routes/sys_management/generateURL'); //nfc_url에 내용 고쳐 쓰는 라우터
+const seedGenerator = require('./routes/sys_management/seed-generator'); //랜덤시드 라우터
 const logRouter = require('./routes/log'); //장부기능
 const successionToTheThroneRouter  = require('./routes/Throne'); //회장 권한 양도 라우터
-const checkOverdueRouter = require('./routes/checkOverdue'); //연체자 권한 관리 라우터
+const checkOverdueRouter = require('./routes/sys_management/checkOverdue'); //연체자 권한 관리 라우터
 
 const app = express();
 
