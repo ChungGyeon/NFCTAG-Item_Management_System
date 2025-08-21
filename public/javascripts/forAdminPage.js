@@ -138,7 +138,6 @@ function updateItem() {
     if(textInput.value) formData.append('itemName', textInput.value);
     if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
     formData.append('originItemName', originItemName);
-    formData.append('whatIstype', whatIstype);
     fetch('/imgProcess/updateItem', {
         method: 'POST',
         body: formData
