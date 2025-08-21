@@ -60,7 +60,7 @@ router.get('/logout', (req, res) => {
 /*
 어드민이 사용하는 기능 쿼리 작성 영역
 */
-//계정추가 구문, 콜백 기반으로 리팩토링
+//계정추가 엔드포인트, 콜백 기반으로 리팩토링
 router.post('/signUpquery', (req, res) => {
   const {studentnum, name, grade, password} = req.body;
 
@@ -147,7 +147,7 @@ router.post('/signUpquery', (req, res) => {
 });
 
 
-
+//어드민이 유저계정을 확인 및 관리하기 위한 페이지 엔드포인트
 router.get('/list', (req, res) => {
   const sql = `
     SELECT
