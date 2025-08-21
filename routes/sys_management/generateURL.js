@@ -3,7 +3,7 @@ const path = require('path');
 const seedGenerator = require('./seed-generator');
 
 async function writeUrlToNfc(url) {
-    const filePath = path.join(__dirname, '../randURL', 'nfc_url.json');
+    const filePath = path.join(__dirname, '/randURL', 'nfc_url.json');
     try {
         let data = {};
         try {

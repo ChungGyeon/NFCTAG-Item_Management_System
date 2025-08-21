@@ -19,4 +19,4 @@ views/.DS_Store
 !/public/images/item_IMG/더미.gitkeep
 
 #randURL파일은 무시, 없으면 알아서 생성할거임
-/routes/randURL/
+/routes/sys_management/randURL/
