@@ -69,7 +69,7 @@ router.get('/', function(req, res, next) {//router123
             return res.redirect('/itemlist');
         }
         else if(results.length > 0) {
-            res.render('adminHub', { title: '관리자 허브'});
+            res.render('adminFolder/adminHub', { title: '관리자 허브'});
         }
         else{
             return res.status(404).send('뭔가 일어났음');
@@ -441,7 +441,7 @@ router.get('/admin',(req,res)=> {
                 console.error('DB 오류:', err);
                 return res.status(500).send('데이터베이스 오류');
             }
-            res.render('admin', { title: '관리자 페이지', items: results });
+            res.render('adminFolder/admin', { title: '관리자 페이지', items: results });
         });
     });
 });
