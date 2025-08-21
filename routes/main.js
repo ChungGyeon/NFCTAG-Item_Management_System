@@ -525,7 +525,7 @@ router.get('/admin/users', (req, res) => {
                 console.error('DB 오류:', err);
                 return res.status(500).send('데이터베이스 오류');
             }
-            res.render('users', { title: '사용자 관리', users: users });
+            res.render('adminFolder/managementUserList', { title: '사용자 관리', users: users });
         });
     });
 });
