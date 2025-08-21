@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(err => {
                 alert("⚠️ 서버 오류 발생");
                 console.error('대여 요청 에러:', err);
+                window.location.href = '/itemlist';
             });
     }
 });
