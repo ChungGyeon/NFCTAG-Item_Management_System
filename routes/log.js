@@ -1,7 +1,7 @@
 // routes/log.js
 const express = require('express');
 const router = express.Router();
-const { db } = require('./IMS_db'); // ✅ 프로젝트 내 export와 맞춰서!
+const { db } = require('./sys_management/IMS_db'); // ✅ 프로젝트 내 export와 맞춰서!
 
 // 유틸: year, month를 Date 범위로 변환 (해당 월 1일 00:00:00 ~ 다음달 1일 00:00:00)
 function getMonthRange(year, month) {

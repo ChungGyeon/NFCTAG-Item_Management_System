@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { db } = require('./IMS_db'); // DB 연결
+const { db } = require('./sys_management/IMS_db'); // DB 연결
 
 // 시간 문자열(HH:MM:SS)을 초 단위로 변환
 function timeToSeconds(timeString) {

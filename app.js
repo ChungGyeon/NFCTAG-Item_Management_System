@@ -11,7 +11,7 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
 const detCookie = require('./routes/sys_management/detectCookie'); //쿠키 감지 처리 관련 라우트
-const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+const db = require('./routes/sys_management/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
 const imgProcessor = require('./routes/imgProcess'); //이미지처리 라우트
 require('./routes/sys_management/generateURL'); //nfc_url에 내용 고쳐 쓰는 라우터

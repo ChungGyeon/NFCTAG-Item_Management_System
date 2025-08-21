@@ -24,7 +24,7 @@ const router = express.Router();
 const multer  = require('multer');
 const path = require("path");
 const fs = require('fs');
-const { db }= require('./IMS_db'); // DB 연결
+const { db }= require('./sys_management/IMS_db'); // DB 연결
 
 
 const upload = multer({

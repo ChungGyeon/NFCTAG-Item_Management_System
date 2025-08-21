@@ -4,7 +4,7 @@
 */
 const express = require('express');
 const router = express.Router();
-const { db } = require('./IMS_db');
+const { db } = require('./sys_management/IMS_db');
 
 //10~148라인은 옛날 버전, 혹시 모르니 남겨두고 추후 삭제
 // ✅ 대여 확정 및 DB 반영 라우트, 이전버전

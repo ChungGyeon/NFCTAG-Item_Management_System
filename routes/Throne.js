@@ -3,7 +3,7 @@
 * */
 const express = require('express');
 const router = express.Router();
-const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+const { db, testPageConnect } = require('./sys_management/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
 
 //페이지 접근 엔드포인트
