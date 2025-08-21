@@ -196,5 +196,41 @@ router.post('/deleteItems', (req, res) => {
 
 });
 
+//main.ejs의 대문 사진 요청 api
+router.get('/mainImg', (req, res) => {
+    const fileName = 'ITS-IMS.png';
+    const imagePath = path.join(__dirname, '../public/images/mainPageIMG', fileName);
+
+    // 파일 존재 확인
+    if (fs.existsSync(imagePath)) {
+        res.sendFile(imagePath);
+    } else {
+        res.status(404).send('이미지 파일이 존재하지 않습니다.');
+    }
+});
+
+//main.ejs의 아이템 사진 요청 api
+router.get('/itemImg/:itemName', (req, res) => {
+    const { itemName } = req.params;
+
+    // DB에서 아이템 정보 조회 (파일명만 저장되어 있음)
+    const sql = 'SELECT img FROM Items WHERE itemName = ?';
+
+    db.query(sql, [itemName], (err, result) => {
+        if (err || result.length === 0) {
+            return res.status(404).send('이미지를 찾을 수 없습니다.');
+        }
+
+        const fileName = result[0].img; // img에는 이미지 경로까지 포함해서 저장하기에 주의
+        const imagePath = path.join(__dirname, '../public/',fileName);
+        console.log('이미지 어디에있나: ', imagePath);
+        // 파일 존재 확인
+        if (fs.existsSync(imagePath)) {
+            res.sendFile(imagePath);
+        } else {
+            res.status(404).send('이미지 파일이 존재하지 않습니다.');
+        }
+    });
+});
 
 module.exports = router;

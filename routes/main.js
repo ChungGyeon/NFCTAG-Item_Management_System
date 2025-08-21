@@ -150,8 +150,7 @@ router.get('/itemlist', function(req, res, next) {
                     items: itemsWithStatus,
                     title: '물품대여소',
                     currentUser: req.session.user,
-                    overdueInfo: null,
-                    mainPhotoPath: '/images/mainPageIMG/ITS-IMS.png'
+                    overdueInfo: null
                 });
             }
 
@@ -178,7 +177,6 @@ router.get('/itemlist', function(req, res, next) {
                 title: '물품대여소',
                 currentUser: req.session.user,
                 overdueInfo: overdueInfo,
-                mainPhotoPath: '/images/mainPageIMG/ITS-IMS.png'
             });
         });
     });

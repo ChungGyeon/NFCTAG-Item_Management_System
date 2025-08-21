@@ -11,7 +11,7 @@
 <body>
 <div class="main-grid-container <%= items.some(item => item.status === 1) ? 'with-rented' : 'without-rented' %>">
   <header>
-    <img class="welcome-img" src="<%= mainPhotoPath %>" />
+    <img class="welcome-img" src="/imgProcess/mainImg" />
     <div class="indroduction-img-container">
       <p class="bottom-text">잠시 빌리려 왔습니다</p>
     </div>
@@ -57,7 +57,7 @@
               data-rent-start="<%= item.date %>">
         </span>
       </p>
-      <img src="<%= item.img %>" alt="<%= item.itemName %>" />
+      <img src="/imgProcess/itemImg/<%= item.itemName %>" alt="<%= item.itemName %>" />
       <% if (currentUser && item.studentNum === currentUser.studentnum) { %>
         <div class="item-buttons">
           <button onclick="reserveFromServer2('<%= item.itemName %>')">반납예약</button>
@@ -78,7 +78,7 @@
     <div class="itemDetail-card not-rented" data-item-name="<%= item.itemName %>">
       <input type="hidden" name="status" value="<%= item.status %>">
       <h3><%= item.itemName %></h3>
-      <img src="<%= item.img %>" alt="<%= item.itemName %>" />
+      <img src="/imgProcess/itemImg/<%= item.itemName %>" alt="<%= item.itemName %>" />
       <div class="item-buttons">
         <% if (overdueInfo && overdueInfo.isRestricted) { %>
           <!-- 연체자는 예약 불가 -->
