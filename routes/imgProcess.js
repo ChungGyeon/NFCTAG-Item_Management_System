@@ -223,7 +223,7 @@ router.get('/itemImg/:itemName', (req, res) => {
 
         const fileName = result[0].img; // img에는 이미지 경로까지 포함해서 저장하기에 주의
         const imagePath = path.join(__dirname, '../public/',fileName);
-        console.log('이미지 어디에있나: ', imagePath);
+        //console.log('이미지 어디에있나: ', imagePath); //디버깅용 로그
         // 파일 존재 확인
         if (fs.existsSync(imagePath)) {
             res.sendFile(imagePath);

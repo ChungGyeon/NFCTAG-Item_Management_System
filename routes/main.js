@@ -83,7 +83,7 @@ router.get('/itemlist', function(req, res, next) {
     if (!req.session.user) {
         return res.redirect('/users/login');
     }
-    const sql = 'SELECT I.itemName, I.img, I.status, R.whoAreRent, R.studentNum, R.date, R.rentToHour FROM Items I LEFT JOIN Rent_status R ON I.itemName = R.itemName';
+    const sql = 'SELECT I.itemName, I.status, R.whoAreRent, R.studentNum, R.date, R.rentToHour FROM Items I LEFT JOIN Rent_status R ON I.itemName = R.itemName';
 
     db.query(sql, (err, items) => {
         if (err) {
