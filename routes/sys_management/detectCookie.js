@@ -48,7 +48,7 @@ router.get('/startRentingItem/:seed',(req,res) => {
 
     if (urlSeed === currentSeed || urlSeed === lastSeed) {
      if (!req.session.user) {
-         return res.status(404).send('로그인부터 하고 오십쇼');
+         return res.status(403).send('로그인부터 하고 오십쇼');
      }
      res.render('ckCookie',{title:"ITS-IMS : 쿠키 읽는 중"});
     } else {
