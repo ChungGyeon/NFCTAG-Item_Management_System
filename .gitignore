@@ -14,8 +14,8 @@
 #.DS_Store파일 무시
 views/.DS_Store
 
-#이미지 파일 무시
-/public/images/*
+#아이템 부분 이미지만 무시
+/public/images/item_IMG
 
 #randURL파일은 무시, 없으면 알아서 생성할거임
 /routes/randURL/
