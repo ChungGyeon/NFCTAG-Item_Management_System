@@ -16,6 +16,7 @@ views/.DS_Store
 
 #아이템 부분 이미지만 무시
 /public/images/item_IMG/*
+!/public/images/item_IMG/.gitkeep
 
 #randURL파일은 무시, 없으면 알아서 생성할거임
 /routes/randURL/
