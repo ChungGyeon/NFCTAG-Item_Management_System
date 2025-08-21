@@ -148,6 +148,7 @@ router.get('/check', (req, res) => {
     res.json({ success: true, message: '연체자 권한 확인을 실행했습니다.' });
 });
 
+//대여권한 수동제한 엔드포인트, 이 역시 사용x
 router.post('/restrict/:studentNum', (req, res) => {
     const { studentNum } = req.params;
     const { reason } = req.body;
