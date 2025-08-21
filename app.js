@@ -85,11 +85,11 @@ app.use('/rent', verifyRouter);
 app.use('/log', logRouter);
 app.use('/Throne',successionToTheThroneRouter);
 app.use('/checkOverdue', checkOverdueRouter);
-/*
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));ve
-});*/
+    next(createError(404));
+});
+
 
 //module.exports = app;
 const SubpoRt = 3001;
