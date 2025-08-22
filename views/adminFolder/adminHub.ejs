@@ -7,7 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="/stylesheets/adminHub.css" rel="stylesheet" />
-    <script src="/javascripts/formainPage.js" defer></script>
+    <script src="/javascripts/adminHub.js" defer></script>
+    <script src="/javascripts/forAdminPage.js" defer></script>
 </head>
 <body>
     <div class="admin-hub-container">
@@ -18,6 +19,7 @@
             </div>
             <div class="user-info">
                 <span>관리자: <%= user ? user.name : '관리자' %></span>
+                <button id="helpBtn" class="help-btn"><i class="fas fa-question-circle"></i> 도움말</button>
                 <a href="/users/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
             </div>
         </header>
@@ -29,11 +31,21 @@
                 <p>대부분의 기능은 관리자페이지에서 수행가능합니다.</p>
             </div>
 
+            <!-- 안내 배너 -->
+            <div class="help-banner">
+                <i class="fas fa-lightbulb"></i>
+                <p>각 기능에 대한 설명이 필요하시면 아이콘을 클릭하세요 <span><i class="fas fa-info-circle help-icon"></i></span></p>
+                <button class="close-banner"><i class="fas fa-times"></i></button>
+            </div>
+
             <div class="admin-hub-grid">
                 <!-- 기본 기능 섹션 -->
                 <div class="feature-section">
                     <div class="section-header">
-                        <h3><i class="fas fa-cogs"></i> 기본 기능</h3>
+                        <h3>
+                            <i class="fas fa-cogs"></i> 기본 기능
+                            <i class="fas fa-info-circle help-icon" data-help="basic"></i>
+                        </h3>
                     </div>
                     <div class="button-container">
                         <button class="admin-btn primary-btn" onclick="location.href='/itemlist'">
@@ -50,7 +62,10 @@
                 <!-- 로그 및 통계 섹션 -->
                 <div class="feature-section">
                     <div class="section-header">
-                        <h3><i class="fas fa-chart-line"></i> 로그 및 통계</h3>
+                        <h3>
+                            <i class="fas fa-chart-line"></i> 로그 및 통계
+                            <i class="fas fa-info-circle help-icon" data-help="logs"></i>
+                        </h3>
                     </div>
                     <div class="button-container">
                         <button class="admin-btn secondary-btn" onclick="location.href='/log'">
@@ -60,17 +75,41 @@
                     </div>
                 </div>
 
+                <!-- 계정관리 섹션 -->
+                <div class="feature-section">
+                    <div class="section-header">
+                        <h3>
+                            <i class="fas fa-tools"></i> 계정 관리
+                            <i class="fas fa-info-circle help-icon" data-help="system"></i>
+                        </h3>
+                    </div>
+                    <div class="button-container">
+                        <button class="admin-btn tertiary-btn" onclick="location.href='/admin/users'">
+                            <i class="fas fa-users"></i>
+                            <span>계정 관리</span>
+                        </button>
+
+                        <!-- 계정 추가 모달 -->
+                        <button class="admin-btn tertiary-btn" onclick="OpenAddAcountModal()">
+                            <i class="fas fa-user-cog"></i>
+                            <span>사용자 추가</span>
+                        </button>
+                    </div>
+                </div>
 
                 <!-- 향후 확장 가능한 빈 섹션 -->
                 <div class="feature-section expandable">
                     <div class="section-header">
-                        <h3><i class="fas fa-puzzle-piece"></i> 확장 기능</h3>
+                        <h3>
+                            <i class="fas fa-puzzle-piece"></i> 확장 기능
+                            <i class="fas fa-info-circle help-icon" data-help="expansion"></i>
+                        </h3>
                     </div>
                     <div class="button-container">
                         <!-- 향후 버튼이 추가될 예정인 공간 -->
                         <div class="placeholder">
                             <i class="fas fa-plus-circle"></i>
-                            <span>새로운 기능 추가 가능, html등 작성으로 가능</span>
+                            <span>새로운 기능 추가 가능</span>
                         </div>
                     </div>
                 </div>
@@ -81,5 +120,53 @@
             <p>&copy; <%= new Date().getFullYear() %> 물품 관리 시스템 - 관리자 허브</p>
         </footer>
     </div>
+
+    <!-- 도움말 모달 -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-book"></i> 관리자 허브 사용 가이드</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="helpContent">
+                    <!-- 동적으로 내용이 채워질 부분 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="close-btn">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!--계정 생성용 모달 수정한다면 admin.ejs 53라인에 동일한 모달 존재, 이를 같이 수정-->
+    <!-- 대충 집어넣은거라 관련 함수도 대충 끌어다 온겁니다. 수정할땐 머리아프긴 할듯해요 ㅋㅋ...-->
+    <section aria-hidden="true">
+        <div id="AddAcountModal" class="AddAcountModal">
+            <div class="AddAcountModal-content">
+                <span class="close" onclick="CloseModal()" role="button" aria-label="닫기">&times;</span>
+                <p>계정추가</p><br />
+                <div class="signUp-container">
+                    <form method="POST" onsubmit="signUpquery(); return false;">
+                        <label for="grade">학년</label>
+                        <input type="number" id="grade" name="grade" required />
+
+                        <label for="name">이름</label>
+                        <input type="text" id="name" name="name" required />
+
+                        <label for="studentnum">학번</label>
+                        <input type="number" id="studentnum" name="studentnum" required />
+
+                        <label for="password">비밀번호</label>
+                        <input type="password" id="password" name="password" required />
+
+                        <div class="AddAcountModal-buttons">
+                            <button type="submit">추가</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 </html>
