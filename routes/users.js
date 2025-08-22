@@ -6,13 +6,16 @@ const express = require('express');
 const router = express.Router();
 const { db, testPageConnect } = require('./sys_management/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
+
 router.get('/', (req, res) => {
     res.render('login');
 })
 
+
 router.get('/login', (req, res) => {
   res.render('login', {title: '로그인'});
 });
+
 
 
 router.post('/login', async (req, res) => { //login
