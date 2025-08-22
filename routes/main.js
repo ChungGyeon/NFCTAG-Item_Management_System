@@ -72,7 +72,7 @@ router.get('/', function(req, res, next) {//router123
             return res.redirect('/itemlist');
         }
         else if(results.length > 0) {
-            res.render('adminFolder/adminHub', { title: '관리자 허브'});
+            res.render('adminFolder/adminHub', { title: '관리자 허브', user: req.session.user });
         }
         else{
             return res.status(404).send('뭔가 일어났음');

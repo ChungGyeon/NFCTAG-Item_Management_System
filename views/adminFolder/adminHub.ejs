@@ -4,12 +4,82 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title><%= baseTitle %> <%= title %></title>
-    <link href="/stylesheets/forAdmin.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="/stylesheets/adminHub.css" rel="stylesheet" />
     <script src="/javascripts/formainPage.js" defer></script>
 </head>
 <body>
-<button onclick="location.href='/itemlist'"> 아이템 대여소로 </button>
-<button onclick="location.href='/admin'"> 어드민 관리자로 </button>
-</div>
+    <div class="admin-hub-container">
+        <header class="admin-hub-header">
+            <div class="logo-container">
+                <i class="fas fa-shield-alt"></i>
+                <h1>ITS-IMS</h1>
+            </div>
+            <div class="user-info">
+                <span>관리자: <%= user ? user.name : '관리자' %></span>
+                <a href="/users/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
+            </div>
+        </header>
+
+        <main class="admin-hub-content">
+            <div class="section-title">
+                <h2>시스템 관리</h2>
+                <p>계정 추가를 제외한 모든 계정 수정 권한은 회장에게 있습니다.</p>
+                <p>대부분의 기능은 관리자페이지에서 수행가능합니다.</p>
+            </div>
+
+            <div class="admin-hub-grid">
+                <!-- 기본 기능 섹션 -->
+                <div class="feature-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-cogs"></i> 기본 기능</h3>
+                    </div>
+                    <div class="button-container">
+                        <button class="admin-btn primary-btn" onclick="location.href='/itemlist'">
+                            <i class="fas fa-box-open"></i>
+                            <span>아이템 대여소</span>
+                        </button>
+                        <button class="admin-btn primary-btn" onclick="location.href='/admin'">
+                            <i class="fas fa-user-cog"></i>
+                            <span>관리자 페이지</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 로그 및 통계 섹션 -->
+                <div class="feature-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-chart-line"></i> 로그 및 통계</h3>
+                    </div>
+                    <div class="button-container">
+                        <button class="admin-btn secondary-btn" onclick="location.href='/log'">
+                            <i class="fas fa-book"></i>
+                            <span>대여/반납 로그</span>
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- 향후 확장 가능한 빈 섹션 -->
+                <div class="feature-section expandable">
+                    <div class="section-header">
+                        <h3><i class="fas fa-puzzle-piece"></i> 확장 기능</h3>
+                    </div>
+                    <div class="button-container">
+                        <!-- 향후 버튼이 추가될 예정인 공간 -->
+                        <div class="placeholder">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>새로운 기능 추가 가능, html등 작성으로 가능</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="admin-hub-footer">
+            <p>&copy; <%= new Date().getFullYear() %> 물품 관리 시스템 - 관리자 허브</p>
+        </footer>
+    </div>
 </body>
 </html>
