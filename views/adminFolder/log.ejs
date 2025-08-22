@@ -2,54 +2,88 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= baseTitle %><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="/stylesheets/forAdmin.css" rel="stylesheet" />
     <link href="/stylesheets/forLog.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 <div class="log-container">
     <header class="log-header">
-        <h1>장부 열람</h1>
+        <h1><i class="fas fa-book"></i> 대여/반납 장부 열람</h1>
         <div class="month-nav">
             <% if (hasPrev) { %>
-                <a class="nav-btn" href="<%= prevLink %>">← 이전 달</a>
+                <a class="nav-btn" href="<%= prevLink %>"><i class="fas fa-chevron-left"></i> 이전 달</a>
             <% } else { %>
-                <span class="nav-btn disabled">← 이전 달</span>
+                <span class="nav-btn disabled"><i class="fas fa-chevron-left"></i> 이전 달</span>
             <% } %>
 
-            <span class="month-label"><%= ymLabel %></span>
+            <span class="month-label"><i class="far fa-calendar-alt"></i> <%= ymLabel %></span>
 
             <% if (hasNext) { %>
-                <a class="nav-btn" href="<%= nextLink %>">다음 달 →</a>
+                <a class="nav-btn" href="<%= nextLink %>">다음 달 <i class="fas fa-chevron-right"></i></a>
             <% } else { %>
-                <span class="nav-btn disabled">다음 달 →</span>
+                <span class="nav-btn disabled">다음 달 <i class="fas fa-chevron-right"></i></span>
             <% } %>
         </div>
     </header>
 
     <% if (!logs || logs.length === 0) { %>
         <div class="no-log">
+            <i class="fas fa-search" style="font-size: 3rem; color: #bdc3c7; margin-bottom: 1rem;"></i>
             <p>해당 월의 기록이 없습니다.</p>
             <% if (!hasNext) { %>
                 <p class="no-more">이후 기록은 없습니다.</p>
             <% } %>
         </div>
     <% } else { %>
+        <div class="log-stats">
+            <div class="stat-box">
+                <i class="fas fa-exchange-alt"></i>
+                <span class="stat-label">총 활동 수</span>
+                <span class="stat-value"><%= logs.length %></span>
+            </div>
+            <div class="stat-box">
+                <i class="fas fa-arrow-down"></i>
+                <span class="stat-label">대여 건수</span>
+                <span class="stat-value"><%= logs.filter(log => log.action === '대여').length %></span>
+            </div>
+            <div class="stat-box">
+                <i class="fas fa-arrow-up"></i>
+                <span class="stat-label">반납 건수</span>
+                <span class="stat-value"><%= logs.filter(log => log.action === '반납').length %></span>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="logSearch" placeholder="물품명, 이름으로 검색..." />
+            <button id="searchBtn"><i class="fas fa-search"></i></button>
+        </div>
+
         <main class="log-table-wrapper">
-            <table class="log-table">
+            <table class="log-table" id="logTable">
                 <thead>
                 <tr>
-                    <th>시간</th>
-                    <th>구분</th>
-                    <th>물품명</th>
-                    <th>이름</th>
+                    <th><i class="far fa-clock"></i> 시간</th>
+                    <th><i class="fas fa-tag"></i> 구분</th>
+                    <th><i class="fas fa-box"></i> 물품명</th>
+                    <th><i class="fas fa-user"></i> 이름</th>
                 </tr>
                 </thead>
                 <tbody>
                 <% logs.forEach(row => { %>
                     <tr>
                         <td><%= new Date(row.at).toLocaleString('ko-KR', { hour12: false }) %></td>
-                        <td class="<%= row.action === '대여' ? 'rent' : 'return' %>"><%= row.action %></td>
+                        <td class="<%= row.action === '대여' ? 'rent' : 'return' %>">
+                            <% if (row.action === '대여') { %>
+                                <i class="fas fa-arrow-down"></i>
+                            <% } else { %>
+                                <i class="fas fa-arrow-up"></i>
+                            <% } %>
+                            <%= row.action %>
+                        </td>
                         <td><%= row.itemName %></td>
                         <td><%= row.name %></td>
                     </tr>
@@ -57,11 +91,159 @@
                 </tbody>
             </table>
         </main>
+
+        <div class="pagination">
+            <span>페이지:</span>
+            <div class="page-numbers" id="pagination"></div>
+        </div>
     <% } %>
 
     <footer class="log-footer">
-        <a class="back-admin" href="/admin">← 관리자 페이지로</a>
+        <a class="back-admin" href="/admin"><i class="fas fa-arrow-left"></i> 관리자 페이지로</a>
     </footer>
 </div>
+
+<script>
+    // 페이지네이션 및 검색 기능
+    document.addEventListener('DOMContentLoaded', function() {
+        const logTable = document.getElementById('logTable');
+        if (!logTable) return;
+
+        const tableRows = logTable.querySelectorAll('tbody tr');
+        const rowsPerPage = 10;
+        let currentPage = 1;
+
+        // 페이지네이션 생성
+        function setupPagination() {
+            const pageCount = Math.ceil(tableRows.length / rowsPerPage);
+            const paginationEl = document.getElementById('pagination');
+
+            paginationEl.innerHTML = '';
+
+            if (pageCount <= 1) return;
+
+            // 이전 버튼
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('span');
+                prevBtn.classList.add('page-btn');
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevBtn.addEventListener('click', () => {
+                    currentPage--;
+                    showTableRows();
+                    setupPagination();
+                });
+                paginationEl.appendChild(prevBtn);
+            }
+
+            // 페이지 번호
+            for (let i = 1; i <= pageCount; i++) {
+                const pageBtn = document.createElement('span');
+                pageBtn.classList.add('page-num');
+                if (i === currentPage) pageBtn.classList.add('active');
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    showTableRows();
+                    setupPagination();
+                });
+                paginationEl.appendChild(pageBtn);
+            }
+
+            // 다음 버튼
+            if (currentPage < pageCount) {
+                const nextBtn = document.createElement('span');
+                nextBtn.classList.add('page-btn');
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextBtn.addEventListener('click', () => {
+                    currentPage++;
+                    showTableRows();
+                    setupPagination();
+                });
+                paginationEl.appendChild(nextBtn);
+            }
+        }
+
+        // 해당 페이지 행 표시
+        function showTableRows() {
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+
+            tableRows.forEach((row, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // 검색 기능
+        const searchInput = document.getElementById('logSearch');
+        const searchBtn = document.getElementById('searchBtn');
+
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            let visibleCount = 0;
+
+            tableRows.forEach(row => {
+                const itemName = row.cells[2].textContent.toLowerCase();
+                const userName = row.cells[3].textContent.toLowerCase();
+
+                if (itemName.includes(searchTerm) || userName.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // 검색 결과가 없을 때 메시지 표시
+            const tbody = logTable.querySelector('tbody');
+            let noResultRow = document.getElementById('noResultRow');
+
+            if (visibleCount === 0 && searchTerm !== '') {
+                if (!noResultRow) {
+                    noResultRow = document.createElement('tr');
+                    noResultRow.id = 'noResultRow';
+                    const cell = document.createElement('td');
+                    cell.colSpan = 4;
+                    cell.textContent = '검색 결과가 없습니다.';
+                    cell.style.textAlign = 'center';
+                    cell.style.padding = '2rem';
+                    noResultRow.appendChild(cell);
+                    tbody.appendChild(noResultRow);
+                }
+            } else if (noResultRow) {
+                noResultRow.remove();
+            }
+
+            // 검색 시 페이지네이션 비활성화
+            if (searchTerm === '') {
+                currentPage = 1;
+                showTableRows();
+                setupPagination();
+                document.querySelector('.pagination').style.display = '';
+            } else {
+                document.querySelector('.pagination').style.display = 'none';
+            }
+        }
+
+        if (searchBtn) {
+            searchBtn.addEventListener('click', performSearch);
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        }
+
+        // 초기 실행
+        showTableRows();
+        setupPagination();
+    });
+</script>
 </body>
 </html>

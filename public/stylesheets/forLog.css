@@ -1,0 +1,371 @@
+/* 로그 페이지 스타일 */
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --warning-color: #e74c3c;
+  --background-color: #f5f7fa;
+  --text-color: #2c3e50;
+  --border-color: #ddd;
+  --hover-color: #f1f1f1;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.log-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+/* 헤더 스타일 */
+.log-header {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.log-header h1 {
+  font-size: 2.5rem;
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+  text-align: center;
+}
+
+.month-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.month-label {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-color);
+  background-color: rgba(52, 152, 219, 0.1);
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+}
+
+.nav-btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.nav-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav-btn.disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 통계 박스 스타일 */
+.log-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  flex: 1;
+  min-width: 200px;
+  background-color: white;
+  padding: 1.5rem;
+  margin: 0 0.5rem 1rem 0.5rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-5px);
+}
+
+.stat-box i {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.stat-box .stat-label {
+  display: block;
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin-bottom: 0.5rem;
+}
+
+.stat-box .stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+/* 검색 바 */
+.search-bar {
+  display: flex;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: none;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-bar button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-bar button:hover {
+  background-color: #2980b9;
+}
+
+/* 테이블 스타일 */
+.log-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  font-size: 1rem;
+}
+
+.log-table thead {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.log-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: bold;
+}
+
+.log-table tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+.log-table tbody tr:hover {
+  background-color: var(--hover-color);
+}
+
+.log-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* 대여/반납 구분 색상 */
+.log-table .rent {
+  color: var(--secondary-color);
+  font-weight: bold;
+  background-color: rgba(46, 204, 113, 0.1);
+  border-radius: 4px;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.log-table .return {
+  color: var(--warning-color);
+  font-weight: bold;
+  background-color: rgba(231, 76, 60, 0.1);
+  border-radius: 4px;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+/* 페이지네이션 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+}
+
+.pagination span {
+  margin-right: 0.5rem;
+  color: #7f8c8d;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+}
+
+.page-num {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 0.3rem;
+  border-radius: 50%;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.page-num:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.page-num.active {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+}
+
+.page-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 0.3rem;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.page-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* 기록 없음 스타일 */
+.no-log {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  border: 1px dashed var(--border-color);
+}
+
+.no-log p {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  color: #7f8c8d;
+}
+
+.no-log .no-more {
+  font-size: 1rem;
+  color: #95a5a6;
+  font-style: italic;
+}
+
+/* 푸터 스타일 */
+.log-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.back-admin {
+  display: inline-block;
+  background-color: var(--text-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.back-admin:hover {
+  background-color: #1a252f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .log-container {
+    padding: 1rem;
+    margin: 1rem;
+  }
+
+  .log-header h1 {
+    font-size: 2rem;
+  }
+
+  .month-label {
+    font-size: 1.2rem;
+  }
+
+  .nav-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .log-table th,
+  .log-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .stat-box {
+    min-width: 100%;
+    margin: 0 0 1rem 0;
+  }
+
+  .search-bar {
+    flex-direction: column;
+    border-radius: 8px;
+  }
+
+  .search-bar input {
+    border-radius: 8px 8px 0 0;
+  }
+
+  .search-bar button {
+    padding: 0.75rem;
+    border-radius: 0 0 8px 8px;
+  }
+}
