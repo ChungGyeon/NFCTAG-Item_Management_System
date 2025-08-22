@@ -106,7 +106,7 @@ router.get('/:year/:month', (req, res) => {
                 const nextY = nextDate.getFullYear();
                 const nextM = String(nextDate.getMonth() + 1).padStart(2, '0');
 
-                res.render('log', {
+                res.render('adminFolder/log', {
                     // res.locals.baseTitle는 app.js에서 이미 세팅됨
                     title: ' | 장부 열람',
                     ymLabel,
