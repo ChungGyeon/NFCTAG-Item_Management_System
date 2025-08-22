@@ -22,6 +22,8 @@ const checkOverdueRouter = require('./routes/sys_management/checkOverdue'); //�
 
 const app = express();
 
+
+
 //베이스타이틀 지정
 app.use((req, res, next) => {
     res.locals.baseTitle = 'ITS-IMS';
@@ -31,7 +33,6 @@ app.use((req, res, next) => {
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -56,18 +57,25 @@ app.use('/:seed', (req, res, next) => {
     req.lastSeed = lastSeed;
     next();
 }, mainRouter);*/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//경로지정
+//랜덤시드 적용방법
+//app.use('/detect', detCookie);
+//혹은 69라인처럼
 app.use('/', mainRouter);
 app.use('/users', usersRouter);
 app.use('/imgProcess',imgProcessor);
-//랜덤시드 적용
-//app.use('/detect', detCookie);
 app.use('/:seed', (req, res, next) => {
     req.currentSeed = seedGenerator.currentSeed;
     req.lastSeed = seedGenerator.lastSeed;
     next();
 }, detCookie);
 
-
+app.use('/rent', verifyRouter);
+app.use('/log', logRouter);
+app.use('/Throne',successionToTheThroneRouter);
+app.use('/checkOverdue', checkOverdueRouter);
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -80,11 +88,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-
-app.use('/rent', verifyRouter);
-app.use('/log', logRouter);
-app.use('/Throne',successionToTheThroneRouter);
-app.use('/checkOverdue', checkOverdueRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     next(createError(404));
