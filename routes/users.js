@@ -4,15 +4,18 @@
  */
 const express = require('express');
 const router = express.Router();
-const { db, testPageConnect } = require('./IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+const { db, testPageConnect } = require('./sys_management/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+
 
 router.get('/', (req, res) => {
     res.render('login');
 })
 
+
 router.get('/login', (req, res) => {
   res.render('login', {title: '로그인'});
 });
+
 
 
 router.post('/login', async (req, res) => { //login
@@ -60,7 +63,7 @@ router.get('/logout', (req, res) => {
 /*
 어드민이 사용하는 기능 쿼리 작성 영역
 */
-//계정추가 구문, 콜백 기반으로 리팩토링
+//계정추가 엔드포인트, 콜백 기반으로 리팩토링
 router.post('/signUpquery', (req, res) => {
   const {studentnum, name, grade, password} = req.body;
 
@@ -147,7 +150,7 @@ router.post('/signUpquery', (req, res) => {
 });
 
 
-
+//어드민이 유저계정을 확인 및 관리하기 위한 페이지 엔드포인트
 router.get('/list', (req, res) => {
   const sql = `
     SELECT

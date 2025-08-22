@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { db } = require('./IMS_db'); // DB 연결
+const { db } = require('./sys_management/IMS_db'); // DB 연결
 
 // 시간 문자열(HH:MM:SS)을 초 단위로 변환
 function timeToSeconds(timeString) {
@@ -31,6 +31,9 @@ function formatTime(seconds) {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//엔드포인트
+//어드민 관련 내용은 418라인부터
 router.get('/', function(req, res, next) {//router123
     const urlSeed = req.baseUrl.replace('/', ''); // /abcdef1234 → abcdef1234
     const { currentSeed, lastSeed } = req;
@@ -69,7 +72,7 @@ router.get('/', function(req, res, next) {//router123
             return res.redirect('/itemlist');
         }
         else if(results.length > 0) {
-            res.render('adminHub', { title: '관리자 허브'});
+            res.render('adminFolder/adminHub', { title: '관리자 허브'});
         }
         else{
             return res.status(404).send('뭔가 일어났음');
@@ -181,7 +184,10 @@ router.get('/itemlist', function(req, res, next) {
         });
     });
 });
-/* 예약하기
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* 주요 로직
+        예약하기
 * 쿠키도 여기서 구워줌
 */
 router.post('/reservation', (req, res) => {
@@ -409,7 +415,7 @@ router.post('/reservation/cancel2', (req, res) => {
 
 
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
 어드민 관련 엔드포인트
@@ -441,7 +447,7 @@ router.get('/admin',(req,res)=> {
                 console.error('DB 오류:', err);
                 return res.status(500).send('데이터베이스 오류');
             }
-            res.render('admin', { title: '관리자 페이지', items: results });
+            res.render('adminFolder/admin', { title: '관리자 페이지', items: results });
         });
     });
 });
@@ -525,7 +531,7 @@ router.get('/admin/users', (req, res) => {
                 console.error('DB 오류:', err);
                 return res.status(500).send('데이터베이스 오류');
             }
-            res.render('users', { title: '사용자 관리', users: users });
+            res.render('adminFolder/managementUserList', { title: '사용자 관리', users: users });
         });
     });
 });

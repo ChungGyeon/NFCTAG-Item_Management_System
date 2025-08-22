@@ -1,7 +1,7 @@
 // routes/log.js
 const express = require('express');
 const router = express.Router();
-const { db } = require('./IMS_db'); // ✅ 프로젝트 내 export와 맞춰서!
+const { db } = require('./sys_management/IMS_db'); // ✅ 프로젝트 내 export와 맞춰서!
 
 // 유틸: year, month를 Date 범위로 변환 (해당 월 1일 00:00:00 ~ 다음달 1일 00:00:00)
 function getMonthRange(year, month) {
@@ -14,6 +14,9 @@ function getMonthRange(year, month) {
     const end = new Date(y, m, 1, 0, 0, 0);
     return { start, end };
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//엔드포인트
 
 // /log → 오늘 연-월로 리다이렉트
 router.get('/', (req, res) => {
@@ -103,7 +106,7 @@ router.get('/:year/:month', (req, res) => {
                 const nextY = nextDate.getFullYear();
                 const nextM = String(nextDate.getMonth() + 1).padStart(2, '0');
 
-                res.render('log', {
+                res.render('adminFolder/log', {
                     // res.locals.baseTitle는 app.js에서 이미 세팅됨
                     title: ' | 장부 열람',
                     ymLabel,

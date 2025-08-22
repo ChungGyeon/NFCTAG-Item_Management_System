@@ -1,13 +1,14 @@
 /*
-* 예약리스트 쿠키를 검증하여 예약을 진행하는 라우터
+* 예약리스트 쿠키를 검증하여 예약(대여,반납)을 진행하는 라우터
 * 취소도 여기서 처리함
 */
 const express = require('express');
 const router = express.Router();
-const { db } = require('./IMS_db');
+const { db } = require('./sys_management/IMS_db');
 
 //10~148라인은 옛날 버전, 혹시 모르니 남겨두고 추후 삭제
 // ✅ 대여 확정 및 DB 반영 라우트, 이전버전
+/*
 router.post('/verify-step2', (req, res) => {
     const sessionUser = req.session.user;
     const cookieReserved = req.cookies.reservedItems;
@@ -224,12 +225,13 @@ router.post('/cancel', (req, res) => {
     });
 });
 
+*/
 
-const actionMode ={
-    rent: handleRental,
-    return: handleReturn,
-};
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 이 라우터의 메인 로직 엔드포인트
+/*
+* 대여와 반납 예약 쿠키를 불러와 안에 내용이 있으면 각 처리하는 라우터
+* */
 router.post('/verify-step3', (req, res) => {
     const sessionUser = req.session.user;
     const cookieReserved = req.cookies.reservedItems;
@@ -317,6 +319,7 @@ router.post('/verify-step3', (req, res) => {
         });
 });
 
+//대여를 처리하는 함수
 function handleRental(req, res, cookieStudentNum, cookieItemData, callback) {
     // 사용자 대여 권한 확인
     const sqlCheckPerm = 'SELECT rent_perm FROM user_permissions WHERE studentNum = ?';
@@ -414,7 +417,7 @@ function handleRental(req, res, cookieStudentNum, cookieItemData, callback) {
     });
 }
 
-//여러개 한번에 반납하면 Log_rent에 하나만 입력됨, 이거 고쳐야해
+//반납을 처리하는 함수
 function handleReturn(req, res, cookieStudentNum ,cookieItemList, callback) {
     const sqlName = 'SELECT name FROM Users WHERE studentNum = ?';
     db.query(sqlName, [cookieStudentNum], (err, results) => {

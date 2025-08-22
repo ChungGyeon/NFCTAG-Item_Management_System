@@ -2,8 +2,9 @@ const fs = require('fs').promises;
 const path = require('path');
 const seedGenerator = require('./seed-generator');
 
+//nfc_url.json에 생성된 랜덤주소 입력하는 함수
 async function writeUrlToNfc(url) {
-    const filePath = path.join(__dirname, 'randURL', 'nfc_url.json');
+    const filePath = path.join(__dirname, '/randURL', 'nfc_url.json');
     try {
         let data = {};
         try {
@@ -27,7 +28,11 @@ async function writeUrlToNfc(url) {
     }
 }
 
-
+/*
+랜덤함수 쓰는 함수
+이곳에서 랜덤함수 접속 URL을 지정하고
+url 생성 시간을 정하는 함수
+ */
 async function generateAndWriteUrl() {
     setInterval(async () => {
         const currentSeed = seedGenerator.getCurrentSeed();

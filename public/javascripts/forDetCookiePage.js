@@ -16,11 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.href = '/itemlist';
                 } else {
                     alert("❌ 실패: " + data.message);
+                    location.href = '/itemlist';
                 }
             })
             .catch(err => {
                 alert("⚠️ 서버 오류 발생");
                 console.error('대여 요청 에러:', err);
+                location.href = '/itemlist';
             });
     }
 });

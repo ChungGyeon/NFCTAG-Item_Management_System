@@ -24,7 +24,7 @@ const router = express.Router();
 const multer  = require('multer');
 const path = require("path");
 const fs = require('fs');
-const { db }= require('./IMS_db'); // DB 연결
+const { db }= require('./sys_management/IMS_db'); // DB 연결
 
 
 const upload = multer({
@@ -49,7 +49,8 @@ const upload = multer({
     })
 });
 
-//menu_modify.ejs에서 이미지 선택 후 업로드 클릭 시 서버 로그에 파일 디테일을 출력함, 336~342line
+
+//어드민 물건수정 중 이미지 수정에 사용되는 거
 router.post('/updateItem', upload.single('image'), (req, res) => {
     try {
         if (!req.file && !req.body.itemName) { //이미지랑 수정된 이름 둘다 제공 x시
@@ -110,7 +111,7 @@ router.post('/updateItem', upload.single('image'), (req, res) => {
 });
 
 
-// 관리자 물건 추가 라우트
+// 관리자 물건 추가시 사진을 넣는 용도 라우트
 router.post('/addItem', upload.single('itemImg'), (req, res) => {
     const { itemName } = req.body;
     const itemImg = req.file;
