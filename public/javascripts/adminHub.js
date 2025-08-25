@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP 에러!: ${response.status}`);
                 }
                 return response.text();
             })
