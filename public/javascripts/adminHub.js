@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const helpIcons = document.querySelectorAll('.help-icon');
     const helpBanner = document.querySelector('.help-banner');
     const closeBanner = document.querySelector('.close-banner');
+    //계정 추가 모달 관련 요소들
+    const addAccountModal = document.getElementById('AddAcountModal');
+    const openAddAccountBtn = document.getElementById('openAddAccountBtn');
+    const closeAddAccountBtn = document.getElementById('closeAddAccountModal');
+    const addAccountForm = document.getElementById('addAccountForm');
 
     // 도움말 데이터
     const helpData = {
@@ -175,10 +180,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
     }
 
-    //계정 생성용 모달 오픈
-    function OpenAddAcountModal() {
-        document.getElementById("AddAcountModal").style.display = "block";
-    }
 
     // 모달 닫기 함수
     function closeModalFunc() {
@@ -186,10 +187,60 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = ''; // 배경 스크롤 복원
     }
 
+    // 계정 추가 모달 열기
+    function openAddAccountModal() {
+        addAccountModal.style.display = "block";
+    }
+
+    // 계정 추가 모달 닫기
+    function closeAddAccountModal() {
+        addAccountModal.style.display = "none";
+    }
+
+    // 계정 추가 처리
+    function handleSignUp(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        // FormData를 URLSearchParams로 변환
+        const params = new URLSearchParams();
+        for (const [key, value] of formData) {
+            params.append(key, value);
+        }
+
+        fetch('/users/signUpquery', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString()
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert('계정이 성공적으로 추가되었습니다.');
+                form.reset();
+                closeAddAccountModal();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('계정 추가에 실패했습니다: ' + error.message);
+            });
+    }
+
     // 이벤트 리스너 설정
     helpBtn.addEventListener('click', () => openModal('general'));
     closeModalBtn.addEventListener('click', closeModalFunc);
     closeBtn.addEventListener('click', closeModalFunc);
+    //계정추가 모달 관련
+    openAddAccountBtn.addEventListener('click', openAddAccountModal);
+    closeAddAccountBtn.addEventListener('click', closeAddAccountModal);
+    addAccountForm.addEventListener('submit', handleSignUp);
 
     // 도움말 아이콘 클릭 이벤트
     helpIcons.forEach(icon => {
@@ -220,6 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target === modal) {
             closeModalFunc();
         }
+        if (e.target === addAccountModal) {
+            closeAddAccountModal();
+        }
     });
 
     // ESC 키로 모달 닫기
@@ -228,4 +282,5 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModalFunc();
         }
     });
+
 });

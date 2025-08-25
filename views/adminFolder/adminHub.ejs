@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="/stylesheets/adminHub.css" rel="stylesheet" />
     <script src="/javascripts/adminHub.js" defer></script>
-    <script src="/javascripts/forAdminPage.js" defer></script>
 </head>
 <body>
     <div class="admin-hub-container">
@@ -90,7 +89,7 @@
                         </button>
 
                         <!-- 계정 추가 모달 -->
-                        <button class="admin-btn tertiary-btn" onclick="OpenAddAcountModal()">
+                        <button class="admin-btn tertiary-btn" id="openAddAccountBtn">
                             <i class="fas fa-user-cog"></i>
                             <span>사용자 추가</span>
                         </button>
@@ -144,10 +143,10 @@
     <section aria-hidden="true">
         <div id="AddAcountModal" class="AddAcountModal">
             <div class="AddAcountModal-content">
-                <span class="close" onclick="CloseModal()" role="button" aria-label="닫기">&times;</span>
+                <span class="close" id="closeAddAccountModal" role="button" aria-label="닫기">&times;</span>
                 <p>계정추가</p><br />
                 <div class="signUp-container">
-                    <form method="POST" onsubmit="signUpquery(); return false;">
+                    <form method="POST" id="addAccountForm">
                         <label for="grade">학년</label>
                         <input type="number" id="grade" name="grade" required />
 
