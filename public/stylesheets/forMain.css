@@ -4,127 +4,571 @@ body, html {
   font-family: sans-serif;
 }
 
+/* 기존 CSS 코드 */
 .main-grid-container {
   display: grid;
-  width: 100%;
-  min-height: 100vh;
-  grid-template-rows: auto 1fr 1fr;
   grid-template-areas:
-    "header"
-    "main-item1"
-    "main-item2";
+        'header'
+        'main-item1'
+        'main-item2';
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 header {
-  grid-area: header;
-  background-color: #f0f0f0;
-  text-align: center;
-  padding: 20px;
-  position: relative; /* Needed for absolute positioning of child */
+    grid-area: header;
+    text-align: center;
+    position: relative;
 }
 
 .welcome-img {
-  width: 700px;
-  height: 250px;
-  display: block; /* To remove extra space below image */
-  margin: 0 auto; /* Center the image */
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
 }
 
 .indroduction-img-container {
-  position: relative;
-  width: 700px; /* Match image width */
-  margin: 0 auto; /* Center the container */
+    position: relative;
 }
 
 .bottom-text {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 33.33%;
-  background: rgba(0, 0, 0, 0.1);
-  color: black;
-  font-weight: bold;
-  font-size: 1.5em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* 첫 번째 영역: 대여중인 아이템 */
-.main-item1 {
-  grid-area: main-item1;
-  padding: 20px;
-}
-
-.main-item1 .itemDetail-card.rented {
-  display: block;
-  opacity: 0.5;
-}
-
-.main-item1 .itemDetail-card.not-rented {
-  display: none;
-}
-
-/* 두 번째 영역: 대여 가능한 아이템 */
-.main-item2 {
-  grid-area: main-item2;
-  padding: 20px;
-}
-
-.main-item2 .itemDetail-card.rented {
-  display: none;
-}
-
-.main-item2 .itemDetail-card.not-rented {
-  display: block;
-}
-
-.main-grid-container.with-rented {
-  grid-template-rows: auto 1fr 1fr;
-}
-
-.main-grid-container.without-rented {
-  grid-template-rows: auto 1fr;
-}
-
-.main-grid-container.without-rented .main-item1 {
-  display: none;
-}
-
-.main-grid-container.without-rented .main-item2 {
-  grid-row: 2;
-}
-
-.itemDetail-card {
-  width: 200px;
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  border: 1px solid #ccc;
-}
-
-.itemDetail-card img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.item-buttons {
-    margin-top: 10px;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 .logout-btn {
-  margin-top: 10px;
-  padding: 8px 16px;
-  background-color: #ff5c5c;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background-color 0.3s;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    background-color: #333;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid #666;
+    transition: all 0.3s ease;
 }
+
 .logout-btn:hover {
-  background-color: #e60000;
+    background-color: #555;
+    border-color: #888;
+}
+
+/*비번 변경 관련*/
+.change-password-btn {
+    position: absolute;
+    top: 10px;
+    right: 120px;
+    padding: 8px 12px;
+    background-color: #666;
+    color: white;
+    text-decoration: none;
+    border: 1px solid #999;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.change-password-btn:hover {
+    background-color: #777;
+    border-color: #aaa;
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #666;
+    outline: none;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.confirm-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.confirm-btn:hover {
+    background-color: #218838;
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+.main-item1 {
+    grid-area: main-item1;
+}
+
+.main-item2 {
+    grid-area: main-item2;
+}
+
+.item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.itemDetail-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 400px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.itemDetail-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.itemDetail-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    display: block;
+    margin: 0 auto;
+}
+
+.item-buttons button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.item-buttons button:hover {
+    background-color: #e0e0e0;
+    border-color: #999;
+}
+
+.reserve-btn {
+    background-color: #333;
+    color: white;
+    border: 1px solid #666;
+    transition: all 0.3s ease;
+}
+
+.reserve-btn:hover {
+    background-color: #555;
+    border-color: #888;
+}
+
+.cancel-reservation-btn {
+    background-color: #666;
+    color: white;
+    border: 1px solid #999;
+    transition: all 0.3s ease;
+}
+
+.cancel-reservation-btn:hover {
+    background-color: #777;
+    border-color: #aaa;
+}
+
+#addItemModalContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* 데스크톱 최적화 */
+@media (min-width: 1024px) {
+    .main-grid-container {
+        padding: 40px;
+        gap: 30px;
+    }
+    
+    .item-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+    }
+    
+    .itemDetail-card {
+        padding: 25px;
+        min-height: 450px;
+    }
+    
+    .welcome-img {
+        max-height: 500px;
+    }
+    
+    .bottom-text {
+        font-size: 18px;
+        padding: 8px 15px;
+    }
+}
+
+/* 태블릿 최적화 */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .item-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    
+    .itemDetail-card {
+        min-height: 380px;
+    }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 767px) {
+    .main-grid-container {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .item-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+    
+    .itemDetail-card {
+        padding: 15px;
+        min-height: 350px;
+    }
+    
+    .welcome-img {
+        max-height: 300px;
+    }
+    
+    .bottom-text {
+        font-size: 14px;
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .item-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .itemDetail-card {
+        padding: 10px;
+        min-height: 320px;
+    }
+
+    .itemDetail-card h3 {
+        font-size: 1em;
+    }
+}
+
+
+.selectTimemodal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.selectTimemodal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.selectTimemodal-content h3 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.selectTimemodal-content p {
+    margin: 15px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.selectTimemodal .modal-buttons {
+    margin-top: 20px;
+}
+
+.selectTimemodal .modal-buttons button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.selectTimemodal .modal-buttons button:first-child {
+    background-color: #007bff;
+    color: white;
+}
+
+.selectTimemodal .modal-buttons button:first-child:hover {
+    background-color: #0056b3;
+}
+
+.selectTimemodal .modal-buttons button:last-child {
+    background-color: #6c757d;
+    color: white;
+}
+
+.selectTimemodal .modal-buttons button:last-child:hover {
+    background-color: #545b62;
+}
+/* 시간 선택 휠 스타일 */
+.picker-container {
+    position: relative;
+    width: 100px;
+    height: 150px;
+    margin: 20px auto;
+    overflow: hidden;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    cursor: grab;
+}
+
+.picker-container:active {
+    cursor: grabbing;
+}
+
+#wheelPicker {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    transition: transform 0.3s ease;
+    transform: translateY(50px);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: pan-y;
+}
+
+#wheelPicker li {
+    height: 50px;
+    line-height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+#wheelPicker li:hover {
+    background-color: #f0f8ff;
+}
+
+#wheelPicker li.selected {
+    background-color: #007bff;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.highlight {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: rgba(0, 123, 255, 0.1);
+    border: 2px solid #007bff;
+    border-left: none;
+    border-right: none;
+    pointer-events: none;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+    .selectTimemodal-content {
+        width: 280px;
+        margin: 20% auto;
+        padding: 15px;
+    }
+
+    .picker-container {
+        width: 80px;
+        height: 120px;
+    }
+
+    #wheelPicker li {
+        height: 40px;
+        line-height: 40px;
+        font-size: 16px;
+    }
+
+    #wheelPicker li.selected {
+        font-size: 18px;
+    }
+
+    .highlight {
+        top: 40px;
+        height: 40px;
+    }
+}
+
+/* 연체 정보 표시 스타일 */
+.overdue-notice {
+    margin: 20px 0;
+    padding: 0;
+}
+
+.overdue-alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border-left: 5px solid;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.overdue-alert h4 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.overdue-alert p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.active-restriction {
+    background-color: #fee;
+    border-left-color: #e74c3c;
+    color: #c0392b;
+}
+
+.active-restriction h4 {
+    color: #c0392b;
+}
+
+.ready-restore {
+    background-color: #f0f8ff;
+    border-left-color: #3498db;
+    color: #2980b9;
+}
+
+.ready-restore h4 {
+    color: #2980b9;
+}
+
+.remaining-time {
+    font-weight: bold;
+    font-size: 16px;
+    padding: 2px 6px;
+    background-color: rgba(231, 76, 60, 0.1);
+    border-radius: 4px;
+}
+
+.small-text {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 8px;
+}
+
+/* 연체자 대여 버튼 비활성화 */
+.overdue-restricted .reserve-btn {
+    background-color: #bdc3c7 !important;
+    color: #7f8c8d !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+.overdue-restricted .reserve-btn:hover {
+    background-color: #bdc3c7 !important;
 }

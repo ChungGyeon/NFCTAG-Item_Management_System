@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title><%= baseTitle %> <%= title%></title>
+    <script src="/javascripts/Throne/forThronePage.js"></script>
+    <link rel="stylesheet" href="/stylesheets/Throne/successionToTheThrone.css">
+</head>
+<body>
+<div class="login-container">
+    <h2>👑🔪❌ 계승자를 입력하라 👑🫲</h2>
+    <form id="succession-form" method="POST">
+        <label for="studentnum">학번</label>
+        <input type="text" id="studentnum" name="studentnum" required>
+
+        <label for="name">이름</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="grade">학년</label>
+        <input type="text" id="grade" name="grade" required>
+
+        <button type="button" id="prepare-button">준비가 되었다</button>
+    </form>
+</div>
+
+<div id="warning-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <p>정말 준비가 되었는가?</p>
+        <div class="button-container">
+            <button id="confirm-button">예</button>
+            <button id="cancel-button">아니오</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

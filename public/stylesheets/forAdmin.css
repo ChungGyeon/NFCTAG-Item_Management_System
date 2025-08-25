@@ -29,7 +29,7 @@ aside {
     grid-area: aside;
     background-color: #d0d0d0;
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
 
@@ -129,6 +129,15 @@ aside adjust-button-caluelate-logVer:hover {
     display: block;
     margin-top: 10px;
 }
+
+.table-card img {
+    width: 100%; /* 부모 요소의 너비에 맞춤 */
+    height: auto; /* 비율 유지 */
+    object-fit: cover; /* 이미지 비율 유지하며 영역 채우기 */
+    max-height: 200px; /* 최대 높이 제한 */
+    border-radius: 8px; /* 선택적: 모서리 둥글게 */
+}
+
 .modal-overlay {
     display: none;
     position: fixed;
@@ -183,11 +192,16 @@ aside adjust-button-caluelate-logVer:hover {
 .AddAcountModal-content {
     position: relative;
     background-color: #fefefe;
-    margin: 5% auto;
+    margin: auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
+    max-width: 500px;
     animation: slide-down 0.5s ease-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 .AddAcountModal-content p {
     display: flex;
@@ -218,7 +232,7 @@ aside adjust-button-caluelate-logVer:hover {
     padding: 50px 60px;
     border-radius: 20px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-    width: 450px;
+    width: 100%;
     max-width: 90%;
     box-sizing: border-box;
     text-align: center;
@@ -319,4 +333,94 @@ aside adjust-button-caluelate-logVer:hover {
 .header-logo {
     height: 40px;
     object-fit: contain;
+}
+
+
+
+
+/*editItemModal용 css*/
+.editItemModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 120%;
+    overflow: auto;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+
+}
+.editItemModal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    animation: slide-down 0.5s ease-out;
+}
+
+.editItemModalContainer {
+    display: flex;
+    flex-direction: column;  /* 수직 배치 */
+    align-items: center;     /* 가운데 정렬 */
+    gap: 20px;              /* 요소 간 간격 */
+}
+
+/* 이미지 크기 조절이 필요한 경우 */
+.editItemModalContainer img {
+    width: 80%;             /* 컨테이너 너비의 80% */
+    max-width: 300px;       /* 최대 너비 제한 */
+    height: auto;           /* 비율 유지 */
+}
+
+/* input 스타일링 */
+.editItemModalContainer input {
+    width: 80%;             /* 컨테이너 너비의 80% */
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.editItemModalSendBtn {
+    margin: 20px auto;  /* 상하 여백과 좌우 중앙 정렬 */
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: block;  /* 블록 레벨 요소로 변경 */
+}
+
+
+
+.AddAcountModal-content p {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.AddAcountModal-buttons {
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.AddAcountModal-content button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+th[onclick] {
+    cursor: pointer;
 }

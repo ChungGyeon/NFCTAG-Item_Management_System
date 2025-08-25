@@ -16,7 +16,6 @@ function loginquery() {
 
             if (response.ok) {
                 const result = await response.json();
-                alert('로그인 성공');
                 window.location.href = '/'; // 로그인 성공 시 리다이렉트
 
             } else {

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= baseTitle%> <%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/Throne/forsuccessionToTheThrone2.css">
+</head>
+<body>
+<div id="loading-screen">
+    <div id="left-door" class="door"></div>
+    <div id="right-door" class="door"></div>
+</div>
+
+<div class="game-container">
+    <div class="instructions">당신의 권한을 양도하라</div>
+
+    <div class="person" id="person1">
+        <div class="drop-zone"></div>
+        <div class="head">
+            <div class="crown" id="crown" draggable="true">
+                <div class="crown-points">
+                    <div class="point point1"></div>
+                    <div class="point point2"></div>
+                    <div class="point point3">
+                        <div class="gems"></div>
+                    </div>
+                    <div class="point point4"></div>
+                    <div class="point point5"></div>
+                </div>
+                <div class="crown-base"></div>
+            </div>
+            <div class="face">
+                <div class="eyes eye-left"></div>
+                <div class="eyes eye-right"></div>
+                <div class="mouth"></div>
+            </div>
+        </div>
+        <div class="body">
+            <div class="arms"></div>
+        </div>
+        <div class="legs">
+            <div class="leg leg-left"></div>
+            <div class="leg leg-right"></div>
+        </div>
+        <div class="person-label">당신</div>
+    </div>
+
+    <div class="person" id="person2">
+        <div class="drop-zone"></div>
+        <div class="head">
+            <div class="face">
+                <div class="eyes eye-left"></div>
+                <div class="eyes eye-right"></div>
+                <div class="mouth"></div>
+            </div>
+        </div>
+        <div class="body">
+            <div class="arms"></div>
+        </div>
+        <div class="legs">
+            <div class="leg leg-left"></div>
+            <div class="leg leg-right"></div>
+        </div>
+        <div class="person-label"><%= name %></div>
+    </div>
+</div>
+<script>
+    window.userData = {
+        studentNum: '<%= studentNum %>',
+        name: '<%= name %>',
+        grade: '<%= grade %>'
+    };
+</script>
+<script src="/javascripts/Throne/forThronePage2.js">
+</script>
+</body>
+</html>

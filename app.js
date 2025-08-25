@@ -10,29 +10,19 @@ require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하�
 //각 실행경로 설정
 const mainRouter = require('./routes/main');
 const usersRouter = require('./routes/users');
-const genCookie = require('./routes/generateCookie'); //쿠키 생성 라우트
-const detCookie = require('./routes/detectCookie'); //쿠키 감지 처리 관련 라우트
-const db = require('./routes/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+const detCookie = require('./routes/sys_management/detectCookie'); //쿠키 감지 처리 관련 라우트
+const db = require('./routes/sys_management/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 const verifyRouter = require('./routes/verify'); // 물건리스트 쿠키 확인 라우트
-
-// === [여기부터 추가] ===
-let currentSeed = generateRandomSeed();
-let lastSeed = null; // (선택) 이전 시드도 잠깐 허용하려면 사용
-
-function generateRandomSeed() {
-    return Math.random().toString(36).substr(2, 10);
-}
-
-// 5분마다 시드 갱신
-setInterval(() => {
-    lastSeed = currentSeed;
-    currentSeed = generateRandomSeed();
-    console.log('새 시드:', currentSeed);
-}, 10 * 1000);
-// === [여기까지 추가] ===
-
+const imgProcessor = require('./routes/imgProcess'); //이미지처리 라우트
+require('./routes/sys_management/generateURL'); //nfc_url에 내용 고쳐 쓰는 라우터
+const seedGenerator = require('./routes/sys_management/seed-generator'); //랜덤시드 라우터
+const logRouter = require('./routes/log'); //장부기능
+const successionToTheThroneRouter  = require('./routes/Throne'); //회장 권한 양도 라우터
+const checkOverdueRouter = require('./routes/sys_management/checkOverdue'); //연체자 권한 관리 라우터
 
 const app = express();
+
+
 
 //베이스타이틀 지정
 app.use((req, res, next) => {
@@ -43,18 +33,11 @@ app.use((req, res, next) => {
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-//랜덤시드 생성시키는 그시기
-app.get('/get-current-seed', (req, res) => {
-    res.json({ seed: currentSeed });
-});
-
 
 /* 세션설정 */
 app.use(session({
@@ -74,20 +57,25 @@ app.use('/:seed', (req, res, next) => {
     req.lastSeed = lastSeed;
     next();
 }, mainRouter);*/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//경로지정
+//랜덤시드 적용방법
+//app.use('/detect', detCookie);
+//혹은 69라인처럼
 app.use('/', mainRouter);
 app.use('/users', usersRouter);
-app.use('/util', genCookie);
-
-//랜덤시드 적용
-//app.use('/detect', detCookie);
+app.use('/imgProcess',imgProcessor);
 app.use('/:seed', (req, res, next) => {
-    req.currentSeed = currentSeed;
-    req.lastSeed = lastSeed;
+    req.currentSeed = seedGenerator.currentSeed;
+    req.lastSeed = seedGenerator.lastSeed;
     next();
 }, detCookie);
 
-
-
+app.use('/rent', verifyRouter);
+app.use('/log', logRouter);
+app.use('/Throne',successionToTheThroneRouter);
+app.use('/checkOverdue', checkOverdueRouter);
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -100,14 +88,11 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-
-app.use('/rent', verifyRouter);
-
-/*
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));ve
-});*/
+    next(createError(404));
+});
+
 
 //module.exports = app;
 const SubpoRt = 3001;
@@ -115,3 +100,5 @@ app.listen(SubpoRt, () => {
   console.log(`서버가 ${SubpoRt} 실행됩니다.`);
 });
 
+//오직 서버라우터만 또 만들어놔야지
+module.exports = app;
