@@ -745,7 +745,89 @@ router.post('/admin/remove-vice-president', (req, res) => {
     });
 });
 
+// 개별 학생 학년 수정 기능
+router.post('/admin/update-student-grade', (req, res) => {
+    const { studentNum, grade } = req.body;
 
+    if (!studentNum || !grade) {
+        return res.status(400).json({
+            success: false,
+            message: '학번 또는 학년 정보가 제공되지 않았습니다.'
+        });
+    }
+
+    // 학년은 1~4 사이의 값만 허용
+    if (grade < 1 || grade > 4) {
+        return res.status(400).json({
+            success: false,
+            message: '학년은 1~4 사이의 값이어야 합니다.'
+        });
+    }
+
+    // 학생 정보 업데이트
+    const updateSql = 'UPDATE Users SET grade = ? WHERE studentNum = ?';
+
+    db.query(updateSql, [grade, studentNum], (err, result) => {
+        if (err) {
+            console.error('학년 수정 중 DB 오류:', err);
+            return res.status(500).json({
+                success: false,
+                message: '데이터베이스 오류가 발생했습니다.'
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: '해당 학번의 학생을 찾을 수 없습니다.'
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: '학년이 성공적으로 수정되었습니다.'
+        });
+    });
+});
+
+// 전체 학년 일괄 수정 기능
+router.post('/admin/bulk-update-grades', (req, res) => {
+    const { action } = req.body;
+
+    if (!action || (action !== 'increment' && action !== 'reset')) {
+        return res.status(400).json({
+            success: false,
+            message: '유효하지 않은 작업입니다.'
+        });
+    }
+
+    let updateSql;
+    let params = [];
+
+    if (action === 'increment') {
+        // 모든 학생의 학년을 1씩 증가 (최대 4학년까지)
+        updateSql = 'UPDATE Users SET grade = CASE WHEN grade < 4 THEN grade + 1 ELSE 4 END';
+    } else if (action === 'reset') {
+        // 4학년 학생들의 학년을 1학년으로 초기화
+        updateSql = 'UPDATE Users SET grade = 1 WHERE grade = 4';
+    }
+
+    db.query(updateSql, params, (err, result) => {
+        if (err) {
+            console.error('일괄 학년 수정 중 DB 오류:', err);
+            return res.status(500).json({
+                success: false,
+                message: '데이터베이스 오류가 발생했습니다.'
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: '학년이 성공적으로 업데이트되었습니다.',
+            affectedRows: result.affectedRows
+        });
+    });
+});
 
 module.exports = router;
 
