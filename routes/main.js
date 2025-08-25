@@ -626,51 +626,7 @@ router.post('/admin/delete-user', (req, res) => {
     });
 });
 
-/* ✅ 관리자 물건 삭제 기능 */
-router.post('/admin/delete-items', (req, res) => {
-    const { items } = req.body;
-
-    if (!items || !Array.isArray(items) || items.length === 0) {
-        return res.status(400).json({
-            success: false,
-            message: '삭제할 물건이 선택되지 않았습니다.'
-        });
-    }
-
-    // 관리자 권한 확인 (선택사항)
-    /*
-    if (!req.session.user || req.session.user.role !== 'admin') {
-        return res.status(403).json({
-            success: false,
-            message: '관리자 권한이 필요합니다.'
-        });
-    */
-
-    // 선택된 물건들을 데이터베이스에서 삭제
-    const placeholders = items.map(() => '?').join(',');
-    const sql = `DELETE FROM Items WHERE itemName IN (${placeholders})`;
-
-    db.query(sql, items, (err, result) => {
-        if (err) {
-            console.error('DB 삭제 오류:', err);
-            return res.status(500).json({
-                success: false,
-                message: '데이터베이스 오류가 발생했습니다.'
-            });
-        }
-
-        console.log(`${items.length}개의 물건이 삭제되었습니다:`, items);
-        res.json({
-            success: true,
-            message: `${items.length}개의 물건이 성공적으로 삭제되었습니다.`,
-            deletedItems: items
-        });
-    });
-});
-
-
-
-//부회장 임명 기능
+// 부회장 임명 기능
 router.post('/admin/appoint-vice-president', (req, res) => {
     const { studentNum } = req.body;
 
@@ -681,63 +637,38 @@ router.post('/admin/appoint-vice-president', (req, res) => {
         });
     }
 
-    //먼저 해당 사용자가 존재하는지 확인
-    const checkUserSql = 'SELECT studentNum FROM Users WHERE studentNum = ?';
-    db.query(checkUserSql, [studentNum], (err, users) => {
+    // 부회장 권한 확인
+    const checkSql = 'SELECT vice_president FROM user_permissions WHERE studentNum = ?';
+    db.query(checkSql, [studentNum], (err, permissions) => {
         if (err) {
-            console.error('사용자 확인 DB 오류:', err);
+            console.error('권한 확인 DB 오류:', err);
             return res.status(500).json({
                 success: false,
                 message: '데이터베이스 오류가 발생했습니다.'
             });
         }
 
-        if (users.length === 0) {
-            return res.status(404).json({
+        // 이미 부회장인 경우
+        if (permissions.length > 0 && permissions[0].vice_president) {
+            return res.status(400).json({
                 success: false,
-                message: '해당 학번의 사용자를 찾을 수 없습니다.'
+                message: '이미 부회장입니다.'
             });
         }
 
-        //이미 부회장인지 확인
-        const checkViceSql = 'SELECT vice_president FROM user_permissions WHERE studentNum = ?';
-        db.query(checkViceSql, [studentNum], (err, permissions) => {
+        // 부회장 권한 부여
+        const updateSql = 'UPDATE user_permissions SET vice_president = TRUE WHERE studentNum = ?';
+        db.query(updateSql, [studentNum], (err, result) => {
             if (err) {
-                console.error('권한 확인 DB 오류:', err);
+                console.error('부회장 임명 DB 오류:', err);
                 return res.status(500).json({
                     success: false,
                     message: '데이터베이스 오류가 발생했습니다.'
                 });
             }
 
-            if (permissions.length > 0 && permissions[0].vice_president) {
-                return res.status(400).json({
-                    success: false,
-                    message: '이미 부회장으로 임명된 사용자입니다.'
-                });
-            }
-
-            //user_permissions 테이블에 레코드가 있는지 확인하고 업데이트 또는 삽입
-            if (permissions.length > 0) {
-                // 기존 레코드 업데이트
-                const updateSql = 'UPDATE user_permissions SET vice_president = TRUE WHERE studentNum = ?';
-                db.query(updateSql, [studentNum], (err, result) => {
-                    if (err) {
-                        console.error('부회장 임명 DB 오류:', err);
-                        return res.status(500).json({
-                            success: false,
-                            message: '데이터베이스 오류가 발생했습니다.'
-                        });
-                    }
-
-                    console.log(`학번 ${studentNum}을 부회장으로 임명했습니다.`);
-                    res.json({
-                        success: true,
-                        message: '부회장으로 성공적으로 임명되었습니다.'
-                    });
-                });
-            } else {
-                // 새 레코드 삽입
+            // 새로 삽입
+            if (result.affectedRows === 0) {
                 const insertSql = 'INSERT INTO user_permissions (studentNum, vice_president) VALUES (?, TRUE)';
                 db.query(insertSql, [studentNum], (err, result) => {
                     if (err) {
@@ -753,6 +684,12 @@ router.post('/admin/appoint-vice-president', (req, res) => {
                         success: true,
                         message: '부회장으로 성공적으로 임명되었습니다.'
                     });
+                });
+            } else {
+                console.log(`학번 ${studentNum}을 부회장으로 임명했습니다.`);
+                res.json({
+                    success: true,
+                    message: '부회장으로 성공적으로 임명되었습니다.'
                 });
             }
         });

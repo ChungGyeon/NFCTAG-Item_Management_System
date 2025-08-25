@@ -13,26 +13,55 @@
     
     <h1>사용자 관리</h1>
     
+    <!-- 검색 기능 추가 -->
+    <div class="search-container">
+      <input type="text" id="userSearchInput" placeholder="학번 또는 이름으로 검색..." class="search-input">
+      <button id="searchButton" class="search-button">검색</button>
+      <button id="resetButton" class="reset-button">초기화</button>
+    </div>
+
+    <!-- 전체 학년 수정 패널 추가 -->
+    <div class="grade-management-panel">
+      <h3>전체 학년 관리</h3>
+      <div class="bulk-grade-update">
+        <p>새 학기가 시작되면 모든 학생의 학년을 한 번에 업데이트할 수 있습니다.</p>
+        <div class="grade-actions">
+          <button id="incrementAllGradesBtn" class="grade-btn increment">전체 학년 올리기 (+1)</button>
+          <button id="resetGraduatesBtn" class="grade-btn reset-graduates">졸업생 학년 초기화 (4학년 → 1학년)</button>
+        </div>
+      </div>
+    </div>
+
     <table class="user-table">
       <thead>
         <tr>
-          <th>학번</th>
-          <th>이름</th>
-          <th>학년</th>
+          <th class="sortable" data-sort="studentNum">학번 <span class="sort-icon">⇕</span></th>
+          <th class="sortable" data-sort="name">이름 <span class="sort-icon">⇕</span></th>
+          <th class="sortable" data-sort="grade">학년 <span class="sort-icon">⇕</span></th>
           <th>권한</th>
           <th>작업</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="userTableBody">
         <% users.forEach(user => { %>
           <tr>
             <td><%= user.studentNum %></td>
             <td><%= user.name %></td>
-            <td><%= user.grade %></td>
+            <td class="grade-cell">
+              <span class="grade-display"><%= user.grade %></span>
+              <div class="grade-edit-controls" style="display: none;">
+                <select class="grade-select">
+                  <option value="1" <%= user.grade === 1 ? 'selected' : '' %>>1학년</option>
+                  <option value="2" <%= user.grade === 2 ? 'selected' : '' %>>2학년</option>
+                  <option value="3" <%= user.grade === 3 ? 'selected' : '' %>>3학년</option>
+                  <option value="4" <%= user.grade === 4 ? 'selected' : '' %>>4학년</option>
+                </select>
+                <button class="save-grade-btn" data-student-num="<%= user.studentNum %>">저장</button>
+                <button class="cancel-grade-btn">취소</button>
+              </div>
+              <button class="edit-grade-btn">수정</button>
+            </td>
             <td>
-              <% if (!user.president && !user.vice_president) { %>
-                <span style="color: #6c757d;">일반 사용자</span>
-              <% } %>
               <% if (user.president) { %>
                 <span class="permission-badge president">회장</span>
               <% } %>
@@ -139,6 +168,18 @@
       <p id="removeMessage"></p>
       <div class="modal-buttons">
         <button class="modal-btn removeConfirm-btn" id="confirmRemove">확인</button>
+        <button class="modal-btn cancel-btn" onclick="closeModal()">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 전체 학년 수정 모달 -->
+  <div id="bulkGradeUpdateModal" class="modal">
+    <div class="modal-content">
+      <h3 id="bulkGradeUpdateTitle">전체 학년 수정</h3>
+      <p id="bulkGradeUpdateMessage"></p>
+      <div class="modal-buttons">
+        <button class="modal-btn confirmBulkUpdate-btn" id="confirmBulkGradeUpdate">확인</button>
         <button class="modal-btn cancel-btn" onclick="closeModal()">취소</button>
       </div>
     </div>
