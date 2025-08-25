@@ -184,11 +184,48 @@ body {
   box-shadow: var(--shadow-light);
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  z-index: 1;
 }
 
 .feature-section:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-medium);
+}
+
+/* 배경 이미지 스타일 */
+.feature-section .bg-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  z-index: -1;
+  transition: opacity 0.3s;
+}
+
+.feature-section:hover .bg-image {
+  opacity: 0.15;
+}
+
+/* 각 섹션별 배경 이미지 */
+.feature-section.basic-features .bg-image {
+  background-image: url('/images/mainPageIMG/ITS-IMS.png');
+}
+
+.feature-section.logs-features .bg-image {
+  /* 로그 및 통계 섹션용 배경 이미지 - 추후 추가 */
+}
+
+.feature-section.account-features .bg-image {
+  /* 계정 관리 섹션용 배경 이미지 - 추후 추가 */
+}
+
+.feature-section.expandable .bg-image {
+  /* 확장 가능한 섹션용 배경 이미지 - 추후 추가 */
 }
 
 .section-header {
@@ -198,6 +235,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+  z-index: 2;
 }
 
 .section-header h3 {
