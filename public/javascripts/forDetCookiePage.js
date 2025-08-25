@@ -13,14 +13,16 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     alert("✅ 완료: " + data.message);
-                    location.href = '/';
+                    location.href = '/itemlist';
                 } else {
                     alert("❌ 실패: " + data.message);
+                    location.href = '/itemlist';
                 }
             })
             .catch(err => {
                 alert("⚠️ 서버 오류 발생");
                 console.error('대여 요청 에러:', err);
+                location.href = '/itemlist';
             });
     }
 });

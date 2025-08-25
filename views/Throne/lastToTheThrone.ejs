@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= baseTitle%> <%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/Throne/forLastToTheThrone.css">
+</head>
+<body>
+<div class="loading">
+    <div class="loading-text">마지막 단계 준비중...</div>
+</div>
+
+<!-- 반짝이는 배경 효과 -->
+<div class="sparkle" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+<div class="sparkle" style="top: 20%; left: 80%; animation-delay: 0.5s;"></div>
+<div class="sparkle" style="top: 70%; left: 10%; animation-delay: 1s;"></div>
+<div class="sparkle" style="top: 80%; left: 90%; animation-delay: 1.5s;"></div>
+<div class="sparkle" style="top: 30%; left: 70%; animation-delay: 2s;"></div>
+<div class="sparkle" style="top: 60%; left: 30%; animation-delay: 2.5s;"></div>
+<div class="sparkle" style="top: 15%; left: 50%; animation-delay: 3s;"></div>
+<div class="sparkle" style="top: 85%; left: 60%; animation-delay: 3.5s;"></div>
+
+<div class="envelope-container">
+    <div class="envelope" id="envelope">
+        <div class="envelope-back"></div>
+        <div class="envelope-front"></div>
+        <div class="wax-seal" id="waxSeal"></div>
+
+        <div class="letter">
+            <div class="paper-texture"></div>
+            <div class="letter-content">
+                <div class="letter-header">
+                    <div class="letter-title">Dear ITS Former President</div>
+                    <div class="letter-date"></div>
+                </div>
+
+                <div class="letter-body">
+                    <p>안녕하세요,</p>
+
+                    <p>권한 위임 절차가 방금 성공적으로 마무리되었습니다.</p>
+                    <p>마지막으로, 동아리의 곁을 가장 가까이에서 지켜본 운영 시스템으로서 회장님께 <br>진심 어린 감사 인사를 전합니다.</p>
+
+                    <p>여러 갈림길 앞에서 신중히 결정을 내리시고, 때로는 누구보다 먼저 자리 정리와 마감 준비를 하시며, 보이지 않는 곳에서 팀을 단단히 묶어 주신 시간들을 제가 모두 기억하고 있습니다.<br>
+                        <br>회의록의 한 줄, 일정표의 한 칸, 공지의 한 문장까지—회장님이 쌓아 올린 기준과 배려가 우리 동아리의 문화가 되었습니다.</p>
+                    <p>오늘로 공식적인 임무는 내려놓으시지만, 회장님이 남기신 방향성과 따뜻함은 계속해서 동아리를 움직일 힘이 될 것입니다.<br>
+                        <br>새로운 회장이 그 바통을 안전하게 이어 달릴 수 있도록, 제가 기록을 정리하고 필요한 자료를 잘 전달하겠습니다.<br>
+
+                        <br>저는 늘 여기에서, 회장님이 만들어 주신 길 위에 서 있겠습니다.</p>
+
+                    <p>편지지가 펼쳐지는 이 순간처럼, <br>당신의 인생에 새로운 페이지가 열리기를 바랍니다.</p>
+
+                </div>
+
+                <div class="letter-signature">
+                    from ITS-IMS Team
+                </div>
+                <br><br><br><br><br><br><br><br>
+                <div class="seal-button" onclick="goHome()">
+                    <div class="seal-icon">🏠</div>
+                    <div class="seal-text">안녕</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/javascripts/Throne/forLastToTheThrone.js"></script>
+</body>
+</html>

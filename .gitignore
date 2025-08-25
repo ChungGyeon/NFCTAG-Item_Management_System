@@ -14,8 +14,13 @@
 #.DS_Store파일 무시
 views/.DS_Store
 
-#이미지 파일 무시
-/public/images/*
+#아이템 부분 이미지만 무시
+/public/images/item_IMG/*
+!/public/images/item_IMG/더미.gitkeep
 
 #randURL파일은 무시, 없으면 알아서 생성할거임
-/routes/randURL/
+/routes/sys_management/randURL/*
+!/routes/sys_management/randURL/.gitkeep
+
+#nfc_url.json 파일 명시적으로 무시
+/routes/sys_management/randURL/nfc_url.json

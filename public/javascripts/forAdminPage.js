@@ -9,6 +9,7 @@ function CloseModal(){
 }
 
 
+
 //계정 추가 쿼리
 function signUpquery() {
     var studentnum = document.getElementById("studentnum").value;
@@ -137,7 +138,6 @@ function updateItem() {
     if(textInput.value) formData.append('itemName', textInput.value);
     if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
     formData.append('originItemName', originItemName);
-    formData.append('whatIstype', whatIstype);
     fetch('/imgProcess/updateItem', {
         method: 'POST',
         body: formData
@@ -361,58 +361,33 @@ function deleteSelectedItems() {
 }
 
 
-// 계정 삭제 모달 표시 함수
-function showDeleteModal(studentNum, userName, isPresident, isVicePresident) {
-    const modal = document.getElementById('deleteModal');
-    const message = document.getElementById('deleteMessage');
-    const confirmBtn = document.getElementById('confirmDelete');
-
-    // 전역 변수에 현재 선택된 학번 저장
-    window.currentStudentNum = studentNum;
-
-    if (isPresident || isVicePresident) {
-        message.innerHTML = `<strong>${userName}</strong>님은 ${isPresident ? '회장' : '부회장'}이므로 삭제할 수 없습니다.`;
-        confirmBtn.style.display = 'none';
-    } else {
-        message.innerHTML = `<strong>${userName}</strong>님의 계정을 정말 삭제하시겠습니까?<br><br><small style="color: #dc3545;">※ 이 작업은 되돌릴 수 없습니다.</small>`;
-        confirmBtn.style.display = 'inline-block';
-    }
-
-    modal.style.display = 'block';
+//관리자 페이지에서 로그 확인하는 곳으로
+function goToLog() {
+    window.location.href = '/log';
 }
 
-// 계정 삭제 모달 닫기 함수
-function closeDeleteModal() {
-    document.getElementById('deleteModal').style.display = 'none';
-    window.currentStudentNum = null;
-}
-
-// 계정 삭제 실행 함수
-function deleteUser() {
-    const studentNum = window.currentStudentNum;
-    if (!studentNum) return;
-
-    fetch('/admin/delete-user', {
+//관리자 페이지에서 계정 확인하는 곳으로
+function goToAccountList() {
+    // 현재 로그인한 사용자의 학번을 서버에 전송하여 권한 확인
+    fetch('/admin/check-permission', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ studentNum: studentNum })
+        body: JSON.stringify({})
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('계정이 성공적으로 삭제되었습니다.');
-                location.reload();
-            } else {
-                alert('삭제 실패: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('삭제 중 오류가 발생했습니다.');
-        })
-        .finally(() => {
-            closeDeleteModal();
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // 권한이 있으면 계정 관리 페이지로 이동
+            window.location.href = '/admin/users';
+        } else {
+            // 권한이 없으면 에러 메시지 표시
+            alert('권한이 없습니다: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('권한 확인 중 오류가 발생했습니다.');
+    });
 }
