@@ -114,7 +114,7 @@ def test_nfc_components():
     return test_results
 
 
-def check_nfc_url_file(file_path="./routes/sys_management/randURL/nfc_url.json"):
+def check_nfc_url_file(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_management", "randURL", "nfc_url.json")):
     """NFC URL 파일의 존재 여부와 유효성을 확인합니다."""
     try:
         # 파일 존재 여부 확인
@@ -273,7 +273,7 @@ def detect_and_write_tag(pn532, url):
         return {"status": "error", "message": f"태그 쓰기 오류: {str(e)}"}
 
 
-def periodic_writer(file_path="./routes/sys_management/randURL/nfc_url.json", interval=30):
+def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_management", "randURL", "nfc_url.json"), interval=30):
     """주어진 간격(초)마다 파일에서 URL을 읽어 NFC 태그에 씁니다."""
     pn532 = None
     i2c = None
