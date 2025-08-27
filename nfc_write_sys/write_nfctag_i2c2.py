@@ -8,7 +8,9 @@ from datetime import datetime
 from adafruit_pn532.i2c import PN532_I2C
 
 # 프로젝트 루트 디렉토리 경로 얻기
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+current_file = os.path.abspath(__file__)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(current_file))
+
 
 
 def test_nfc_components():
@@ -349,6 +351,8 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
 
 
 if __name__ == "__main__":
+    #파일경로 췤
+    check_file_path()
     # NFC 컴포넌트 테스트 실행
     test_results = test_nfc_components()
 
