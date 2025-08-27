@@ -7,6 +7,9 @@ import ndef
 from datetime import datetime
 from adafruit_pn532.i2c import PN532_I2C
 
+# 프로젝트 루트 디렉토리 경로 얻기
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 def test_nfc_components():
     """detect_and_write_tag() 함수에서 사용하는 모든 컴포넌트들의 동작을 테스트합니다."""
@@ -62,7 +65,8 @@ def test_nfc_components():
     # 4. 파일 작업 테스트
     try:
         print(f"[{datetime.now()}] 4. 파일 작업 테스트...")
-        test_file_path = "./routes/sys_management/randURL/nfc_url.json"
+        # 절대 경로 사용
+        test_file_path = os.path.join(PROJECT_ROOT, "routes", "sys_management", "randURL", "nfc_url.json")
         test_data = {"url": test_url}
 
         # 파일 쓰기 테스트
@@ -87,6 +91,8 @@ def test_nfc_components():
     except Exception as e:
         print(f"[{datetime.now()}] ✗ 파일 작업 테스트 실패: {e}")
         test_results["file_operations"] = False
+        print(f"[{datetime.now()}] 📁 시도한 파일 경로: {test_file_path}")
+        print(f"[{datetime.now()}] 📁 프로젝트 루트: {PROJECT_ROOT}")
 
     # 5. 전체 상태 평가
     critical_tests = ["pn532_connection", "ndef_library", "ndef_message_creation"]
