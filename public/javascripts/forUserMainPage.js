@@ -236,6 +236,8 @@ document.addEventListener('DOMContentLoaded', function() {
             closeChangePasswordModal();
         }
     }
+    initCountdowns();
+
 });
 
 
@@ -415,70 +417,6 @@ function confirmWheel() {
             });
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    // 기존 비밀번호 변경 폼 코드
-    const changePasswordForm = document.getElementById('changePasswordForm');
-    if (changePasswordForm) {
-        changePasswordForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (newPassword !== confirmPassword) {
-                alert('새 비밀번호가 일치하지 않습니다.');
-                return;
-            }
-
-            if (newPassword.length < 6) {
-                alert('새 비밀번호는 최소 6자 이상이어야 합니다.');
-                return;
-            }
-
-            fetch('/users/change-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    currentPassword: currentPassword,
-                    newPassword: newPassword
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('비밀번호가 성공적으로 변경되었습니다.');
-                        closeChangePasswordModal();
-                    } else {
-                        alert('비밀번호 변경 실패: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('비밀번호 변경 중 오류가 발생했습니다.');
-                });
-        });
-    }
-
-    // 모달 외부 클릭 이벤트
-    window.onclick = function(event) {
-        const passwordModal = document.getElementById('changePasswordModal');
-        const timeModal = document.getElementById('timePickerModal');
-
-        if (event.target === passwordModal) {
-            closeChangePasswordModal();
-        }
-        if (event.target === timeModal) {
-            closeTimePickerModal();
-        }
-    }
-
-    // 카운트다운 초기화
-    initCountdowns();
-});
 
 // 연체시간 실시간 카운트다운 기능
 function startOverdueCountdown() {
