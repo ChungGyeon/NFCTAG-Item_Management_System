@@ -55,7 +55,7 @@ router.get('/:year/:month', (req, res) => {
                  WHERE returnTime IS NOT NULL
                    AND returnTime >= ? AND returnTime < ?
              ) AS u
-        ORDER BY u.at ASC;
+        ORDER BY u.at DESC;
 
     `;
 
