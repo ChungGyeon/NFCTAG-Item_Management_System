@@ -1,4 +1,4 @@
-#!/home/chunggyeon/Desktop/pn532-prj/venv/bin/python3
+#!/Users/imjaehyeog/IdeaProjects/NFCTAG-Item_Management_System/nfc_write_sys/venv/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys

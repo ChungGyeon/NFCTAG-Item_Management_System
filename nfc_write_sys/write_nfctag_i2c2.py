@@ -351,8 +351,6 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
 
 
 if __name__ == "__main__":
-    #파일경로 췤
-    check_file_path()
     # NFC 컴포넌트 테스트 실행
     test_results = test_nfc_components()
 
