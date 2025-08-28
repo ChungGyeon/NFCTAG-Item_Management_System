@@ -9,7 +9,7 @@ from adafruit_pn532.i2c import PN532_I2C
 
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
-PROJECT_ROOT = os.path.dirname(os.path.dirname(current_file))
+PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
 
 
 
@@ -86,9 +86,9 @@ def test_nfc_components():
             print(f"[{datetime.now()}] ✗ 파일 데이터 불일치")
             test_results["file_operations"] = False
 
-        # 테스트 파일 정리
-        if os.path.exists(test_file_path):
-            os.remove(test_file_path)
+        # 테스트 파일 정리 (실제 파일을 삭제하지 않도록 주석 처리)
+        # if os.path.exists(test_file_path):
+        #     os.remove(test_file_path)
 
     except Exception as e:
         print(f"[{datetime.now()}] ✗ 파일 작업 테스트 실패: {e}")
