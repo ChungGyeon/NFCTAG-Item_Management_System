@@ -90,7 +90,7 @@ function editModalOpen(button) {
     // 이미지 업로드를 위한 input 생성
     const imageInput = document.createElement('input');
     imageInput.type = 'file';
-    imageInput.accept = 'image/*';
+    imageInput.accept = '.jpg,.jpeg,.png';
     imageInput.id = 'imageInput';
     imageInput.style.display = 'none';
 
@@ -107,7 +107,16 @@ function editModalOpen(button) {
     // 이미지 파일이 선택되면 프리뷰 업데이트
     imageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
+
         if (file) {
+            const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+            const extension = '.' + file.name.split('.').pop().toLowerCase();
+            //확장자 검증
+            if (!allowedExtensions.includes(extension)) {
+                alert('jpg, jpeg, png 파일만 업로드 가능합니다.');
+                imageInput.value = ''; // 선택된 파일 초기화
+                return;
+            }
             const reader = new FileReader();
             reader.onload = (e) => img.src = e.target.result;
             reader.readAsDataURL(file);
