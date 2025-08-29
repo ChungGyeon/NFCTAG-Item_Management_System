@@ -332,6 +332,13 @@ function handleDragMove(e) {
     const clampedTransform = Math.max(minTransform, Math.min(maxTransform, newTransform));
     wheelPicker.style.transform = `translateY(${clampedTransform}px)`;
 
+    // 드래그 중에도 1 미만, 12 초과로 이동 시 자동 복원
+    if (clampedTransform === minTransform) {
+        selectHour(12);
+    } else if (clampedTransform === maxTransform) {
+        selectHour(1);
+    }
+
     e.preventDefault();
 }
 
