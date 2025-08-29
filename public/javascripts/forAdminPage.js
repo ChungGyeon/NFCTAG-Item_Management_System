@@ -169,11 +169,15 @@ function addItemQuery() {
     const formData = new FormData();
     const itemName = document.getElementById("addItem_itemName").value;
     const itemImg = document.getElementById("addimageInput");
-    if (!itemName || !itemImg.files[0]) {
+    if (!itemName) {
         return console.error('입력된게 아무것도 없는뎁슝');
     }
+
     formData.append('itemName', itemName);
-    formData.append('itemImg', itemImg.files[0]);
+    if(itemImg.files && itemImg.files.length > 0){
+        formData.append('itemImg', itemImg.files[0]);
+        console.log("테스테테스ㅡ테틑: "+ itemImg.files[0].length);
+    }
 
     fetch('/imgProcess/addItem', {
         method: 'POST',
@@ -221,7 +225,7 @@ function OpenAddItemModal(button){
     addimageInput.type = 'file';
     addimageInput.accept = 'image/*';
     addimageInput.id = 'addimageInput';
-    addimageInput.required = true;
+    //addimageInput.required = true;
     addimageInput.style.display = 'none';
 
     const img = document.createElement('img');

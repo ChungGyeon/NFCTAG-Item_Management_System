@@ -114,13 +114,15 @@ router.post('/updateItem', upload.single('image'), (req, res) => {
 // 관리자 물건 추가시 사진을 넣는 용도 라우트
 router.post('/addItem', upload.single('itemImg'), (req, res) => {
     const { itemName } = req.body;
-    const itemImg = req.file;
 
-    if (!itemName || !itemImg) {
-        return res.status(400).json({ message: '아이템 이름과 이미지가 필요합니다.' });
+    if (!itemName) {
+        return res.status(400).json({ message: '최소한 아이템 이름만은 필요합니다.' });
     }
 
-    const imgPath = req.fullImagePath || `images/item_IMG/${itemImg.filename}`;
+    const imgPath = req.file
+        ? (req.fullImagePath || `images/item_IMG/${req.file.filename}`)
+        : null;
+
     const sql = 'INSERT INTO Items (itemName, img, status) VALUES (?, ?, 0)';
     db.query(sql, [itemName, imgPath], (err, result) => {
         if (err) {
@@ -130,7 +132,6 @@ router.post('/addItem', upload.single('itemImg'), (req, res) => {
         return res.status(200).json({ message: '아이템 추가 성공!' });
     });
 });
-
 
 /* ✅ 관리자 물건 삭제 기능 */
 router.post('/deleteItems', (req, res) => {
