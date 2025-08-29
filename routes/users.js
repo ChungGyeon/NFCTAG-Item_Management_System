@@ -21,7 +21,7 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => { //login
   const { studentnum, password } = req.body;
 
-  const sql = 'SELECT studentNum, password FROM Users WHERE studentNum = ? AND password = ?';
+  const sql = 'SELECT name, studentNum, password FROM Users WHERE studentNum = ? AND password = ?';
   db.query(sql, [studentnum, password], (err, result) => {
     if(err){
       console.log("DB 오류 : ", err); //error
@@ -33,7 +33,8 @@ router.post('/login', async (req, res) => { //login
       if(!req.session.user) {
         req.session.user = {
           studentnum: studentnum,
-          password: password
+          password: password,
+          studentName: result[0].name,
         };
       }
       res.json({ success: true });

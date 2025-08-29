@@ -179,6 +179,7 @@ router.get('/itemlist', function(req, res, next) {
                 items: itemsWithStatus,
                 title: '물품대여소',
                 currentUser: req.session.user,
+                studentName: req.session.user?.studentName,
                 overdueInfo: overdueInfo,
             });
         });
