@@ -507,7 +507,17 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// 페이지 로드 시 카운트다운 시작
+//페이지 진입시 자동 새로고침
+function setupPageReloadOnBack() {
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+}
+
+//체이지 접속 시 연체 계산, 새로고침을 수행
 document.addEventListener('DOMContentLoaded', function() {
     startOverdueCountdown();
+    setupPageReloadOnBack();
 });

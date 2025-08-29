@@ -406,3 +406,15 @@ function goToAccountList() {
         alert('권한 확인 중 오류가 발생했습니다.');
     });
 }
+//자동새로고침
+function setupPageReloadOnBack() {
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupPageReloadOnBack();
+});

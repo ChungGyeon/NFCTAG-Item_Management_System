@@ -203,9 +203,18 @@ window.onclick = function(event) {
         closeModal();
     }
 }
+//자동 새로고침
+function setupPageReloadOnBack() {
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+}
 
 // 페이지 로드 시 정렬 및 검색 기능 초기화
 document.addEventListener('DOMContentLoaded', function() {
+    setupPageReloadOnBack();
     // 정렬 기능 초기화
     initSorting();
 

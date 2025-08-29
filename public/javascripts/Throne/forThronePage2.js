@@ -4,6 +4,19 @@ let person2 = document.getElementById('person2');
 let draggedElement = null;
 let currentOwner = person1;
 
+//자동새로고침
+function setupPageReloadOnBack() {
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupPageReloadOnBack();
+});
+
 window.addEventListener('load', () => {
     const loadingScreen = document.getElementById('loading-screen');
     const gameContainer = document.querySelector('.game-container');

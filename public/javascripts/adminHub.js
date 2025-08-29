@@ -1,8 +1,18 @@
 /**
  * 관리자 허브 도움말 기능 스크립트
  */
+//자동새로고침
+function setupPageReloadOnBack() {
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // 요소 참조
+    setupPageReloadOnBack();
     const modal = document.getElementById('helpModal');
     const helpBtn = document.getElementById('helpBtn');
     const closeModalBtn = document.querySelector('.close-modal');

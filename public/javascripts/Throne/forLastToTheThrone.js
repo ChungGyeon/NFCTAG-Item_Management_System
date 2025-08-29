@@ -1,5 +1,14 @@
+function setupPageReloadOnBack() {
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+}
+
 // DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', function() {
+    setupPageReloadOnBack();
     setCurrentDate();
 
     // 클릭해서도 열 수 있게

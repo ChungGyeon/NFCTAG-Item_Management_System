@@ -1,4 +1,13 @@
+//자동새로고침
+function setupPageReloadOnBack() {
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+}
 document.addEventListener('DOMContentLoaded', () => {
+    setupPageReloadOnBack();
     const prepareButton = document.getElementById('prepare-button');
     const warningModal = document.getElementById('warning-modal');
     const confirmButton = document.getElementById('confirm-button');
