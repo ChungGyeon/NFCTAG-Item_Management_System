@@ -232,7 +232,13 @@ function OpenAddItemModal(button){
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => img.src = e.target.result;
+            reader.onload = (e) => {
+                img.src = e.target.result;
+                img.style.width = '320px';
+                img.style.height = '320px';
+                img.style.objectFit = 'cover';
+                img.style.cursor = 'pointer';
+            }
             reader.readAsDataURL(file);
         }
     });
