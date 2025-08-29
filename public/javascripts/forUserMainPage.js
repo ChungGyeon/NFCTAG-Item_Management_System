@@ -332,6 +332,7 @@ function handleDragMove(e) {
     const clampedTransform = Math.max(minTransform, Math.min(maxTransform, newTransform));
     wheelPicker.style.transform = `translateY(${clampedTransform}px)`;
 
+
     // 드래그 중에도 1 미만, 12 초과로 이동 시 자동 복원
     if (clampedTransform === minTransform) {
         selectHour(12);
@@ -355,9 +356,16 @@ function handleDragEnd(e) {
     const newTransform = currentTransform + deltaY;
 
     // 가장 가까운 시간으로 스냅
-    const hourIndex = Math.round((50 - newTransform) / 50);
-    const clampedHourIndex = Math.max(0, Math.min(11, hourIndex));
-    const selectedHour = clampedHourIndex + 1;
+    let hourIndex = Math.round((50 - newTransform) / 50);
+
+    if(hourIndex < 0) {
+        hourIndex = 0;
+    }
+    else if (hourIndex > 11) {
+        hourIndex = 11;
+    }
+
+    const selectedHour = hourIndex + 1;
 
     // 트랜지션 다시 활성화
     wheelPicker.style.transition = 'transform 0.3s ease';
@@ -428,11 +436,11 @@ function confirmWheel() {
 // 연체시간 실시간 카운트다운 기능
 function startOverdueCountdown() {
     const remainingTimeElement = document.querySelector('.remaining-time');
-    
+
     if (!remainingTimeElement) return;
-    
+
     let remainingSeconds = parseInt(remainingTimeElement.dataset.remaining);
-    
+
     if (remainingSeconds <= 0) {
         // 이미 시간이 다 된 경우 페이지 새로고침
         setTimeout(() => {
@@ -440,14 +448,14 @@ function startOverdueCountdown() {
         }, 3000);
         return;
     }
-    
+
     const countdown = setInterval(() => {
         remainingSeconds--;
-        
+
         if (remainingSeconds <= 0) {
             clearInterval(countdown);
             remainingTimeElement.textContent = "00:00:00";
-            
+
             // 권한 복구 메시지 표시
             const overdueAlert = document.querySelector('.overdue-alert');
             if (overdueAlert) {
@@ -458,34 +466,34 @@ function startOverdueCountdown() {
                     <p>5분 이내에 자동으로 대여 권한이 복구됩니다.</p>
                 `;
             }
-            
+
             // 5초 후 페이지 새로고침
             setTimeout(() => {
                 location.reload();
             }, 5000);
-            
+
             return;
         }
-        
+
         // 시간 형식으로 변환하여 표시
         const hours = Math.floor(remainingSeconds / 3600);
         const minutes = Math.floor((remainingSeconds % 3600) / 60);
         const seconds = remainingSeconds % 60;
-        
+
         const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         remainingTimeElement.textContent = timeString;
-        
+
         // 시간이 10분 이하일 때 강조 표시
         if (remainingSeconds <= 600) {
             remainingTimeElement.style.backgroundColor = 'rgba(231, 76, 60, 0.2)';
             remainingTimeElement.style.color = '#c0392b';
         }
-        
+
         // 시간이 1분 이하일 때 깜빡이는 효과
         if (remainingSeconds <= 60) {
             remainingTimeElement.style.animation = 'blink 1s infinite';
         }
-        
+
     }, 1000);
 }
 
