@@ -259,6 +259,11 @@ function reserveFromServer(itemName) {
     // 모달 표시
     document.getElementById("timePickerModal").style.display = "block";
 
+    // 배경 스크롤 막기
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+
     // 휠 초기화
     initializeWheel();
 }
@@ -268,6 +273,11 @@ function closeTimePickerModal() {
     selectedItemName = null;
     currentSelectedHour = 1;
     isDragging = false;
+
+    // 배경 스크롤 복원
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
 }
 
 function initializeWheel() {
