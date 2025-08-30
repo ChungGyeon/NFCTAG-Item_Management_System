@@ -234,7 +234,7 @@ router.get('/itemImg/:itemName', (req, res) => {
         if (fs.existsSync(imagePath)) {
             res.sendFile(imagePath);
         } else {
-            res.status(404).send('이미지 파일이 존재하지 않습니다.');\
+            res.status(404).send('이미지 파일이 존재하지 않습니다.');
         }
     });
 });
