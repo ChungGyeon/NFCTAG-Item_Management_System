@@ -45,8 +45,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        httpOnly: true
-        // maxAge 생략 → 브라우저 종료 시 세션도 종료됨
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 120 //120일마다 로그인이 필요
     }
 }));
 
