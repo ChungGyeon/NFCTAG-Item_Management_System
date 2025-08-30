@@ -433,6 +433,9 @@ header {
     -moz-user-select: none;
     -ms-user-select: none;
     touch-action: pan-y;
+    /* 모바일에서 스크롤 범위 제한을 위한 추가 설정 */
+    overflow: hidden;
+    position: relative;
 }
 
 #wheelPicker li {

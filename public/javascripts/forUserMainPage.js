@@ -244,10 +244,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 let selectedItemName = null;
 let currentSelectedHour = 1;
+// 시간 선택 휠 관련 변수들
+let isDragging = false;
+let startY = 0;
+let currentTransform = 50; // 초기 transform 값 (1시간 위치)
 
 function reserveFromServer(itemName) {
     selectedItemName = itemName;
     currentSelectedHour = 1;
+    isDragging = false; // 초기화
+    startY = 0;
+    currentTransform = 50;
 
     // 모달 표시
     document.getElementById("timePickerModal").style.display = "block";
@@ -332,12 +339,14 @@ function handleDragMove(e) {
     const clampedTransform = Math.max(minTransform, Math.min(maxTransform, newTransform));
     wheelPicker.style.transform = `translateY(${clampedTransform}px)`;
 
+    // 현재 위치에 해당하는 시간 계산 및 표시 업데이트
+    let hourIndex = Math.round((50 - clampedTransform) / 50);
+    hourIndex = Math.max(0, Math.min(11, hourIndex)); // 0-11 범위로 제한
+    const displayHour = hourIndex + 1;
 
-    // 드래그 중에도 1 미만, 12 초과로 이동 시 자동 복원
-    if (clampedTransform === minTransform) {
-        selectHour(12);
-    } else if (clampedTransform === maxTransform) {
-        selectHour(1);
+    const displayElement = document.getElementById('selectedHourDisplay');
+    if (displayElement) {
+        displayElement.textContent = displayHour;
     }
 
     e.preventDefault();
@@ -349,22 +358,13 @@ function handleDragEnd(e) {
     isDragging = false;
 
     const wheelPicker = document.getElementById('wheelPicker');
-    const currentY = e.type === 'mouseup' ? e.clientY : (e.changedTouches ? e.changedTouches[0].clientY : startY);
-    const deltaY = currentY - startY;
 
-    // 최종 위치 계산
-    const newTransform = currentTransform + deltaY;
+    // 현재 transform 값을 가져와서 가장 가까운 시간으로 스냅
+    const currentTransformValue = getCurrentTransformY(wheelPicker);
+    let hourIndex = Math.round((50 - currentTransformValue) / 50);
 
-    // 가장 가까운 시간으로 스냅
-    let hourIndex = Math.round((50 - newTransform) / 50);
-
-    if(hourIndex < 0) {
-        hourIndex = 0;
-    }
-    else if (hourIndex > 11) {
-        hourIndex = 11;
-    }
-
+    // 범위 제한 (0-11)
+    hourIndex = Math.max(0, Math.min(11, hourIndex));
     const selectedHour = hourIndex + 1;
 
     // 트랜지션 다시 활성화
@@ -374,6 +374,17 @@ function handleDragEnd(e) {
     selectHour(selectedHour);
 }
 
+// transform 값을 정확히 가져오는 헬퍼 함수 추가
+function getCurrentTransformY(element) {
+    const transform = element.style.transform;
+    if (transform && transform.includes('translateY')) {
+        const match = transform.match(/translateY\(([^)]+)\)/);
+        if (match) {
+            return parseFloat(match[1]);
+        }
+    }
+    return 0;
+}
 
 function selectHour(hour) {
     currentSelectedHour = hour;
