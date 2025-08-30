@@ -342,21 +342,19 @@ function handleDragMove(e) {
     const wheelPicker = document.getElementById('wheelPicker');
     const newTransform = currentTransform + deltaY;
 
-    // 드래그 범위 제한 (1시간~12시간)
+    // 드래그 범위 제한
     const minTransform = 50 - (12 - 1) * 50; // -500px
     const maxTransform = 50; // 50px
     const clampedTransform = Math.max(minTransform, Math.min(maxTransform, newTransform));
 
-    // index를 계산 (0~11 범위)
+    // 드래그 중에는 스냅말고 그대로 반영
+    wheelPicker.style.transform = `translateY(${clampedTransform}px)`;
+
+    // 미리 보기용 시간 표시
     let hourIndex = Math.round((50 - clampedTransform) / 50);
-    hourIndex = Math.max(0, Math.min(11, hourIndex)); // 항상 0~11
-
-    // transform을 인덱스에 "스냅" → 빈 공간 방지
-    const snappedTransform = 50 - hourIndex * 50;
-    wheelPicker.style.transform = `translateY(${snappedTransform}px)`;
-
-    // 표시할 시간 (1~12)
+    hourIndex = Math.max(0, Math.min(11, hourIndex));
     const displayHour = hourIndex + 1;
+
     const displayElement = document.getElementById('selectedHourDisplay');
     if (displayElement) {
         displayElement.textContent = displayHour;
@@ -367,23 +365,17 @@ function handleDragMove(e) {
 
 function handleDragEnd(e) {
     if (!isDragging) return;
-
     isDragging = false;
 
     const wheelPicker = document.getElementById('wheelPicker');
-
-    // 현재 transform 값을 가져와서 가장 가까운 시간으로 스냅
     const currentTransformValue = getCurrentTransformY(wheelPicker);
-    let hourIndex = Math.round((50 - currentTransformValue) / 50);
 
-    // 범위 제한 (0-11)
+    // 가장 가까운 시간으로 스냅
+    let hourIndex = Math.round((50 - currentTransformValue) / 50);
     hourIndex = Math.max(0, Math.min(11, hourIndex));
     const selectedHour = hourIndex + 1;
 
-    // 트랜지션 다시 활성화
     wheelPicker.style.transition = 'transform 0.3s ease';
-
-    // 선택된 시간으로 이동
     selectHour(selectedHour);
 }
 
