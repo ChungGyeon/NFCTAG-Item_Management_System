@@ -248,7 +248,19 @@ let currentSelectedHour = 1;
 let isDragging = false;
 let startY = 0;
 let currentTransform = 50; // 초기 transform 값 (1시간 위치)
+let UNIT = 50;  // li 실제 높이(마진 포함)로 런타임에 갱신
+let BASE_OFFSET = 50; // 선택 슬롯까지의 기준 오프셋(= UNIT으로 설정)
 
+let dragBaseTransform = 0;
+
+let listenersAdded = false;
+let dragAbortController = null;
+
+function removeDragListeners() {
+    if (dragAbortController) dragAbortController.abort();
+    dragAbortController = null;
+    listenersAdded = false;
+}
 function reserveFromServer(itemName) {
     selectedItemName = itemName;
     currentSelectedHour = 1;
@@ -274,6 +286,7 @@ function closeTimePickerModal() {
     currentSelectedHour = 1;
     isDragging = false;
 
+    removeDragListeners(); //리스너 클리어
     // 배경 스크롤 복원
     document.body.style.overflow = '';
     document.body.style.position = '';
@@ -302,6 +315,16 @@ function initializeWheel() {
         wheelPicker.appendChild(li);
     }
 
+    // 실제 아이템 높이로 UNIT/base_offset 설정
+    const first = wheelPicker.querySelector('li');
+    if (first) {
+        const rect = first.getBoundingClientRect();
+        const cs = window.getComputedStyle(first);
+        const margin = parseFloat(cs.marginTop) + parseFloat(cs.marginBottom);
+        UNIT = rect.height + margin || 50;
+        BASE_OFFSET = UNIT; // “1시간”이 선택 슬롯에 오도록 동일 간격 사용
+    }
+
     // 드래그 이벤트 리스너 추가
     addDragListeners(wheelPicker);
 
@@ -309,18 +332,25 @@ function initializeWheel() {
     selectHour(1);
 }
 function addDragListeners(wheelPicker) {
-    // 마우스 이벤트
-    wheelPicker.addEventListener('mousedown', handleDragStart);
-    document.addEventListener('mousemove', handleDragMove);
-    document.addEventListener('mouseup', handleDragEnd);
+    if (listenersAdded) return;
+    dragAbortController = new AbortController();
+    const opt = { signal: dragAbortController.signal, passive: false };
 
     // 터치 이벤트 (모바일)
-    wheelPicker.addEventListener('touchstart', handleDragStart, { passive: false });
-    document.addEventListener('touchmove', handleDragMove, { passive: false });
-    document.addEventListener('touchend', handleDragEnd);
+    wheelPicker.addEventListener('touchstart', handleDragStart, opt);
+    document.addEventListener('touchmove', handleDragMove, opt);
+    document.addEventListener('touchend', handleDragEnd, opt);
+    document.addEventListener('touchcancel', handleDragEnd, opt);
 
+    // 마우스 이벤트
+    wheelPicker.addEventListener('mousedown', handleDragStart, opt);
+    document.addEventListener('mousemove', handleDragMove, opt);
+    document.addEventListener('mouseup', handleDragEnd, opt);
+    //마우스가 문서 밖으로 나가도 드래그 종료될 수 있도록
+    document.addEventListener('mouseleave', handleDragEnd, opt);
     // 드래그 방지
     wheelPicker.addEventListener('dragstart', e => e.preventDefault());
+    listenersAdded = true;
 }
 
 function handleDragStart(e) {
@@ -329,6 +359,9 @@ function handleDragStart(e) {
 
     const wheelPicker = document.getElementById('wheelPicker');
     wheelPicker.style.transition = 'none';
+
+    // 현재 위치를 드래그 기준으로 고정
+    dragBaseTransform = currentTransform;
 
     e.preventDefault();
 }
@@ -343,15 +376,15 @@ function handleDragMove(e) {
     const newTransform = currentTransform + deltaY;
 
     // 드래그 범위 제한
-    const minTransform = 50 - (12 - 1) * 50; // -500px
-    const maxTransform = 50; // 50px
+    const minTransform = BASE_OFFSET - (12 - 1) * UNIT;
+    const maxTransform = BASE_OFFSET;
     const clampedTransform = Math.max(minTransform, Math.min(maxTransform, newTransform));
 
     // 드래그 중에는 스냅말고 그대로 반영
     wheelPicker.style.transform = `translateY(${clampedTransform}px)`;
 
     // 미리 보기용 시간 표시
-    let hourIndex = Math.round((50 - clampedTransform) / 50);
+    let hourIndex = Math.round((BASE_OFFSET - clampedTransform) / UNIT);
     hourIndex = Math.max(0, Math.min(11, hourIndex));
     const displayHour = hourIndex + 1;
 
@@ -371,12 +404,12 @@ function handleDragEnd(e) {
     const currentTransformValue = getCurrentTransformY(wheelPicker);
 
     // 가장 가까운 시간으로 스냅
-    let hourIndex = Math.round((50 - currentTransformValue) / 50);
+    let hourIndex = Math.round((BASE_OFFSET - currentTransformValue) / UNIT);
     hourIndex = Math.max(0, Math.min(11, hourIndex));
     const selectedHour = hourIndex + 1;
 
-    wheelPicker.style.transition = 'transform 0.3s ease';
-    selectHour(selectedHour);
+    wheelPicker.style.transition = 'transform 0.25s ease';
+    selectHour(selectedHour); //여기서 currentTransform도 갱신됨
 }
 
 // transform 값을 정확히 가져오는 헬퍼 함수 추가
@@ -393,7 +426,7 @@ function getCurrentTransformY(element) {
 
 function selectHour(hour) {
     currentSelectedHour = hour;
-    currentTransform = 50 - (hour - 1) * 50;
+    currentTransform = BASE_OFFSET - (hour - 1) * UNIT;
 
     const wheelPicker = document.getElementById('wheelPicker');
     const items = wheelPicker.querySelectorAll('li');
