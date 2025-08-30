@@ -222,15 +222,20 @@ router.get('/itemImg/:itemName', (req, res) => {
         if (err || result.length === 0) {
             return res.status(404).send('이미지를 찾을 수 없습니다.');
         }
-            const fileName = result[0].img; // img에는 이미지 경로까지 포함해서 저장하기에 주의
-            const imagePath = path.join(__dirname, '../public/', fileName);
-            //console.log('이미지 어디에있나: ', imagePath); //디버깅용 로그
-            // 파일 존재 확인
-            if (fs.existsSync(imagePath)) {
-                res.sendFile(imagePath);
-            } else {
-                res.status(404).send('이미지 파일이 존재하지 않습니다.');
-            }
+        //이미지 없는 아이템일 경우 정해진 이미지를 전송
+        // 아이템에 등록된 이미지가 있다면 그걸 사용
+        const imgPath = req.file
+            ? (req.fullImagePath || `images/item_IMG/${req.file.filename}`)
+            : null;
+        const fileName = result[0].img ? result[0].img : 'images/administrator_didnt_post_picture.png'; // img에는 이미지 경로까지 포함해서 저장하기에 주의
+        const imagePath = path.join(__dirname, '../public/', fileName);
+        //console.log('이미지 어디에있나: ', imagePath); //디버깅용 로그
+        // 파일 존재 확인
+        if (fs.existsSync(imagePath)) {
+            res.sendFile(imagePath);
+        } else {
+            res.status(404).send('이미지 파일이 존재하지 않습니다.');\
+        }
     });
 });
 
