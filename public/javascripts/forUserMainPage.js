@@ -287,7 +287,7 @@ function initializeWheel() {
     wheelPicker.innerHTML = '';
 
     // 1~12시간 리스트 아이템 생성
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i < 12; i++) {
         const li = document.createElement('li');
         li.textContent = i;
         li.dataset.hour = i;
