@@ -287,7 +287,7 @@ function initializeWheel() {
     wheelPicker.innerHTML = '';
 
     // 1~12시간 리스트 아이템 생성
-    for (let i = 1; i < 12; i++) {
+    for (let i = 1; i <= 12; i++) {
         const li = document.createElement('li');
         li.textContent = i;
         li.dataset.hour = i;
@@ -345,15 +345,18 @@ function handleDragMove(e) {
     // 드래그 범위 제한 (1시간~12시간)
     const minTransform = 50 - (12 - 1) * 50; // -500px
     const maxTransform = 50; // 50px
-
     const clampedTransform = Math.max(minTransform, Math.min(maxTransform, newTransform));
-    wheelPicker.style.transform = `translateY(${clampedTransform}px)`;
 
-    // 현재 위치에 해당하는 시간 계산 및 표시 업데이트
+    // index를 계산 (0~11 범위)
     let hourIndex = Math.round((50 - clampedTransform) / 50);
-    hourIndex = Math.max(0, Math.min(11, hourIndex)); // 0-11 범위로 제한
-    const displayHour = hourIndex + 1;
+    hourIndex = Math.max(0, Math.min(11, hourIndex)); // 항상 0~11
 
+    // transform을 인덱스에 "스냅" → 빈 공간 방지
+    const snappedTransform = 50 - hourIndex * 50;
+    wheelPicker.style.transform = `translateY(${snappedTransform}px)`;
+
+    // 표시할 시간 (1~12)
+    const displayHour = hourIndex + 1;
     const displayElement = document.getElementById('selectedHourDisplay');
     if (displayElement) {
         displayElement.textContent = displayHour;
