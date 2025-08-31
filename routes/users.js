@@ -5,6 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const { db, testPageConnect } = require('./sys_management/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
+const {genHashPassWord, compareHashPassWord} = require('./passWordHashing');
 
 router.get('/', (req, res) => {
     res.render('login');
@@ -20,13 +21,17 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => { //login
   const { studentnum, password } = req.body;
 
-  const sql = 'SELECT name, studentNum, password FROM Users WHERE studentNum = ? AND password = ?';
-  db.query(sql, [studentnum, password], (err, result) => {
+  const sql = 'SELECT name, studentNum, password FROM Users WHERE studentNum = ?';
+  db.query(sql, [studentnum], async (err, result) => {
     if(err){
-      console.log("DB 오류 : ", err); //error
+      console.log("DB 오류 : ", err);
     }
     if(result.length <= 0){
       res.status(401).send('학번 또는 비밀번호가 틀렸습니다.');
+    }
+    const comparePassword = await compareHashPassWord(password, result[0].password);
+    if(!comparePassword){
+        res.status(401).send('비밀번호가 틀렸습니다.');
     }
     else {
       if(!req.session.user) {
@@ -99,52 +104,53 @@ router.post('/signUpquery', (req, res) => {
         return res.status(500).send('서버 오류');
       }
       const sql = 'SELECT * FROM Users WHERE studentNum = ?';
-      db.query(sql, [studentnum], (err, result) => {
-        if (err) {
-          console.error('DB 오류:', err);
-          return res.status(500).json({message: '서버 오류가 발생했습니다.'});
-        }
+      db.query(sql, [studentnum], async (err, result) => {
+          if (err) {
+              console.error('DB 오류:', err);
+              return res.status(500).json({message: '서버 오류가 발생했습니다.'});
+          }
 
-        if (result.length > 0) {
-          return res.status(409).json({message: '이미 존재하는 계정입니다.'});
-        } else {
+          if (result.length > 0) {
+              return res.status(409).json({message: '이미 존재하는 계정입니다.'});
+          } else {
 
-          //비밀번호 해시화
+              //비밀번호 해시화
+              const hashedPassWord = await genHashPassWord(password);
+              // Users 테이블에 삽입
+              const userInsertQuery = 'INSERT INTO Users (name, studentNum, grade, password) VALUES (?, ?, ?, ?)';
+              console.log('입력 전 테스트 ', name, studentnum, grade, hashedPassWord);
+              db.query(userInsertQuery, [name, studentnum, grade, hashedPassWord], (err, userResult) => {
+                  if (err) {
+                      return db.rollback(() => {
+                          console.error('Users 테이블 삽입 오류:', err);
+                          res.status(500).send('등록 실패');
+                      });
+                  }
 
-          // Users 테이블에 삽입
-          const userInsertQuery = 'INSERT INTO Users (name, studentNum, grade, password) VALUES (?, ?, ?, ?)';
-          db.query(userInsertQuery, [name, studentnum, grade, password], (err, userResult) => {
-            if (err) {
-              return db.rollback(() => {
-                console.error('Users 테이블 삽입 오류:', err);
-                res.status(500).send('등록 실패');
-              });
-            }
+                  // user_permissions 테이블에 삽입
+                  const permInsertQuery = 'INSERT INTO user_permissions (studentNum, rent_perm) VALUES (?, ?)';
+                  db.query(permInsertQuery, [studentnum, true], (err, permResult) => {
+                      if (err) {
+                          return db.rollback(() => {
+                              console.error('user_permissions 테이블 삽입 오류:', err);
+                              res.status(500).send('등록 실패');
+                          });
+                      }
 
-            // user_permissions 테이블에 삽입
-            const permInsertQuery = 'INSERT INTO user_permissions (studentNum, rent_perm) VALUES (?, ?)';
-            db.query(permInsertQuery, [studentnum, true], (err, permResult) => {
-              if (err) {
-                return db.rollback(() => {
-                  console.error('user_permissions 테이블 삽입 오류:', err);
-                  res.status(500).send('등록 실패');
-                });
-              }
-
-              // 모든 쿼리가 성공하면 커밋
-              db.commit(err => {
-                if (err) {
-                  return db.rollback(() => {
-                    console.error('커밋 오류:', err);
-                    res.status(500).send('등록 실패');
+                      // 모든 쿼리가 성공하면 커밋
+                      db.commit(err => {
+                          if (err) {
+                              return db.rollback(() => {
+                                  console.error('커밋 오류:', err);
+                                  res.status(500).send('등록 실패');
+                              });
+                          }
+                          console.log('계정이 성공적으로 생성되었습니다.');
+                          res.json({message: '등록 성공'});
+                      });
                   });
-                }
-                console.log('계정이 성공적으로 생성되었습니다.');
-                res.json({message: '등록 성공'});
               });
-            });
-          });
-        }
+          }
 
       });
     });
@@ -178,7 +184,7 @@ router.get('/list', (req, res) => {
 
 
 // 비밀번호 변경 엔드포인트
-router.post('/change-password', (req, res) => {
+router.post('/change-password', async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   
   // 세션에서 현재 로그인한 사용자 정보 가져오기
@@ -208,7 +214,7 @@ router.post('/change-password', (req, res) => {
 
   // 현재 비밀번호 확인
   const checkPasswordSql = 'SELECT password FROM Users WHERE studentNum = ?';
-  db.query(checkPasswordSql, [userStudentNum], (err, result) => {
+  db.query(checkPasswordSql, [userStudentNum], async (err, result) => {
     if (err) {
       console.error('비밀번호 확인 DB 오류:', err);
       return res.status(500).json({
@@ -224,8 +230,9 @@ router.post('/change-password', (req, res) => {
       });
     }
 
+    const comparePassWord = await compareHashPassWord(result[0].password, currentPassword)
     // 현재 비밀번호가 일치하는지 확인
-    if (result[0].password !== currentPassword) {
+    if (comparePassWord) {
       return res.status(400).json({
         success: false,
         message: '현재 비밀번호가 일치하지 않습니다.'
@@ -234,7 +241,8 @@ router.post('/change-password', (req, res) => {
 
     // 새 비밀번호로 업데이트
     const updatePasswordSql = 'UPDATE Users SET password = ? WHERE studentNum = ?';
-    db.query(updatePasswordSql, [newPassword, userStudentNum], (err, updateResult) => {
+    const hashNewPassword = await genHashPassWord(newPassword);
+    db.query(updatePasswordSql, [hashNewPassword, userStudentNum], (err, updateResult) => {
       if (err) {
         console.error('비밀번호 변경 DB 오류:', err);
         return res.status(500).json({

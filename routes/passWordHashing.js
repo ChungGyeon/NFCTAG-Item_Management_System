@@ -1,10 +1,9 @@
 const express = require('express');
-const router = express.Router();
 const bcrypt = require('bcrypt');
 
 async function genHashPassWord(inPassWord){
     try {
-        const saltRound = bcrypt.genSalt(10);
+        const saltRound = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(inPassWord, saltRound);
         return hashPassword;
     }
@@ -23,4 +22,7 @@ async function compareHashPassWord(inPassWord, hashPassword){
     }
 }
 
-module.exports = router;
+module.exports ={
+    genHashPassWord,
+    compareHashPassWord,
+};
