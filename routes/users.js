@@ -6,7 +6,6 @@ const express = require('express');
 const router = express.Router();
 const { db, testPageConnect } = require('./sys_management/IMS_db'); //IMS_db.js에서 db 연결변수 가져오기
 
-
 router.get('/', (req, res) => {
     res.render('login');
 })
@@ -109,6 +108,8 @@ router.post('/signUpquery', (req, res) => {
         if (result.length > 0) {
           return res.status(409).json({message: '이미 존재하는 계정입니다.'});
         } else {
+
+          //비밀번호 해시화
 
           // Users 테이블에 삽입
           const userInsertQuery = 'INSERT INTO Users (name, studentNum, grade, password) VALUES (?, ?, ?, ?)';
