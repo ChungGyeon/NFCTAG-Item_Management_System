@@ -232,7 +232,7 @@ function OpenAddItemModal(button){
     img.id = 'itemImg';
     img.src = '/images/introItemAdding.png';
     img.alt = '이미지가 안보인다구요? 어쩌라구여';
-    img.style.width = '280px';ß
+    img.style.width = '280px';
     img.style.height = '320px';
     img.style.objectFit = 'cover';
     img.style.cursor = 'pointer';
