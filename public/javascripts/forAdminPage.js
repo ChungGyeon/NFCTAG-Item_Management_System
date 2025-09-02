@@ -230,9 +230,9 @@ function OpenAddItemModal(button){
 
     const img = document.createElement('img');
     img.id = 'itemImg';
-    img.src = '/images/이미지추가안내.png';
+    img.src = '/images/introItemAdding.png';
     img.alt = '이미지가 안보인다구요? 어쩌라구여';
-    img.style.width = '280px';
+    img.style.width = '280px';ß
     img.style.height = '320px';
     img.style.objectFit = 'cover';
     img.style.cursor = 'pointer';
