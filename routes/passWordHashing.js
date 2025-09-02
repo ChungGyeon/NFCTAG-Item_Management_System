@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 
-async function(inPassWord){
+async function genHashPassWord(inPassWord){
     try {
         const saltRound = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(inPassWord, saltRound);

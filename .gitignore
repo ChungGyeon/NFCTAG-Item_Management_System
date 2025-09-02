@@ -24,3 +24,7 @@ views/.DS_Store
 
 #nfc_url.json 파일 명시적으로 무시
 /routes/sys_management/randURL/nfc_url.json
+
+#각 로그파일들 무시
+node.log
+python.log
