@@ -37,7 +37,7 @@ async function generateAndWriteUrl() {
     setInterval(async () => {
         const currentSeed = seedGenerator.getCurrentSeed();
         //추후 정해지는 도메인에 따라 여기 주소 변경필요함
-        const url = `http://localhost:3001/detect/startRentingItem/${currentSeed}`;
+        const url = `http://its.iptime.org:61427/detect/startRentingItem/${currentSeed}`;
         const result = await writeUrlToNfc(url);
         console.log(`${new Date().toISOString()} - URL 생성됨: ${url}`);
     }, 10 * 1050);
