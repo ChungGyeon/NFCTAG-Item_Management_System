@@ -2,11 +2,11 @@
 
 # 스크립트 파일 위치 기준으로 경로 설정
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$SCRIPT_DIR"
 
 # 절대 경로 설정
-VENV_PATH="$PROJECT_ROOT/venv"                # 파이썬 가상환경 디렉토리 경로
-PY_SCRIPT="$SCRIPT_DIR/write_nfctag_i2c2.py"  # 실행할 파이썬 파일 절대 경로
+VENV_PATH="$PROJECT_ROOT/nfc_write_sys/venv"  # 파이썬 가상환경 디렉토리 경로
+PY_SCRIPT="$SCRIPT_DIR/nfc_write_sys/write_nfctag_i2c2.py"  # 실행할 파이썬 파일 절대 경로
 NODE_SCRIPT="$PROJECT_ROOT/app.js"            # 실행할 Node.js 서버 파일 절대 경로
 
 echo "================================================"
@@ -27,7 +27,7 @@ echo "[$(date)] Node.js 서버 시작됨 (PID: $NODE_PID)"
 # 2. Python 가상환경 활성화
 if [ -d "$VENV_PATH" ]; then
     echo "[$(date)] 파이썬 가상환경 활성화 중..."
-    source "$VENV_PATH/bin/activate"
+    . "$VENV_PATH/bin/activate"
 
     # 가상환경이 제대로 활성화되었는지 확인
     if [ $? -ne 0 ]; then
@@ -49,7 +49,7 @@ else
         exit 1
     fi
 
-    source "$VENV_PATH/bin/activate"
+    . "$VENV_PATH/bin/activate"
     echo "[$(date)] 가상환경 생성 및 활성화 성공"
 
     # 필요한 패키지 설치
