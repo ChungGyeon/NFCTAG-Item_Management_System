@@ -6,11 +6,12 @@ import time
 import ndef
 from datetime import datetime
 from adafruit_pn532.i2c import PN532_I2C
-from adafruit_pn532 import _COMMAND_RFCONFIGURATION
+
 
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
+_COMMAND_RFCONFIGURATION = 0x32
 
 def RF_field_off(pn532):
     # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x00 (off)
