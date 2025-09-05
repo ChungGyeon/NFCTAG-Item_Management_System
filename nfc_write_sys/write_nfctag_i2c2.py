@@ -417,11 +417,7 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
         if i2c:
             i2c.deinit()
             # 종료 전 RF 필드 끄기
-            if pn532:
-                try:
-                    configure_rf_field(pn532, False)
-                    print(f"[{datetime.now()}] RF 필드 정리 완료")
-        print(f"[{datetime.now()}] I2C 연결이 최종적으로 해제되었습니다.")
+            print(f"[{datetime.now()}] I2C 연결이 최종적으로 해제되었습니다.")
 
 
 if __name__ == "__main__":
