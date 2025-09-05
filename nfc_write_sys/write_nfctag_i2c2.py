@@ -18,9 +18,10 @@ def RF_field_off(pn532):
     # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x00 (off)
     pn532._wakeup()
     time.sleep(0.1)  # Wake-up 후 안정화 대기
-    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=bytes([0x01, 0x00]), response_length=2, timeout=1)
-    if response and len(response) > 0 and response[0] == 0x00:
-        print("RF 필드 꺼짐")
+    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=bytes([0x01, 0x00]), response_length=0, timeout=1)
+
+    if response is not None:
+        print(f"RF 필드 on 성공: {response.hex()}")
         return True
     else:
         print(f"RF 필드 off 실패 - 응답 : {response.hex() if response else '없음'}")
@@ -29,9 +30,9 @@ def RF_field_off(pn532):
 def RF_field_on(pn532):
     pn532._wakeup()
     time.sleep(0.1)  # Wake-up 후 안정화 대기
-    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=bytes([0x01, 0x01]), response_length=2, timeout=1)
-    if response and len(response) > 0 and response[0] == 0x00:
-        print("RF 필드 켜짐")
+    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=bytes([0x01, 0x01]), response_length=0, timeout=1)
+    if response is not None:
+        print(f"RF 필드 on 성공 응답 수신: {response.hex()}")
         return True
     else:
         print(f"RF 필드 on 실패 - 응답 : {response.hex() if response else '없음'}")
