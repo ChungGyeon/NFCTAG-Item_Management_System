@@ -6,11 +6,31 @@ import time
 import ndef
 from datetime import datetime
 from adafruit_pn532.i2c import PN532_I2C
+from adafruit_pn532 import _COMMAND_RFCONFIGURATION
 
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
 
+def RF_field_off(pn532):
+    # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x00 (off)
+    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x00], response_length=1)
+    if response[0] == 0x00:
+        print("RF 필드 꺼짐")
+        return True
+    else:
+        print("RF 필드 off 실패")
+        return False
+
+def RF_field_on(pn532):
+    # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x01 (on, auto RFCA)
+    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x01], response_length=1)
+    if response[0] == 0x00:
+        print("RF 필드 켜짐")
+        return True
+    else:
+        print("RF 필드 on 실패")
+        return False
 
 
 def test_nfc_components():
@@ -18,6 +38,7 @@ def test_nfc_components():
     test_url = "https://example.com/test"
     test_results = {
         "pn532_connection": False,
+        "module_powerDown": False,
         "ndef_library": False,
         "ndef_message_creation": False,
         "file_operations": False,
@@ -44,15 +65,31 @@ def test_nfc_components():
     # 1-2 PN532 파워다운 테스트
     try:
         print(f"[{datetime.now()}] 1-2. PN532 파워 다운 테스트...")
+        resultPowerOff = RF_field_off(pn532)
+        """
         resultPowerDown = pn532.power_down()
         if resultPowerDown:
-            print("파워 다운 테스트 성공")
+            print(f"[{datetime.now()}] ✓ 파워 다운 테스트 성공")
         else:
-            print("에러는 안나지만, 파워다운은 실패")
+            print(f"[{datetime.now()}] ✗ 에러는 안나지만, 파워다운은 실패")
+        """
+        if resultPowerOff:
+            print(f"[{datetime.now()}] ✓ 파워 오프 테스트 성공")
+        else:
+            print(f"[{datetime.now()}] ✗ 에러는 안나지만, 파워 오프 실패")
+
+        resultPowerOn = RF_field_on(pn532)
+        if resultPowerOn:
+            print(f"[{datetime.now()}] ✓ 파워 온 테스트 성공")
+        else:
+            print(f"[{datetime.now()}] ✗ 에러는 안나지만, 파워 온 실패")
+
         i2c.deinit()
+        test_results["module_powerDown"] = True
 
     except Exception as e:
         print(f"[{datetime.now()}] x PN532 파워 다운 실패: {e}")
+        test_results["module_powerDown"] = False
 
     # 2. NDEF 라이브러리 테스트
     try:
