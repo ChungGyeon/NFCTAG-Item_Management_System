@@ -11,6 +11,7 @@ from adafruit_pn532.i2c import PN532_I2C
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
+"""
 _COMMAND_RFCONFIGURATION = 0x32
 
 def RF_field_off(pn532):
@@ -35,7 +36,7 @@ def RF_field_on(pn532):
     else:
         print(f"RF 필드 on 실패 - 응답 : {response.hex() if response else '없음'}")
         return False
-
+"""
 
 def test_nfc_components():
     """detect_and_write_tag() 함수에서 사용하는 모든 컴포넌트들의 동작을 테스트합니다."""
@@ -69,8 +70,8 @@ def test_nfc_components():
     # 1-2 PN532 파워다운 테스트
     try:
         print(f"[{datetime.now()}] 1-2. PN532 파워 다운 테스트...")
-        resultPowerOff = RF_field_off(pn532)
-        """
+        #resultPowerOff = RF_field_off(pn532)
+
         resultPowerDown = pn532.power_down()
         if resultPowerDown:
             print(f"[{datetime.now()}] ✓ 파워 다운 테스트 성공")
@@ -87,7 +88,7 @@ def test_nfc_components():
             print(f"[{datetime.now()}] ✓ 파워 온 테스트 성공")
         else:
             print(f"[{datetime.now()}] ✗ 에러는 안나지만, 파워 온 실패")
-
+"""
         i2c.deinit()
         test_results["module_powerDown"] = True
 
