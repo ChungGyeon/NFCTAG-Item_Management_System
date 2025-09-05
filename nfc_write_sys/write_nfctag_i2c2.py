@@ -283,7 +283,7 @@ def write_ndef_message(pn532, message_bytes, uid, start_block=4):
                 raise RuntimeError(f"블록 {block_num} 쓰기 실패")
             
             print(f"[{datetime.now()}] ✓ 블록 {block_num} 쓰기 성공")
-            time.sleep(0.01) # 안정적인 쓰기를 위해 블록 간 짧은 딜레이 추가
+            time.sleep(0.02) # 안정적인 쓰기를 위해 블록 간 짧은 딜레이 추가
 
         print(f"[{datetime.now()}] ✓ 모든 블록 쓰기 완료")
         return True
@@ -376,13 +376,13 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
                 if url:
                     print(f"[{datetime.now()}] URL '{url}'을 태그에 쓸 준비가 되었습니다.")
                     # 태그 쓰기 전에 RF 필드 상태 확인
-                    configure_rf_field(pn532, True)
-
-                    result = detect_and_write_tag(pn532, url)
-                    if result["status"] == "error":
-                        print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 실패: {result['message']}")
-                    elif result["status"] == "success":
-                        print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 성공!")
+                    if configure_rf_field(pn532, True):
+                        time.sleep(0.1)  # RF 안정화 대기
+                        result = detect_and_write_tag(pn532, url)
+                        if result["status"] == "error":
+                            print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 실패: {result['message']}")
+                        elif result["status"] == "success":
+                            print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 성공!")
 
                 # --- 4. 다음 주기까지 대기 ---
                 print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다.")
