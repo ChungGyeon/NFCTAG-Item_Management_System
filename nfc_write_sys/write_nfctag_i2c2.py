@@ -10,7 +10,7 @@ from adafruit_pn532.i2c import PN532_I2C
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
-
+_COMMAND_RFCONFIGURATION = 0x32
 
 
 def test_nfc_components():
