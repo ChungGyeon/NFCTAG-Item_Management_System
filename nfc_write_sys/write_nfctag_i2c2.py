@@ -31,8 +31,6 @@ def test_nfc_components():
         print(f"[{datetime.now()}] 1. PN532 연결 테스트...")
         i2c = busio.I2C(board.SCL, board.SDA)
         pn532 = PN532_I2C(i2c, debug=False)
-        if pn532._wakeup():
-            print('wakeup 성공')
         ic, ver, rev, support = pn532.firmware_version
         print(f"[{datetime.now()}] ✓ PN532 연결 성공. 펌웨어: {ver}.{rev}")
         test_results["pn532_connection"] = True
@@ -110,8 +108,6 @@ def test_nfc_components():
         print(f"[{datetime.now()}] ⚠️ 일부 테스트 실패. NFC 쓰기에 문제가 있을 수 있습니다.")
 
     # 6. 상세 결과 출력
-    if pn532.power_down():
-        print('power_down 성공')
     print(f"\n[{datetime.now()}] === 테스트 결과 요약 ===")
     for test_name, result in test_results.items():
         status = "✓ 통과" if result else "✗ 실패"
