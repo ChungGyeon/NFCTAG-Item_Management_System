@@ -12,6 +12,7 @@ current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
 
 
+
 def test_nfc_components():
     """detect_and_write_tag() 함수에서 사용하는 모든 컴포넌트들의 동작을 테스트합니다."""
     test_url = "https://example.com/test"
@@ -30,7 +31,6 @@ def test_nfc_components():
         print(f"[{datetime.now()}] 1. PN532 연결 테스트...")
         i2c = busio.I2C(board.SCL, board.SDA)
         pn532 = PN532_I2C(i2c, debug=False)
-        #이게 될련지 모르겠다만
         if pn532._wakeup():
             print('wakeup 성공')
         ic, ver, rev, support = pn532.firmware_version
@@ -110,9 +110,9 @@ def test_nfc_components():
         print(f"[{datetime.now()}] ⚠️ 일부 테스트 실패. NFC 쓰기에 문제가 있을 수 있습니다.")
 
     # 6. 상세 결과 출력
-    print(f"\n[{datetime.now()}] === 테스트 결과 요약 ===")
     if pn532.power_down():
-        print('파워다운 성공')
+        print('power_down 성공')
+    print(f"\n[{datetime.now()}] === 테스트 결과 요약 ===")
     for test_name, result in test_results.items():
         status = "✓ 통과" if result else "✗ 실패"
         print(f"  {test_name}: {status}")
@@ -219,7 +219,7 @@ def write_ndef_message(pn532, message_bytes, uid, start_block=4):
 
         # 데이터를 4바이트 블록으로 나누어 쓰기 (NTAG2xx/Mifare Ultralight)
         print(f"[{datetime.now()}] 블록 단위 쓰기 시작 (시작 블록: {start_block})...")
-        
+
         total_blocks = (len(payload) + 3) // 4
         print(f"[{datetime.now()}] 총 {total_blocks}개 블록에 쓰기 예정")
 
@@ -227,23 +227,23 @@ def write_ndef_message(pn532, message_bytes, uid, start_block=4):
             block_num = start_block + i
             start_idx = i * 4
             chunk = payload[start_idx:start_idx + 4]
-            
+
             # 마지막 블록이 4바이트보다 작으면 0x00으로 패딩
             if len(chunk) < 4:
                 chunk += bytes([0x00] * (4 - len(chunk)))
-            
+
             print(f"[{datetime.now()}] 블록 {block_num} 쓰기 중... (데이터: {chunk.hex()})")
-            
+
             # NTAG2xx 블록 쓰기 명령
             if not pn532.ntag2xx_write_block(block_num, chunk):
                 raise RuntimeError(f"블록 {block_num} 쓰기 실패")
-            
+
             print(f"[{datetime.now()}] ✓ 블록 {block_num} 쓰기 성공")
             time.sleep(0.01) # 안정적인 쓰기를 위해 블록 간 짧은 딜레이 추가
 
         print(f"[{datetime.now()}] ✓ 모든 블록 쓰기 완료")
         return True
-        
+
     except Exception as e:
         print(f"[{datetime.now()}] NDEF 쓰기 중 오류: {e}")
         # RuntimeError를 발생시켜 상위 루프에서 연결 재설정을 시도하도록 함
@@ -327,17 +327,44 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
                     result = detect_and_write_tag(pn532, url)
                     if result["status"] == "error":
                         print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 실패: {result['message']}")
-                    elif result["status"] == "success":
-                        print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 성공!")
 
-                # --- 4. 다음 주기까지 대기 ---
+                # --- 4. 다음 주기까지 대기 (try 블록 안으로 이동) ---
                 print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다.")
                 time.sleep(interval)
 
             except RuntimeError as e:
                 # 태그 통신 오류 발생 시 연결 재설정
                 print(f"[{datetime.now()}] PN532 통신 오류 발생: {e}. 연결을 초기화합니다.")
+                pn532 = None
                 if i2c:
                     i2c.deinit()
             except KeyboardInterrupt:
                 print("프로그램을 종료합니다.")
+                break
+            except Exception as e:
+                print(f"[{datetime.now()}] 메인 루프 오류: {e}. 연결을 초기화합니다.")
+                pn532 = None
+                if i2c:
+                    i2c.deinit()
+
+    finally:
+        # 프로그램 종료 시 리소스 정리
+        if i2c:
+            i2c.deinit()
+        print(f"[{datetime.now()}] I2C 연결이 최종적으로 해제되었습니다.")
+
+
+if __name__ == "__main__":
+    # NFC 컴포넌트 테스트 실행
+    test_results = test_nfc_components()
+
+    if test_results["overall_status"]:
+        print(f"\n[{datetime.now()}] 테스트 통과! 정상적인 NFC 쓰기를 시작합니다.")
+        # 30초마다 ./tmp/nfc_url.json 파일을 읽어 태그에 씁니다.
+        periodic_writer(interval=11)
+    else:
+        print(f"\n[{datetime.now()}] 테스트 실패! 문제를 해결한 후 다시 실행해주세요.")
+        print("실패한 항목:")
+        for test_name, result in test_results.items():
+            if not result and test_name != "overall_status":
+                print(f"  - {test_name}")
