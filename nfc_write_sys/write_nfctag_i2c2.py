@@ -293,6 +293,10 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
                         pn532 = PN532_I2C(i2c, debug=False)
                         ic, ver, rev, support = pn532.firmware_version
                         print(f"[{datetime.now()}] 1번 시퀸스, PN532 연결 성공. 펌웨어: {ver}.{rev}")
+                        response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x01], response_length=1)
+                        if response and response[0] == 0x00:
+                             print("RF 필드 켜기 성공")
+
                     except Exception as e:
                         print(f"[{datetime.now()}] 1번 시퀸스, PN532 연결 실패: {e}. 다음 주기까지 대기합니다.")
                         pn532 = None
@@ -326,6 +330,9 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
 
                 # --- 4. 다음 주기까지 대기 (try 블록 안으로 이동) ---
                 print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다.")
+                response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x01], response_length=1)
+                if response and response[0] == 0x00:
+                     print("RF 필드 켜기 성공")
                 time.sleep(interval)
 
             except RuntimeError as e:
