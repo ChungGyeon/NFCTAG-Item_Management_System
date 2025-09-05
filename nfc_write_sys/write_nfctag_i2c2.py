@@ -6,11 +6,11 @@ import time
 import ndef
 from datetime import datetime
 from adafruit_pn532.i2c import PN532_I2C
+from adafruit_pn532.adafruit_pn532 import _COMMAND_RFCONFIGURATION
 
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
-_COMMAND_RFCONFIGURATION = 0x32
 
 
 def configure_rf_field(pn532, enable=True):
@@ -433,4 +433,5 @@ if __name__ == "__main__":
         for test_name, result in test_results.items():
             if not result and test_name != "overall_status":
                 print(f"  - {test_name}")
+
 
