@@ -13,6 +13,55 @@ PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
 _COMMAND_RFCONFIGURATION = 0x32
 
 
+def configure_rf_field(pn532, enable=True):
+    """RF 필드를 켜거나 끕니다."""
+    try:
+        # RF Configuration 명령: 0x32
+        # 파라미터: [Config Item, Config Data]
+        # Config Item 0x01: RF Field (0x00=Off, 0x01=On)
+        params = [0x01, 0x01 if enable else 0x00]
+        response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=params, response_length=1)
+
+        if response and response[0] == 0x00:
+            status = "켜기" if enable else "끄기"
+            print(f"[{datetime.now()}] RF 필드 {status} 성공")
+            return True
+        else:
+            status = "켜기" if enable else "끄기"
+            print(f"[{datetime.now()}] RF 필드 {status} 실패 - 응답: {response}")
+            return False
+    except Exception as e:
+        status = "켜기" if enable else "끄기"
+        print(f"[{datetime.now()}] RF 필드 {status} 중 오류: {e}")
+        return False
+
+
+def optimize_rf_settings(pn532):
+    """NFC 태그 읽기/쓰기를 위한 최적의 RF 설정을 적용합니다."""
+    try:
+        print(f"[{datetime.now()}] RF 설정 최적화 시작...")
+
+        # 1. RF 필드 켜기
+        if not configure_rf_field(pn532, True):
+            return False
+
+        # 2. RF 타임아웃 설정 (선택사항)
+        # 0x02: Max Retry Count 설정
+        try:
+            response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x05, 0xFF, 0x01, 0x01], response_length=1)
+            if response and response[0] == 0x00:
+                print(f"[{datetime.now()}] RF 타임아웃 설정 성공")
+        except Exception as e:
+            print(f"[{datetime.now()}] RF 타임아웃 설정 실패 (무시): {e}")
+
+        print(f"[{datetime.now()}] RF 설정 최적화 완료")
+        return True
+
+    except Exception as e:
+        print(f"[{datetime.now()}] RF 설정 최적화 중 오류: {e}")
+        return False
+
+
 def test_nfc_components():
     """detect_and_write_tag() 함수에서 사용하는 모든 컴포넌트들의 동작을 테스트합니다."""
     test_url = "https://example.com/test"
@@ -293,9 +342,12 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
                         pn532 = PN532_I2C(i2c, debug=False)
                         ic, ver, rev, support = pn532.firmware_version
                         print(f"[{datetime.now()}] 1번 시퀸스, PN532 연결 성공. 펌웨어: {ver}.{rev}")
-                        response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x01], response_length=1)
-                        if response and response[0] == 0x00:
-                             print("RF 필드 켜기 성공")
+
+                        # RF 설정 최적화 적용
+                        if optimize_rf_settings(pn532):
+                            print(f"[{datetime.now()}] RF 안테나 초기화 완료")
+                        else:
+                            print(f"[{datetime.now()}] RF 안테나 초기화 실패, 계속 진행")
 
                     except Exception as e:
                         print(f"[{datetime.now()}] 1번 시퀸스, PN532 연결 실패: {e}. 다음 주기까지 대기합니다.")
@@ -324,20 +376,30 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
                 # --- 3. URL이 있으면 태그에 쓰기 ---
                 if url:
                     print(f"[{datetime.now()}] URL '{url}'을 태그에 쓸 준비가 되었습니다.")
+                    # 태그 쓰기 전에 RF 필드 상태 확인
+                    configure_rf_field(pn532, True)
+
                     result = detect_and_write_tag(pn532, url)
                     if result["status"] == "error":
                         print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 실패: {result['message']}")
+                    elif result["status"] == "success":
+                        print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 성공!")
 
-                # --- 4. 다음 주기까지 대기 (try 블록 안으로 이동) ---
+                # --- 4. 다음 주기까지 대기 ---
                 print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다.")
-                response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x01], response_length=1)
-                if response and response[0] == 0x00:
-                     print("RF 필드 켜기 성공")
+                # 대기 중에는 RF 필드를 끄고 전력 절약
+                configure_rf_field(pn532, False)
                 time.sleep(interval)
 
             except RuntimeError as e:
                 # 태그 통신 오류 발생 시 연결 재설정
                 print(f"[{datetime.now()}] PN532 통신 오류 발생: {e}. 연결을 초기화합니다.")
+                # RF 필드 끄고 연결 재설정
+                if pn532:
+                    try:
+                        configure_rf_field(pn532, False)
+                    except:
+                        pass
                 pn532 = None
                 if i2c:
                     i2c.deinit()
@@ -354,6 +416,11 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
         # 프로그램 종료 시 리소스 정리
         if i2c:
             i2c.deinit()
+            # 종료 전 RF 필드 끄기
+            if pn532:
+                try:
+                    configure_rf_field(pn532, False)
+                    print(f"[{datetime.now()}] RF 필드 정리 완료")
         print(f"[{datetime.now()}] I2C 연결이 최종적으로 해제되었습니다.")
 
 
@@ -371,3 +438,4 @@ if __name__ == "__main__":
         for test_name, result in test_results.items():
             if not result and test_name != "overall_status":
                 print(f"  - {test_name}")
+
