@@ -11,14 +11,14 @@ from adafruit_pn532.i2c import PN532_I2C
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
-"""
+
 _COMMAND_RFCONFIGURATION = 0x32
 
 def RF_field_off(pn532):
     # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x00 (off)
     pn532._wakeup()
     time.sleep(0.1)  # Wake-up 후 안정화 대기
-    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x00], response_length=2, timeout=1)
+    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=bytes([0x01, 0x00]), response_length=2, timeout=1)
     if response and len(response) > 0 and response[0] == 0x00:
         print("RF 필드 꺼짐")
         return True
@@ -29,14 +29,14 @@ def RF_field_off(pn532):
 def RF_field_on(pn532):
     pn532._wakeup()
     time.sleep(0.1)  # Wake-up 후 안정화 대기
-    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x00], response_length=2, timeout=1)
+    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=bytes([0x01, 0x01]), response_length=2, timeout=1)
     if response and len(response) > 0 and response[0] == 0x00:
         print("RF 필드 켜짐")
         return True
     else:
         print(f"RF 필드 on 실패 - 응답 : {response.hex() if response else '없음'}")
         return False
-"""
+
 
 def test_nfc_components():
     """detect_and_write_tag() 함수에서 사용하는 모든 컴포넌트들의 동작을 테스트합니다."""
@@ -70,9 +70,10 @@ def test_nfc_components():
     # 1-2 PN532 파워다운 테스트
     try:
         print(f"[{datetime.now()}] 1-2. PN532 파워 다운 테스트...")
-        #resultPowerOff = RF_field_off(pn532)
+        resultPowerOff = RF_field_off(pn532)
 
-        resultPowerDown = pn532.power_down()
+        #resultPowerDown = pn532.power_down()
+        """
         if resultPowerDown:
             print(f"[{datetime.now()}] ✓ 파워 다운 테스트 성공")
         else:
@@ -88,7 +89,7 @@ def test_nfc_components():
             print(f"[{datetime.now()}] ✓ 파워 온 테스트 성공")
         else:
             print(f"[{datetime.now()}] ✗ 에러는 안나지만, 파워 온 실패")
-"""
+
         i2c.deinit()
         test_results["module_powerDown"] = True
 
