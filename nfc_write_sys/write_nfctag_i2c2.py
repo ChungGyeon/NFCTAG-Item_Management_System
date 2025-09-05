@@ -98,6 +98,11 @@ def test_nfc_components():
 
     # 5. 전체 상태 평가
     critical_tests = ["pn532_connection", "ndef_library", "ndef_message_creation"]
+    respn = pn532.power_down()
+    if respn:
+        print('파워 오프!')
+    else:
+        print('파워 오프 안됨 ㅠㅠ')
     passed_critical = sum(test_results[test] for test in critical_tests)
 
     if passed_critical == len(critical_tests):
