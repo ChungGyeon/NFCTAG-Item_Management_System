@@ -15,22 +15,25 @@ _COMMAND_RFCONFIGURATION = 0x32
 
 def RF_field_off(pn532):
     # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x00 (off)
-    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x00], response_length=1)
-    if response[0] == 0x00:
+    pn532._wakeup()
+    time.sleep(0.1)  # Wake-up 후 안정화 대기
+    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x00], response_length=2, timeout=1)
+    if response and len(response) > 0 and response[0] == 0x00:
         print("RF 필드 꺼짐")
         return True
     else:
-        print("RF 필드 off 실패")
+        print(f"RF 필드 off 실패 - 응답 : {response.hex() if response else '없음'}")
         return False
 
 def RF_field_on(pn532):
-    # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x01 (on, auto RFCA)
-    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x01], response_length=1)
-    if response[0] == 0x00:
+    pn532._wakeup()
+    time.sleep(0.1)  # Wake-up 후 안정화 대기
+    response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x01, 0x00], response_length=2, timeout=1)
+    if response and len(response) > 0 and response[0] == 0x00:
         print("RF 필드 켜짐")
         return True
     else:
-        print("RF 필드 on 실패")
+        print(f"RF 필드 on 실패 - 응답 : {response.hex() if response else '없음'}")
         return False
 
 
@@ -150,7 +153,7 @@ def test_nfc_components():
         print(f"[{datetime.now()}] 📁 프로젝트 루트: {PROJECT_ROOT}")
 
     # 5. 전체 상태 평가
-    critical_tests = ["pn532_connection", "ndef_library", "ndef_message_creation"]
+    critical_tests = ["pn532_connection", "module_powerDown", "ndef_library", "ndef_message_creation"]
     passed_critical = sum(test_results[test] for test in critical_tests)
 
     if passed_critical == len(critical_tests):
