@@ -26,6 +26,9 @@ def test_nfc_components():
 
     print(f"[{datetime.now()}] NFC 컴포넌트 테스트를 시작합니다...")
 
+    pn532 = None
+    i2c = None
+
     # 1. PN532 연결 테스트
     try:
         print(f"[{datetime.now()}] 1. PN532 연결 테스트...")
@@ -34,10 +37,22 @@ def test_nfc_components():
         ic, ver, rev, support = pn532.firmware_version
         print(f"[{datetime.now()}] ✓ PN532 연결 성공. 펌웨어: {ver}.{rev}")
         test_results["pn532_connection"] = True
-        i2c.deinit()
     except Exception as e:
         print(f"[{datetime.now()}] ✗ PN532 연결 실패: {e}")
         test_results["pn532_connection"] = False
+
+    # 1-2 PN532 파워다운 테스트
+    try:
+        print(f"[{datetime.now()}] 1-2. PN532 파워 다운 테스트...")
+        resultPowerDown = pn532.power_down()
+        if resultPowerDown:
+            print("파워 다운 테스트 성공")
+        else:
+            print("에러는 안나지만, 파워다운은 실패")
+        i2c.deinit()
+
+    except Exception as e:
+        print(f"[{datetime.now()}] x PN532 파워 다운 실패: {e}")
 
     # 2. NDEF 라이브러리 테스트
     try:
@@ -98,11 +113,6 @@ def test_nfc_components():
 
     # 5. 전체 상태 평가
     critical_tests = ["pn532_connection", "ndef_library", "ndef_message_creation"]
-    respn = pn532.power_down()
-    if respn:
-        print('파워 오프!')
-    else:
-        print('파워 오프 안됨 ㅠㅠ')
     passed_critical = sum(test_results[test] for test in critical_tests)
 
     if passed_critical == len(critical_tests):
