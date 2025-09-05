@@ -6,59 +6,10 @@ import time
 import ndef
 from datetime import datetime
 from adafruit_pn532.i2c import PN532_I2C
-from adafruit_pn532.adafruit_pn532 import _COMMAND_RFCONFIGURATION
 
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
-
-
-def configure_rf_field(pn532, enable=True):
-    """RF 필드를 켜거나 끕니다."""
-    try:
-        # RFConfiguration 명령: 0x32
-        # CfgItem 0x01: RF Field (0x00=Off, 0x01=On)
-        params = [0x01, 0x01 if enable else 0x00]
-        # 응답 길이를 2로 늘려 에러 코드 확인 가능 (Status + Optional Data)
-        response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=params, response_length=2, timeout=1)
-
-        if response and response[0] == 0x00:
-            status = "켜기" if enable else "끄기"
-            print(f"[{datetime.now()}] RF 필드 {status} 성공")
-            return True
-        else:
-            status = "켜기" if enable else "끄기"
-            print(f"[{datetime.now()}] RF 필드 {status} 실패 - 응답: {response.hex() if response else '없음'}")
-            return False
-    except Exception as e:
-        status = "켜기" if enable else "끄기"
-        print(f"[{datetime.now()}] RF 필드 {status} 중 오류: {e}")
-        return False
-
-def optimize_rf_settings(pn532):
-    """NFC 태그 읽기/쓰기를 위한 최적의 RF 설정을 적용합니다."""
-    try:
-        print(f"[{datetime.now()}] RF 설정 최적화 시작...")
-
-        # 1. RF 필드 켜기
-        if not configure_rf_field(pn532, True):
-            return False
-
-        # 2. MaxRetries 설정 (문서 기반, CfgItem=0x02)
-        try:
-            # CfgItem 0x02: MaxRetries (0xFF=최대 재시도)
-            response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x02, 0xFF], response_length=1)
-            if response and response[0] == 0x00:
-                print(f"[{datetime.now()}] MaxRetries 설정 성공")
-        except Exception as e:
-            print(f"[{datetime.now()}] MaxRetries 설정 실패 (무시): {e}")
-
-        print(f"[{datetime.now()}] RF 설정 최적화 완료")
-        return True
-
-    except Exception as e:
-        print(f"[{datetime.now()}] RF 설정 최적화 중 오류: {e}")
-        return False
 
 
 def test_nfc_components():
@@ -283,7 +234,7 @@ def write_ndef_message(pn532, message_bytes, uid, start_block=4):
                 raise RuntimeError(f"블록 {block_num} 쓰기 실패")
             
             print(f"[{datetime.now()}] ✓ 블록 {block_num} 쓰기 성공")
-            time.sleep(0.02) # 안정적인 쓰기를 위해 블록 간 짧은 딜레이 추가
+            time.sleep(0.01) # 안정적인 쓰기를 위해 블록 간 짧은 딜레이 추가
 
         print(f"[{datetime.now()}] ✓ 모든 블록 쓰기 완료")
         return True
@@ -341,13 +292,6 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
                         pn532 = PN532_I2C(i2c, debug=False)
                         ic, ver, rev, support = pn532.firmware_version
                         print(f"[{datetime.now()}] 1번 시퀸스, PN532 연결 성공. 펌웨어: {ver}.{rev}")
-
-                        # RF 설정 최적화 적용
-                        if optimize_rf_settings(pn532):
-                            print(f"[{datetime.now()}] RF 안테나 초기화 완료")
-                        else:
-                            print(f"[{datetime.now()}] RF 안테나 초기화 실패, 계속 진행")
-
                     except Exception as e:
                         print(f"[{datetime.now()}] 1번 시퀸스, PN532 연결 실패: {e}. 다음 주기까지 대기합니다.")
                         pn532 = None
@@ -375,63 +319,20 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
                 # --- 3. URL이 있으면 태그에 쓰기 ---
                 if url:
                     print(f"[{datetime.now()}] URL '{url}'을 태그에 쓸 준비가 되었습니다.")
-                    # 태그 쓰기 전에 RF 필드 상태 확인
-                    if configure_rf_field(pn532, True):
-                        time.sleep(0.1)  # RF 안정화 대기
-                        result = detect_and_write_tag(pn532, url)
-                        if result["status"] == "error":
-                            print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 실패: {result['message']}")
-                        elif result["status"] == "success":
-                            print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 성공!")
+                    result = detect_and_write_tag(pn532, url)
+                    if result["status"] == "error":
+                        print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 실패: {result['message']}")
+                    elif result["status"] == "success":
+                        print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 성공!")
 
                 # --- 4. 다음 주기까지 대기 ---
                 print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다.")
-                # 대기 중에는 RF 필드를 끄고 전력 절약
-                configure_rf_field(pn532, False)
                 time.sleep(interval)
 
             except RuntimeError as e:
                 # 태그 통신 오류 발생 시 연결 재설정
                 print(f"[{datetime.now()}] PN532 통신 오류 발생: {e}. 연결을 초기화합니다.")
-                # RF 필드 끄고 연결 재설정
-                if pn532:
-                    try:
-                        configure_rf_field(pn532, False)
-                    except:
-                        pass
-                pn532 = None
                 if i2c:
                     i2c.deinit()
             except KeyboardInterrupt:
                 print("프로그램을 종료합니다.")
-                break
-            except Exception as e:
-                print(f"[{datetime.now()}] 메인 루프 오류: {e}. 연결을 초기화합니다.")
-                pn532 = None
-                if i2c:
-                    i2c.deinit()
-
-    finally:
-        # 프로그램 종료 시 리소스 정리
-        if i2c:
-            i2c.deinit()
-            # 종료 전 RF 필드 끄기
-            print(f"[{datetime.now()}] I2C 연결이 최종적으로 해제되었습니다.")
-
-
-if __name__ == "__main__":
-    # NFC 컴포넌트 테스트 실행
-    test_results = test_nfc_components()
-
-    if test_results["overall_status"]:
-        print(f"\n[{datetime.now()}] 테스트 통과! 정상적인 NFC 쓰기를 시작합니다.")
-        # 30초마다 ./tmp/nfc_url.json 파일을 읽어 태그에 씁니다.
-        periodic_writer(interval=11)
-    else:
-        print(f"\n[{datetime.now()}] 테스트 실패! 문제를 해결한 후 다시 실행해주세요.")
-        print("실패한 항목:")
-        for test_name, result in test_results.items():
-            if not result and test_name != "overall_status":
-                print(f"  - {test_name}")
-
-
