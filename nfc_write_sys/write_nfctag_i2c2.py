@@ -340,7 +340,8 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
                         print(f"[{datetime.now()}] 3번 시퀸스, 태그 쓰기 실패: {result['message']}")
 
                 # --- 4. 다음 주기까지 대기 (try 블록 안으로 이동) ---
-                print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다.")
+                responsePowerDown = pn532.power_down()
+                print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다. | 모듈파워 상태 : {responsePowerDown}")
                 time.sleep(interval)
 
             except RuntimeError as e:
