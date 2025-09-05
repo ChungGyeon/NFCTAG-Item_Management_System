@@ -16,11 +16,11 @@ _COMMAND_RFCONFIGURATION = 0x32
 def configure_rf_field(pn532, enable=True):
     """RF 필드를 켜거나 끕니다."""
     try:
-        # RF Configuration 명령: 0x32
-        # 파라미터: [Config Item, Config Data]
-        # Config Item 0x01: RF Field (0x00=Off, 0x01=On)
+        # RFConfiguration 명령: 0x32
+        # CfgItem 0x01: RF Field (0x00=Off, 0x01=On)
         params = [0x01, 0x01 if enable else 0x00]
-        response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=params, response_length=1)
+        # 응답 길이를 2로 늘려 에러 코드 확인 가능 (Status + Optional Data)
+        response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=params, response_length=2, timeout=1)
 
         if response and response[0] == 0x00:
             status = "켜기" if enable else "끄기"
@@ -28,13 +28,12 @@ def configure_rf_field(pn532, enable=True):
             return True
         else:
             status = "켜기" if enable else "끄기"
-            print(f"[{datetime.now()}] RF 필드 {status} 실패 - 응답: {response}")
+            print(f"[{datetime.now()}] RF 필드 {status} 실패 - 응답: {response.hex() if response else '없음'}")
             return False
     except Exception as e:
         status = "켜기" if enable else "끄기"
         print(f"[{datetime.now()}] RF 필드 {status} 중 오류: {e}")
         return False
-
 
 def optimize_rf_settings(pn532):
     """NFC 태그 읽기/쓰기를 위한 최적의 RF 설정을 적용합니다."""
@@ -45,14 +44,14 @@ def optimize_rf_settings(pn532):
         if not configure_rf_field(pn532, True):
             return False
 
-        # 2. RF 타임아웃 설정 (선택사항)
-        # 0x02: Max Retry Count 설정
+        # 2. MaxRetries 설정 (문서 기반, CfgItem=0x02)
         try:
-            response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x05, 0xFF, 0x01, 0x01], response_length=1)
+            # CfgItem 0x02: MaxRetries (0xFF=최대 재시도)
+            response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=[0x02, 0xFF], response_length=1)
             if response and response[0] == 0x00:
-                print(f"[{datetime.now()}] RF 타임아웃 설정 성공")
+                print(f"[{datetime.now()}] MaxRetries 설정 성공")
         except Exception as e:
-            print(f"[{datetime.now()}] RF 타임아웃 설정 실패 (무시): {e}")
+            print(f"[{datetime.now()}] MaxRetries 설정 실패 (무시): {e}")
 
         print(f"[{datetime.now()}] RF 설정 최적화 완료")
         return True
