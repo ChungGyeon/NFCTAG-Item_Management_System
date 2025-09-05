@@ -13,7 +13,7 @@ current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
 
 _COMMAND_RFCONFIGURATION = 0x32
-
+"""음.... 응답오는게 없다는것이 정상이라면 테스트를 해봐야겠네"""
 def RF_field_off(pn532):
     # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x00 (off)
     pn532._wakeup()
