@@ -1,3 +1,18 @@
+"""
+pn532모듈 파일
+===============================================================
+이 파일은 주기적으로 nfc_url.json에 담겨있는 url을 주변 nfc태그에 쓰는 역할을 수행합니다.
+시작하면 각 nfc모듈의 연결,RF필드 제어, 라이브러리의 연결상태를 점검 후 기능을 수행합니다.
+
+모듈의 연결 및 제어는 adafruit측에서 만든 오픈소스라이브러리로 제어하며, i2c로 연결된 것만 처리합니다.
+하드웨어는 아래를 참조하세요.
+* Adafruit `PN532 Breakout <https://www.adafruit.com/product/364>`
+* Adafruit `PN532 Shield <https://www.adafruit.com/product/789>`
+
+위 하드웨어 외에도 NXP Semiconductors의 사양을 따르는 모듈도 사용가능합니다.
+
+디버깅을 하실때는 debugingPrint를 검색하여 주석을 해지하고 로그를 출력하세요. 이를 따라가면 고칠 수 있을 것 입니다.
+"""
 import board
 import busio
 import json
@@ -11,31 +26,36 @@ from adafruit_pn532.i2c import PN532_I2C
 # 프로젝트 루트 디렉토리 경로 얻기
 current_file = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(current_file, "../.."))
-
 _COMMAND_RFCONFIGURATION = 0x32
-"""음.... 응답오는게 없다는것이 정상이라면 테스트를 해봐야겠네"""
+
+
 def RF_field_off(pn532):
-    # RFConfiguration 명령어: 0x01 (RF 필드 설정), 0x00 (off)
+    # pn532의 RF안테나를 off 하는 함수입니다.
+    # response는 출력이 bool 타입이 아닙니다.
+    # 제대로 출력 되는 경우, 이 함수는 비어있는 b''을 반환합니다.
+    # 그렇지 않은 경우 아무것도 반환하지 않습니다.
+    # RFConfiguration 명령어: 0x01 (RF필드 ON), 0x00 (RF필드 off)
     pn532._wakeup()
     time.sleep(0.1)  # Wake-up 후 안정화 대기
     response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=bytes([0x01, 0x00]), response_length=0, timeout=1)
 
     if response is not None:
-        print(f"RF 필드 on 성공: {response.hex()}")
+        #print(f"RF 필드 on 성공: {response.hex()}") #debugingPrint
         return True
     else:
-        print(f"RF 필드 off 실패 - 응답 : {response.hex() if response else '없음'}")
+        #print(f"RF 필드 off 실패 - 응답 : {response.hex() if response else '없음'}") #debugingPrint
         return False
 
 def RF_field_on(pn532):
+    # pn532의 RF안테나를 on 하는 함수입니다.
     pn532._wakeup()
     time.sleep(0.1)  # Wake-up 후 안정화 대기
     response = pn532.call_function(_COMMAND_RFCONFIGURATION, params=bytes([0x01, 0x01]), response_length=0, timeout=1)
     if response is not None:
-        print(f"RF 필드 on 성공 응답 수신: {response.hex()}")
+        #print(f"RF 필드 on 성공 응답 수신: {response.hex()}") # debugingPrint
         return True
     else:
-        print(f"RF 필드 on 실패 - 응답 : {response.hex() if response else '없음'}")
+        #print(f"RF 필드 on 실패 - 응답 : {response.hex() if response else '없음'}") # debugingPrint
         return False
 
 
@@ -57,6 +77,9 @@ def test_nfc_components():
     i2c = None
 
     # 1. PN532 연결 테스트
+    # 이곳에서 PN532모듈을 인식시켜 펌웨어를 가져옵니다.
+    # 펌웨어를 가져오면 무사히 연결이 성공됩니다.
+    # 만약 연결되지 않는다면 모듈이 i2c로 연결되어 있는지, 혹은 제대로 연결되어 있는지 확인하세요.
     try:
         print(f"[{datetime.now()}] 1. PN532 연결 테스트...")
         i2c = busio.I2C(board.SCL, board.SDA)
@@ -71,25 +94,20 @@ def test_nfc_components():
     # 1-2 PN532 파워다운 테스트
     try:
         print(f"[{datetime.now()}] 1-2. PN532 파워 다운 테스트...")
-        resultPowerOff = RF_field_off(pn532)
 
-        #resultPowerDown = pn532.power_down()
-        """
-        if resultPowerDown:
-            print(f"[{datetime.now()}] ✓ 파워 다운 테스트 성공")
-        else:
-            print(f"[{datetime.now()}] ✗ 에러는 안나지만, 파워다운은 실패")
-        """
+        resultPowerOff = RF_field_off(pn532)
+        time.sleep(0.1) # 안정화 대기
         if resultPowerOff:
             print(f"[{datetime.now()}] ✓ 파워 오프 테스트 성공")
         else:
-            print(f"[{datetime.now()}] ✗ 에러는 안나지만, 파워 오프 실패")
+            print(f"[{datetime.now()}] ✗ 파워 오프 실패: 78라인 참조")
 
         resultPowerOn = RF_field_on(pn532)
+        time.sleep(0.1) # 안정화 대기
         if resultPowerOn:
             print(f"[{datetime.now()}] ✓ 파워 온 테스트 성공")
         else:
-            print(f"[{datetime.now()}] ✗ 에러는 안나지만, 파워 온 실패")
+            print(f"[{datetime.now()}] ✗ 파워 온 실패: 84라인 참조")
 
         i2c.deinit()
         test_results["module_powerDown"] = True
@@ -145,10 +163,6 @@ def test_nfc_components():
             print(f"[{datetime.now()}] ✗ 파일 데이터 불일치")
             test_results["file_operations"] = False
 
-        # 테스트 파일 정리 (실제 파일을 삭제하지 않도록 주석 처리)
-        # if os.path.exists(test_file_path):
-        #     os.remove(test_file_path)
-
     except Exception as e:
         print(f"[{datetime.now()}] ✗ 파일 작업 테스트 실패: {e}")
         test_results["file_operations"] = False
@@ -161,10 +175,10 @@ def test_nfc_components():
 
     if passed_critical == len(critical_tests):
         test_results["overall_status"] = True
-        print(f"[{datetime.now()}] 🎉 모든 중요 테스트 통과! NFC 쓰기 준비 완료")
+        print(f"[{datetime.now()}] 모든 중요 테스트 통과! NFC 쓰기 준비 완료")
     else:
         test_results["overall_status"] = False
-        print(f"[{datetime.now()}] ⚠️ 일부 테스트 실패. NFC 쓰기에 문제가 있을 수 있습니다.")
+        print(f"[{datetime.now()}] 일부 테스트 실패. NFC 쓰기에 문제가 있을 수 있습니다. test_nfc_components를 확인하여 문제를 해결해주세요.")
 
     # 6. 상세 결과 출력
     print(f"\n[{datetime.now()}] === 테스트 결과 요약 ===")
@@ -260,23 +274,23 @@ def check_nfc_url_file(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manag
 
 
 def write_ndef_message(pn532, message_bytes, uid, start_block=4):
-    """NDEF 메시지를 NFC 태그에 씁니다. (NTAG2xx 지원)"""
+    """NDEF 메시지를 NFC 태그에 씁니다. (NTAG2xx 지원, 이론상은 그)"""
     try:
         # 아이폰 호환성을 위해 NDEF 메시지를 TLV(Type-Length-Value) 형식으로 래핑합니다.
-        # NDEF Message TLV (T=0x03) + Length (L) + Value (V) + Terminator TLV (T=0xFE)
+        # NDEF Message TLV (T=럼x03) + Length (L) + Value (V) + Terminator TLV (T=0xFE)
         ndef_length = len(message_bytes)
         if ndef_length > 254:
             raise ValueError(f"오류: NDEF 메시지가 너무 깁니다 ({ndef_length} bytes). 254 바이트를 초과할 수 없습니다.")
 
         # 전체 페이로드 생성: [NDEF TLV Tag] + [Length] + [NDEF Message] + [Terminator TLV Tag]
         payload = bytes([0x03, ndef_length]) + message_bytes + bytes([0xFE])
-        print(f"[{datetime.now()}] NDEF 메시지(TLV 포함) 생성 (총 크기: {len(payload)} bytes)")
+        #print(f"[{datetime.now()}] NDEF 메시지(TLV 포함) 생성 (총 크기: {len(payload)} bytes)") # debugingPrint
 
         # 데이터를 4바이트 블록으로 나누어 쓰기 (NTAG2xx/Mifare Ultralight)
-        print(f"[{datetime.now()}] 블록 단위 쓰기 시작 (시작 블록: {start_block})...")
+        #print(f"[{datetime.now()}] 블록 단위 쓰기 시작 (시작 블록: {start_block})...") # debugingPrint
 
         total_blocks = (len(payload) + 3) // 4
-        print(f"[{datetime.now()}] 총 {total_blocks}개 블록에 쓰기 예정")
+        #print(f"[{datetime.now()}] 총 {total_blocks}개 블록에 쓰기 예정") # debugingPrint
 
         for i in range(total_blocks):
             block_num = start_block + i
@@ -287,16 +301,16 @@ def write_ndef_message(pn532, message_bytes, uid, start_block=4):
             if len(chunk) < 4:
                 chunk += bytes([0x00] * (4 - len(chunk)))
 
-            print(f"[{datetime.now()}] 블록 {block_num} 쓰기 중... (데이터: {chunk.hex()})")
+            #print(f"[{datetime.now()}] 블록 {block_num} 쓰기 중... (데이터: {chunk.hex()})") # debugingPrint
 
             # NTAG2xx 블록 쓰기 명령
             if not pn532.ntag2xx_write_block(block_num, chunk):
                 raise RuntimeError(f"블록 {block_num} 쓰기 실패")
 
-            print(f"[{datetime.now()}] ✓ 블록 {block_num} 쓰기 성공")
-            time.sleep(0.01) # 안정적인 쓰기를 위해 블록 간 짧은 딜레이 추가
+            #print(f"[{datetime.now()}] ✓ 블록 {block_num} 쓰기 성공") # debugingPrint
+            time.sleep(0.01) # 안정화 딜레이
 
-        print(f"[{datetime.now()}] ✓ 모든 블록 쓰기 완료")
+        #print(f"[{datetime.now()}] ✓ 모든 블록 쓰기 완료") # debugingPrint
         return True
 
     except Exception as e:
@@ -308,13 +322,13 @@ def write_ndef_message(pn532, message_bytes, uid, start_block=4):
 def detect_and_write_tag(pn532, url):
     """NFC 태그를 감지하고 주어진 URL을 NDEF 형식으로 씁니다."""
     try:
-        print(f"[{datetime.now()}] NFC 태그를 기다립니다 (10초)...")
+        #print(f"[{datetime.now()}] NFC 태그를 기다립니다...") # debugingPrint
         uid = pn532.read_passive_target(timeout=10)
         if uid is None:
             print(f"[{datetime.now()}] 태그를 찾지 못했습니다.")
             return {"status": "info", "message": "태그 미감지"}
 
-        print(f"[{datetime.now()}] 태그 감지됨: {uid.hex()}")
+        #print(f"[{datetime.now()}] 태그 감지됨: {uid.hex()}") # debugingPrint
 
         # ndeflib를 사용하여 표준 NDEF URI 레코드 생성
         ndef_record = ndef.UriRecord(url)
@@ -323,7 +337,7 @@ def detect_and_write_tag(pn532, url):
         # NDEF 메시지 쓰기
         write_ndef_message(pn532, message_bytes, uid)
 
-        print(f"[{datetime.now()}] URL 쓰기 성공: {url}")
+        #print(f"[{datetime.now()}] URL 쓰기 성공: {url}")# debugingPrint
         return {"status": "success", "message": f"URL 쓰기 성공: {url}"}
 
     except RuntimeError as e:
@@ -385,7 +399,7 @@ def periodic_writer(file_path=os.path.join(PROJECT_ROOT, "routes", "sys_manageme
 
                 # --- 4. 다음 주기까지 대기 (try 블록 안으로 이동) ---
                 responsePowerDown = pn532.power_down()
-                print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다. | 모듈파워 상태 : {responsePowerDown}")
+                print(f"[{datetime.now()}] 다음 쓰기까지 {interval}초 대기합니다. | 모듈파워 상태 : {'꺼짐' if responsePowerDown else '켜짐'}")
                 time.sleep(interval)
 
             except RuntimeError as e:
