@@ -10,12 +10,12 @@ PY_SCRIPT="$SCRIPT_DIR/nfc_write_sys/write_nfctag_i2c2.py"  # 실행할 파이�
 NODE_SCRIPT="$PROJECT_ROOT/app.js"            # 실행할 Node.js 서버 파일 절대 경로
 
 echo "================================================"
-echo "ITS-IMS NFC 태그 시스템 시작"
+echo "ITS-IMS start"
 echo "================================================"
-echo "- 프로젝트 경로: $PROJECT_ROOT"
-echo "- 가상환경 경로: $VENV_PATH"
-echo "- 파이썬 스크립트: $PY_SCRIPT"
-echo "- Node.js 서버: $NODE_SCRIPT"
+echo "- Project Root: $PROJECT_ROOT"
+echo "- Virtual ENV PATH: $VENV_PATH"
+echo "- Python Script of NFC Module: $PY_SCRIPT"
+echo "- WEP Server: $NODE_SCRIPT"
 echo "================================================"
 
 # 1. Node.js 서버 실행 (백그라운드로)
@@ -23,10 +23,10 @@ echo "[$(date)] Node.js 서버 시작 중..."
 cd "$PROJECT_ROOT" && node "$NODE_SCRIPT" > "$SCRIPT_DIR/node.log" 2>&1 &
 NODE_PID=$!
 echo "[$(date)] Node.js 서버 시작됨 (PID: $NODE_PID)"
-
+echo "[$(date)] 파이썬 가상환경 활성화 중..."
+sleep 5
 # 2. Python 가상환경 활성화
 if [ -d "$VENV_PATH" ]; then
-    echo "[$(date)] 파이썬 가상환경 활성화 중..."
     . "$VENV_PATH/bin/activate"
 
     # 가상환경이 제대로 활성화되었는지 확인
@@ -54,7 +54,7 @@ else
 
     # 필요한 패키지 설치
     echo "[$(date)] 필수 패키지 설치 중..."
-    pip install adafruit-circuitpython-pn532 ndef adafruit-blinka
+    pip install -r requirements.txt
     if [ $? -ne 0 ]; then
         echo "[$(date)] 오류: 패키지 설치 실패"
         exit 1
@@ -62,16 +62,27 @@ else
     echo "[$(date)] 패키지 설치 완료"
 fi
 
-# 3. Python 코드 실행 (백그라운드로)
+sleep 5
 echo "[$(date)] 파이썬 스크립트 시작 중..."
-cd "$PROJECT_ROOT" && python3 "$PY_SCRIPT" > "$SCRIPT_DIR/python.log" 2>&1 &
+# 3. Python 코드 실행 (백그라운드로)
+cd "$PROJECT_ROOT" && python3 "$PY_SCRIPT" > "$SCRIPT_DIR/nfcModule.log" 2>&1 &
 PY_PID=$!
 echo "[$(date)] 파이썬 스크립트 시작됨 (PID: $PY_PID)"
 
 # 4. 실시간 로그 출력 (두 로그를 병렬로 출력)
-echo "[$(date)] 로그 모니터링 시작 (종료하려면 Ctrl+C)"
+echo " ___ _____ ____       ___ __  __ ____  ";
+echo "|XXX|XXXXX/XXXX|     |XXX|XX\/XX/XXXX| ";
+echo " |X|  |X| \XXXX\ _____|X||X|\/|X\XXXX\ ";
+echo " |X|  |X|  ___)X|XXXXX|X||X|  |X|___)X|";
+echo "|XXX| |X| |XXXX/     |XXX|X|  |X|XXXX/ ";
+echo " ";
+echo " ";
+echo " ";
+echo " ";
+echo " ";
+echo "[$(date)] 로그 모니터링 시작 (시스템 종료는 Ctrl+C)"
 echo "================================================"
-tail -f "$SCRIPT_DIR/node.log" "$SCRIPT_DIR/python.log"
+tail -f "$SCRIPT_DIR/node.log" "$SCRIPT_DIR/nfcModule.log"
 
 # 5. 스크립트 종료 시 프로세스 정리 (Ctrl+C 누를 때)
 trap 'echo "[$(date)] 프로그램 종료 요청"; kill $NODE_PID 2>/dev/null; kill $PY_PID 2>/dev/null; echo "[$(date)] 모든 프로세스 종료됨"; exit 0' INT TERM
