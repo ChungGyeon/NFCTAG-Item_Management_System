@@ -1,2 +1,5 @@
-
-
+adafruit_blinka==8.62.0
+adafruit_circuitpython_pn532==2.4.5
+ndeflib==0.3.3
+RPi.GPIO==0.7.1
+smbus==1.1.post2
