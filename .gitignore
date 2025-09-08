@@ -27,4 +27,4 @@ views/.DS_Store
 
 #각 로그파일들 무시
 node.log
-python.log
+nfcModule.log
