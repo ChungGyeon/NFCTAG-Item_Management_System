@@ -65,7 +65,7 @@ router.post('/nextDOA',checkPresidentAuthority,(req, res) => {
                                                 WHERE studentNum = ?;`;
             db.query(verifyPresidentAthoritySQL, [nextPresidentStudentNum], (err, resultPresidentAthority) => {
                 if (err) {
-                    //console.log('이미 회장인지에서 발생: ' + err); //debugingPrint
+                    if(process.env.DEVELOP_MODE === 'develop') console.log('이미 회장인지에서 발생: ' + err); //debugingPrint
                     return res.status(500).json({success: false, message: '사용자 권한 확인 중 서버 에러가 발생했습니다.'});
                 }
                 if (resultPresidentAthority.length > 0 && resultPresidentAthority[0].president) {

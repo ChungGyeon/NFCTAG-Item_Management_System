@@ -15,15 +15,16 @@ var router = express.Router();
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const mysql = require('mysql'); //mysql 모듈 불러오기
+require('dotenv').config();
 
 //쿠키 목록 조회 라우트 테스트 용
 router.get('/detectCookie',(req,res) => {
     // 쿠키 읽기
     const cookieValue = req.cookies.reservedItems;
     if (cookieValue) {
-        //console.log("reservedItems cookie:", cookieValue); //debugingPrint
+        if(process.env.DEVELOP_MODE === 'develop') console.log("reservedItems cookie:", cookieValue); //debugingPrint
         const numberPart = cookieValue.split(':')[0];
-        //console.log("이거 쿠키 번호: ", numberPart); //debugingPrint
+        if(process.env.DEVELOP_MODE === 'develop') console.log("이거 쿠키 번호: ", numberPart); //debugingPrint
         res.json({success: true, message: '쿠키에서 숫자 부분을 추출했습니다.', number: numberPart});
     }
     else {

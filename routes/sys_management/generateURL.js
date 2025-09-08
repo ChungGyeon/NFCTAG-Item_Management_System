@@ -39,7 +39,7 @@ async function generateAndWriteUrl() {
         //추후 정해지는 도메인에 따라 여기 주소 변경필요함
         const url = `http://its.iptime.org:61427/detect/startRentingItem/${currentSeed}`;
         const result = await writeUrlToNfc(url);
-        //console.log(`${new Date().toISOString()} - URL 생성됨: ${url}`); //debugingPrint
+        if(process.env.DEVELOP_MODE === 'develop') console.log(`${new Date().toISOString()} - URL 생성됨: ${url}`); //debugingPrint
     }, 10 * 1050);
 }
 generateAndWriteUrl();
