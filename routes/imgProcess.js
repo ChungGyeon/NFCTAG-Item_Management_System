@@ -31,7 +31,7 @@ const upload = multer({
     storage: multer.diskStorage({
         //파일저장 위치 지정, file의 이름을 로그에 출력하고 images 폴더에 이미지 저장
         destination(req, file, done) {
-            console.log(file);
+            //console.log(file); //debugingPrint
             done(null, "public/images/item_IMG");
         },
         filename(req, file, done) {
@@ -41,7 +41,7 @@ const upload = multer({
             const uniqueSuffix = Date.now();
             const fileName = `${safeName}-${uniqueSuffix}${ext}`;
             const fullPath = `/images/item_IMG/${fileName}`;
-            console.log(fullPath); //실제 파일명은 fileName임 주의, 그리고 이건 개발용이니 추후에 주석처리 할 수 있도록
+            //console.log(fullPath); //실제 파일명은 fileName임 주의,debugingPrint
             done(null, `${safeName}-${uniqueSuffix}${ext}`); //일단 테스트니까 fileName변수에 선언된 그대로 입력해봄
 
             req.fullImagePath = fullPath; //req갹체에 전체경로를 저장,  DB에 입력할 수 있도록 만듬
@@ -188,7 +188,7 @@ router.post('/deleteItems', (req, res) => {
                     }
                     fs.unlink(imgPath, (err) => {
                         if(err) console.log('이미지 파일 삭제 오류: ', err);
-                        else console.log('이미지 삭제 완료', row.img);
+                        //else console.log('이미지 삭제 완료', row.img); //debugingPrint
                     });
                 }
             });

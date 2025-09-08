@@ -249,7 +249,7 @@ router.post('/reservation', (req, res) => {
             path: '/'
         });
 
-        console.log('현재 예약 목록:', reservedList);
+        //console.log('현재 예약 목록:', reservedList); //debugingPrint
         res.json({ success: true, message: `${itemName} ${rentalHours}시간 예약되었습니다.` });
     });
 });
@@ -318,7 +318,7 @@ router.post('/reservation/cancel', (req, res) => {
         path: '/'
     });
 
-    console.log(`${itemName} 예약 취소됨. 현재 목록:`, updatedList);
+    //console.log(`${itemName} 예약 취소됨. 현재 목록:`, updatedList); //debugingPrint
     res.json({
         success: true,
         message: `${itemName} 예약이 취소되었습니다.`
@@ -361,7 +361,7 @@ router.post('/reservation2', (req, res) => {
         path: '/'
     });
 
-    console.log('반납 예정 목록:', returnedList);
+    //console.log('반납 예정 목록:', returnedList); //debugingPrint
     res.send({ success: true, message: `${itemName} 반납 신청되었습니다.` });
 });
 
@@ -402,7 +402,7 @@ router.post('/reservation/cancel2', (req, res) => {
         // maxAge 생략 → 브라우저 종료 시 자동 삭제
     });
 
-    console.log(`${itemName} 반납 예정 취소됨. 현재 목록:`, updatedList);
+    //console.log(`${itemName} 반납 예정 취소됨. 현재 목록:`, updatedList); //debugingPrint
     res.send({
         success: true,
         message: `${itemName} 반납이 취소되었습니다.`

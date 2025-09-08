@@ -15,7 +15,7 @@ const seedGenerator = {
 setInterval(() => {
     seedGenerator.lastSeed = seedGenerator.currentSeed;
     seedGenerator.currentSeed = generateRandomSeed();
-    console.log('새 시드:', seedGenerator.currentSeed);
+    //console.log('새 시드:', seedGenerator.currentSeed); //debugingPrint
 }, 10 * 1000);
 
 module.exports = seedGenerator;

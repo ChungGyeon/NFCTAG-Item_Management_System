@@ -21,9 +21,9 @@ router.get('/detectCookie',(req,res) => {
     // 쿠키 읽기
     const cookieValue = req.cookies.reservedItems;
     if (cookieValue) {
-        console.log("reservedItems cookie:", cookieValue);
+        //console.log("reservedItems cookie:", cookieValue); //debugingPrint
         const numberPart = cookieValue.split(':')[0];
-        console.log("이거 쿠키 번호: ", numberPart);
+        //console.log("이거 쿠키 번호: ", numberPart); //debugingPrint
         res.json({success: true, message: '쿠키에서 숫자 부분을 추출했습니다.', number: numberPart});
     }
     else {
