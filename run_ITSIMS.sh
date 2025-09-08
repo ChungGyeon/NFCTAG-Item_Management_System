@@ -24,7 +24,7 @@ cd "$PROJECT_ROOT" && node "$NODE_SCRIPT" > "$SCRIPT_DIR/node.log" 2>&1 &
 NODE_PID=$!
 echo "[$(date)] Node.js 서버 시작됨 (PID: $NODE_PID)"
 echo "[$(date)] 파이썬 가상환경 활성화 중..."
-sleep 5
+sleep 1
 # 2. Python 가상환경 활성화
 if [ -d "$VENV_PATH" ]; then
     . "$VENV_PATH/bin/activate"
@@ -62,7 +62,7 @@ else
     echo "[$(date)] 패키지 설치 완료"
 fi
 
-sleep 5
+sleep 1
 echo "[$(date)] 파이썬 스크립트 시작 중..."
 # 3. Python 코드 실행 (백그라운드로)
 cd "$PROJECT_ROOT" && python3 "$PY_SCRIPT" > "$SCRIPT_DIR/nfcModule.log" 2>&1 &
@@ -70,16 +70,21 @@ PY_PID=$!
 echo "[$(date)] 파이썬 스크립트 시작됨 (PID: $PY_PID)"
 
 # 4. 실시간 로그 출력 (두 로그를 병렬로 출력)
-echo " ___ _____ ____       ___ __  __ ____  ";
-echo "|XXX|XXXXX/XXXX|     |XXX|XX\/XX/XXXX| ";
-echo " |X|  |X| \XXXX\ _____|X||X|\/|X\XXXX\ ";
-echo " |X|  |X|  ___)X|XXXXX|X||X|  |X|___)X|";
-echo "|XXX| |X| |XXXX/     |XXX|X|  |X|XXXX/ ";
-echo " ";
-echo " ";
-echo " ";
-echo " ";
-echo " ";
+echo "==========================================================================";
+echo "||                                                                      ||";
+echo "||                                                                      ||";
+echo "||                                                                      ||";
+echo "||                                                                      ||";
+echo "||     ___   _____   ____                ___   __  __   ____            ||";
+echo "||    |_ _| |_   _| / ___|              |_ _| |  \/  | / ___|           ||";
+echo "||     | |    | |   \___ \     _____     | |  | |\/| | \___ \           ||";
+echo "||     | |    | |    ___) |   |_____|    | |  | |  | |  ___) |          ||";
+echo "||    |___|   |_|   |____/              |___| |_|  |_| |____/           ||";
+echo "||                                                                      ||";
+echo "||                                                                      ||";
+echo "||                                                                      ||";
+echo "||                                                                      ||";
+echo "=========================================================================";
 echo "[$(date)] 로그 모니터링 시작 (시스템 종료는 Ctrl+C)"
 echo "================================================"
 tail -f "$SCRIPT_DIR/node.log" "$SCRIPT_DIR/nfcModule.log"
