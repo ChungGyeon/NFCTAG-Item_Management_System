@@ -118,7 +118,7 @@ router.post('/signUpquery', (req, res) => {
               const hashedPassWord = await genHashPassWord(password);
               // Users 테이블에 삽입
               const userInsertQuery = 'INSERT INTO Users (name, studentNum, grade, password) VALUES (?, ?, ?, ?)';
-              console.log('입력 전 테스트 ', name, studentnum, grade, hashedPassWord);
+              //console.log('입력 전 테스트 ', name, studentnum, grade, hashedPassWord);
               db.query(userInsertQuery, [name, studentnum, grade, hashedPassWord], (err, userResult) => {
                   if (err) {
                       return db.rollback(() => {
