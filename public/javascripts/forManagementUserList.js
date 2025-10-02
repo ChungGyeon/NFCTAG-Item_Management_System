@@ -231,6 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupModalEventListeners();
 
     //대여권한 복구 버튼 이벤트 리스너 추가, 누가 함수화로 해주겠지..? 꼭 할필요는 없긴한데 보기 그렇잖아
+    //아래에서 실행하는 restoreRentPermission함수는 609라인에 있습니다.
     document.querySelectorAll('.restore-rent-perm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const studentNum = this.getAttribute('data-student-num');

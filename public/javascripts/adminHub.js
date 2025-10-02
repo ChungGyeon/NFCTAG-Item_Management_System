@@ -85,11 +85,10 @@ document.addEventListener('DOMContentLoaded', function() {
                      <li><strong>계정 관리</strong>
                      <br><strong>오직 회장님만 접근 가능합니다.</strong>
                      <br>이곳에서 모든 계정의 확인, 대여금지 해지, 계정 삭제 그리고, 부회장의 임명과, 회장권한 양도 기능이 있습니다.</li>
-                        <div class="tip">
-                          <p>대여권한은 대여권한 없음 을 클릭하면 <strong>바로 해지됩니다.</strong>주의하세요</p>
-                         </div>
-                     <br>비밀번호 변경은 각 사용자가 직접 수행할 수 있으나, 비밀번호 찾기와 같은 기능은 제작하지 않았습니다. 귀찮았습니다.
-                     <br>만약 부원이 비밀번호를 잊었다고 한다면 DB에 직접 검색하여 찾아야만 합니다.
+                     <div class="tip">
+                        <p><strong>주의:</strong> 개개인의 비밀번호는 관리자, 개발자 모두 알 수 있는 방법이 없습니다.
+                        <br>따라서 비밀번호를 잊어버린 부원이 있다면, 그 분의 계정을 삭제 후, 다시 생성해주세요.</p>
+                     </div>
                      <br>이 기능은 어드민 허브에서도 사용 가능합니다.</li>
                      <li><strong>계정 추가</strong>
                      <br>새로운 부원의 계정을 추가합니다. 이곳에서 학년,이름,학번,비밀번호를 입력하여 바로 추가할 수 있습니다.
@@ -113,10 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <li><strong>검색 기능:</strong> 물품명 또는 사용자 이름으로 기록을 검색할 수 있습니다.</li>
                     <li><strong>통계 확인:</strong> 대여 및 반납 건수 등 기본 통계를 볼 수 있습니다.</li>
                 </ul>
-                
-                <div class="tip">
-                    <p><strong>참고:</strong> 계정 추가는 관리자가 직접 할 수 있지만, 계정 수정 권한은 회장에게 있습니다.</p>
-                </div>
             `
         },
 
@@ -131,11 +126,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <li><strong>계정 관리</strong>
                      <strong>오직 회장님만 접근 가능합니다.</strong>
                      <br>이곳에서 모든 계정의 확인, 대여금지 해지, 계정 삭제 그리고, 부회장의 임명과, 회장권한 양도 기능이 있습니다.</li>
-                        <div class="tip">
-                          <p>대여권한은 대여권한 없음 을 클릭하면 <strong>바로 해지됩니다.</strong>주의하세요</p>
-                         </div>
-                     <br>비밀번호 변경은 각 사용자가 직접 수행할 수 있으나, 비밀번호 찾기와 같은 기능은 제작하지 않았습니다. 귀찮았습니다.
-                     <br>만약 부원이 비밀번호를 잊었다고 한다면 DB에 직접 검색하여 찾아야만 합니다.
+                     <div class="tip">
+                        <p><strong>주의:</strong> 개개인의 비밀번호는 관리자, 개발자 모두 알 수 있는 방법이 없습니다.
+                        <br>따라서 비밀번호를 잊어버린 부원이 있다면, 그 분의 계정을 삭제 후, 다시 생성해주세요.</p>
+                     </div>
                      <br>
                 </ul>
                 <h3>계정 추가</h3>
