@@ -229,6 +229,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 기존 이벤트 리스너 설정
     setupModalEventListeners();
+
+    //대여권한 복구 버튼 이벤트 리스너 추가, 누가 함수화로 해주겠지..? 꼭 할필요는 없긴한데 보기 그렇잖아
+    document.querySelectorAll('.restore-rent-perm-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const studentNum = this.getAttribute('data-student-num');
+            const name = this.getAttribute('data-name');
+            restoreRentPermission(studentNum, name, this);
+        });
+    });
+
 });
 
 // 정렬 관련 변수
@@ -589,4 +599,30 @@ function showNotification(message, type) {
             notification.remove();
         }, 300);
     }, 3000);
+}
+
+
+
+
+// 대여권한 복구 함수
+function restoreRentPermission(studentNum, name, buttonElement) {
+    if (!confirm(`${name}님의 대여권한을 복구하시겠습니까?`)) return;
+
+    fetch('/checkOverdue/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentNum })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('대여권한이 복구되었습니다.', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification('복구 실패: ' + data.message, 'error');
+            }
+        })
+        .catch(() => {
+            showNotification('서버 오류가 발생했습니다.', 'error');
+        });
 }
