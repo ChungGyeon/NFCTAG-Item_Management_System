@@ -1,28 +1,27 @@
-//const https = require('https');
+const https = require('https');
 const http = require('http');
-//const fs = require('fs');
+const fs = require('fs');
 
 const app = require('./app');
 
 require('dotenv').config(); //dotenv 사용 설정, .env파일 사용하게 하는 그거
 
-/*
-const options = {
-    key: fs.readFileSync(process.env.TAGORDER_PRIBUSY_SSL_PATH),
-    cert: fs.readFileSync(process.env.TAGORDER_CA_SSL_PATH)
-};
-*/
 
-//80 2 443 리다이렉션 코드 지금은 없애자
-/*
+const options = {
+    key: fs.readFileSync(process.env.ITSIMS_PRIBUSY_SSL_PATH),
+    cert: fs.readFileSync(process.env.ITSIMS_CA_SSL_PATH)
+};
+
+
+//80 2 443 리다이렉션 코드
 http.createServer((req, res) => {
     res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
     res.end();
 }).listen(80);
-*/
-//const server = https.createServer(options, app);
-const server = http.createServer(app);
-const SubpoRt = 80;
+
+const server = https.createServer(options, app);
+//const server = http.createServer(app);
+const SubpoRt = 443
 
 server.listen(SubpoRt, () => {
     console.log(`서버가 ${SubpoRt} 실행됩니다.`);
