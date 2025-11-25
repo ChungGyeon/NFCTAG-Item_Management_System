@@ -8,6 +8,7 @@ PROJECT_ROOT="$SCRIPT_DIR"
 VENV_PATH="$PROJECT_ROOT/nfc_write_sys/venv"  # 파이썬 가상환경 디렉토리 경로
 PY_SCRIPT="$SCRIPT_DIR/nfc_write_sys/write_nfctag_i2c2.py"  # 실행할 파이썬 파일 절대 경로
 NODE_SCRIPT="$PROJECT_ROOT/app.js"            # 실행할 Node.js 서버 파일 절대 경로
+NODE_BIN="/home/chunggyeon/.nvm/versions/node/v24.4.1/bin/node" #절대 권한 실행
 
 echo "================================================"
 echo "ITS-IMS start"
@@ -20,7 +21,7 @@ echo "================================================"
 
 # 1. Node.js 서버 실행 (백그라운드로)
 echo "[$(date)] Node.js 서버 시작 중..."
-cd "$PROJECT_ROOT" && node "$NODE_SCRIPT" > "$SCRIPT_DIR/node.log" 2>&1 &
+cd "$PROJECT_ROOT" && "$NODE_BIN" "$NODE_SCRIPT" > "$SCRIPT_DIR/node.log" 2>&1 &
 NODE_PID=$!
 echo "[$(date)] Node.js 서버 시작됨 (PID: $NODE_PID)"
 echo "[$(date)] 파이썬 가상환경 활성화 중..."
