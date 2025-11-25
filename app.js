@@ -94,10 +94,12 @@ app.use(function(err, req, res, next) {
 });
 
 //module.exports = app;
-const SubpoRt = 3001;
-app.listen(SubpoRt, () => {
-  console.log(`서버가 ${SubpoRt} 실행됩니다.`);
-});
+if(process.env.DEVELOP_MODE === 'main') {
+    const SubpoRt = 3001;
+    app.listen(SubpoRt, () => {
+        console.log(`서버가 ${SubpoRt} 실행됩니다.`);
+    });
+}
 
 //오직 서버라우터만 또 만들어놔야지
 module.exports = app;
