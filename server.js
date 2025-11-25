@@ -13,11 +13,13 @@ const options = {
 };
 */
 
+//80 2 443 리다이렉션 코드 지금은 없애자
+/*
 http.createServer((req, res) => {
     res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
     res.end();
 }).listen(80);
-
+*/
 //const server = https.createServer(options, app);
 const server = http.createServer(app);
 const SubpoRt = 80;
