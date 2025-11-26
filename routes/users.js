@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => { //login
       console.log("DB 오류 : ", err);
     }
     if(result.length <= 0){
-      res.status(401).send('학번 또는 비밀번호가 틀렸습니다.');
+      return res.status(401).send('학번 또는 비밀번호가 틀렸습니다.');
     }
     const comparePassword = await compareHashPassWord(password, result[0].password);
     if(!comparePassword){
