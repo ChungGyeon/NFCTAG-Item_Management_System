@@ -31,7 +31,7 @@ router.post('/login', async (req, res) => { //login
     }
     const comparePassword = await compareHashPassWord(password, result[0].password);
     if(!comparePassword){
-        res.status(401).send('비밀번호가 틀렸습니다.');
+        return res.status(401).send('학번 또는 비밀번호가 틀렸습니다.');
     }
     else {
       if(!req.session.user) {
