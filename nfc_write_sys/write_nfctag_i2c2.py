@@ -430,8 +430,9 @@ if __name__ == "__main__":
 
     if test_results["overall_status"]:
         print(f"\n[{datetime.now()}] 테스트 통과! 정상적인 NFC 쓰기를 시작합니다.")
-        # 30초마다 ./tmp/nfc_url.json 파일을 읽어 태그에 씁니다.
-        periodic_writer(interval=11)
+        # 여기에 수정된 초마다 ./tmp/nfc_url.json 파일을 읽어 태그에 씁니다.
+	# 시간 조절하는 곳
+        periodic_writer(interval=21)
     else:
         print(f"\n[{datetime.now()}] 테스트 실패! 문제를 해결한 후 다시 실행해주세요.")
         print("실패한 항목:")
