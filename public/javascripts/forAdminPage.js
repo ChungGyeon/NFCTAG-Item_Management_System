@@ -65,8 +65,8 @@ function editModalOpen(button) {
     document.getElementById("editItemModal").style.display = "block";
     const tableCard = button.closest('.table-card');
     const itemName = tableCard.querySelector('h3').textContent;
-    const imgSrc = tableCard.querySelector('img').getAttribute('src');
-
+    const sourceImg = tableCard.querySelector('img');
+    const imgSrc = sourceImg ? sourceImg.src : "";
     const container = document.getElementById('editItemModalContainer');
 
     //메모리관리용, 기존내용제거
@@ -90,7 +90,7 @@ function editModalOpen(button) {
     // 이미지 업로드를 위한 input 생성
     const imageInput = document.createElement('input');
     imageInput.type = 'file';
-    imageInput.accept = '.jpg,.jpeg,.png';
+    imageInput.accept = '.jpg,.jpeg,.png,.webp';
     imageInput.id = 'imageInput';
     imageInput.style.display = 'none';
 
@@ -109,11 +109,11 @@ function editModalOpen(button) {
         const file = e.target.files[0];
 
         if (file) {
-            const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+            const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
             const extension = '.' + file.name.split('.').pop().toLowerCase();
             //확장자 검증
             if (!allowedExtensions.includes(extension)) {
-                alert('jpg, jpeg, png 파일만 업로드 가능합니다.');
+                alert('jpg, jpeg, png, webp 파일만 업로드 가능합니다.');
                 imageInput.value = ''; // 선택된 파일 초기화
                 return;
             }
